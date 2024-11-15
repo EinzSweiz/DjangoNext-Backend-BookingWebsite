@@ -1,0 +1,12 @@
+django
+python-decouple
+psycopg2-binary
+dj-rest-auth
+django-allauth
+django-cors-headers
+djangorestframework
+djangorestframework-simplejwt
+pillow
+channels
+requests
+daphne
