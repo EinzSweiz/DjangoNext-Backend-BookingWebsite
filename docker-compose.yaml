@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./backend  # Path to the Dockerfile inside the `backend` folder
+    command: python manage.py runserver 0.0.0.0:8010  # Run the server on 0.0.0.0:8000
+    volumes:
+      - ./backend:/usr/src/backend  # Mount the `backend` directory to `/usr/src/backend` in the container
+    ports:
+      - 8010:8010  # Map port 8000 on the host to port 8000 in the container
+    env_file:
+      - ./.env  # Use the environment variables from `.env` in the project root
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    volumes:
+      - /postgres_data/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=postgresuser
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=djangodb
+  
+volumes:
+  postgres_data:
