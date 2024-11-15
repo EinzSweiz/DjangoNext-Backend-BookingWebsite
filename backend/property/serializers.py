@@ -19,6 +19,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'title',
+            'description',
             'price_per_night',
             'image_url',
             'bedrooms',
