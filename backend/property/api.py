@@ -3,18 +3,32 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from .models import Property, Reservation
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, ResirvationListSerializer
 from .forms import PropertyForm
+from useraccounts.models import User
+from rest_framework_simplejwt.tokens import AccessToken
 
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
+    user = request.user
+    favorites = []
+
+    # Filter properties based on query parameters
     qs = Property.objects.all()
-    landlord_id = request.GET.get('landlord_id', '')
+    landlord_id = request.GET.get('landlord_id')
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
+    if request.GET.get('is_favorite'):
+        qs = qs.filter(favorited=user)
+
+    # Collect IDs of favorite properties
+    if user.is_authenticated:
+        favorites = qs.filter(favorited=user).values_list('id', flat=True)
+
     serializer = PropertyListSerializer(qs, many=True)
     return JsonResponse({
-        'data': serializer.data
+        'data': serializer.data,
+        'favorites': list(favorites),
     })
 
 
@@ -81,3 +95,15 @@ def book_property(request, pk):
     except Exception as e:
         print('Error', e)
         return JsonResponse({'success': False}, status=400)
+
+
+@api_view(['POST'])
+def toggle_favorite(request, pk):
+    property = Property.objects.get(pk=pk)
+
+    if request.user in property.favorited.all():
+        property.favorited.remove(request.user)
+        return JsonResponse({'is_favorited': False})
+    else:
+        property.favorited.add(request.user)
+        return JsonResponse({'is_favorited': True})
