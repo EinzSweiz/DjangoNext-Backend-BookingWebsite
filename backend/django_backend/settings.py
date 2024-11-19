@@ -35,6 +35,12 @@ SITE_ID = 1
 
 WEBSITE_URL = 'http://localhost:8010'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
@@ -76,6 +82,7 @@ REST_AUTH = {
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -83,6 +90,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #installed app
+    'channels',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
@@ -95,6 +103,7 @@ INSTALLED_APPS = [
     #myapps
     'useraccounts',
     'property',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -130,7 +139,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'django_backend.wsgi.application'
-
+ASGI_APPLICATION = "django_backend.asgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
