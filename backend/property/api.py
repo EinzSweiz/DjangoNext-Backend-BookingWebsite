@@ -12,6 +12,13 @@ from rest_framework_simplejwt.tokens import AccessToken
 def properties_list(request):
     user = request.user
     favorites = []
+    country = request.GET.get('country', '')
+    category = request.GET.get('category', '')
+    checkin_date = request.GET.get('checkIn', '')
+    checkout_date = request.GET.get('checkOut', '')
+    bedrooms = request.GET.get('numBedrooms', '')
+    bathrooms = request.GET.get('numBathrooms', '')
+    guests = request.GET.get('numGuests', '')
 
     # Filter properties based on query parameters
     qs = Property.objects.all()
@@ -20,10 +27,27 @@ def properties_list(request):
         qs = qs.filter(landlord_id=landlord_id)
     if request.GET.get('is_favorite'):
         qs = qs.filter(favorited=user)
+    if checkin_date and checkout_date:
+        exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
+        overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
+        all_matches = []
+        for reservation in exact_matches | overlap_matches:
+            all_matches.append(reservation.property_id)
+        qs = qs.exclude(id__in=all_matches)
 
     # Collect IDs of favorite properties
     if user.is_authenticated:
         favorites = qs.filter(favorited=user).values_list('id', flat=True)
+    if guests:
+        qs = qs.filter(guests__gte=guests)
+    if bedrooms:
+        qs = qs.filter(bedrooms__gte=bedrooms)
+    if bathrooms:
+        qs = qs.filter(bathrooms__gte=bathrooms)
+    if country:
+        qs = qs.filter(country=country)
+    if category and category != 'undefined':
+        qs = qs.filter(category=category)
 
     serializer = PropertyListSerializer(qs, many=True)
     return JsonResponse({
