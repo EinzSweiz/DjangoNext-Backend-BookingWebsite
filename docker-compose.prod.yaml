@@ -8,18 +8,18 @@ services:
     depends_on:
       - web
     volumes:
-      - media_volume:/usr/src/backend/media
+      - media_volume:/usr/src/backend/media  # Correct path to media volume
 
   web:
-    build: ./backend  # Path to the Dockerfile inside the `backend` folder
-    command: sh -c "python manage.py migrate && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010"  # Run migrations before starting the server
+    build: ./backend
+    command: sh -c "python manage.py migrate && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010"
     volumes:
-      - ./backend:/usr/src/backend  # Mount the `backend` directory to `/usr/src/backend` in the container
-      - media_volume:/usr/src/backend/media
+      - ./backend:/usr/src/backend
+      - media_volume:/usr/src/backend/media  # Correct path to media volume
     expose:
-      - 8010  # Expose port 8010 for internal container communication
+      - 8010
     env_file:
-      - ./.env  # Use the environment variables from `.env` in the project root
+      - ./.env
     depends_on:
       - db
       - daphne
