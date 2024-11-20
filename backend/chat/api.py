@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from .models import Conversation, ConversationMessage
 from .serizalizers import ConversationListSerializer, ConversationDetailSerializer, ConversationMessageSerializer
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from useraccounts.models import User
 
 @api_view(['GET'])
