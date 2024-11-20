@@ -10,3 +10,4 @@ pillow
 channels
 requests
 daphne
+gunicorn
