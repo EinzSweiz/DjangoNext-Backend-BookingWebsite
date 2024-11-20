@@ -19,11 +19,11 @@ services:
     depends_on:
       - db
       - daphne
-daphne:
-  build: ./backend
-  command: daphne --bind 0.0.0.0 -p 8002 django_backend.asgi:application
-  ports:
-    - 8002:8002
+  daphne:
+    build: ./backend
+    command: daphne --bind 0.0.0.0 -p 8002 django_backend.asgi:application
+    ports:
+      - 8002:8002
 
 
   db:
