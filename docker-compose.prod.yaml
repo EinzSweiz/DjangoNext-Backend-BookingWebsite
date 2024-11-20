@@ -7,12 +7,15 @@ services:
       - 1337:80
     depends_on:
       - web
+    volumes:
+      - media_volume:/usr/src/backend/media
 
   web:
     build: ./backend  # Path to the Dockerfile inside the `backend` folder
     command: sh -c "python manage.py migrate && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010"  # Run migrations before starting the server
     volumes:
       - ./backend:/usr/src/backend  # Mount the `backend` directory to `/usr/src/backend` in the container
+      - media_volume:/usr/src/backend/media
     expose:
       - 8010  # Expose port 8010 for internal container communication
     env_file:
