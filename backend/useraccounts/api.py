@@ -23,8 +23,9 @@ def reservations_list(request):
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-def profile_detail(request):
-    serializer = UserProfileSerializer(request.user)
+def profile_detail(request, pk):
+    user = User.objects.get(pk=pk)
+    serializer = UserProfileSerializer(user)
     return JsonResponse(serializer.data)
 
 
