@@ -37,4 +37,5 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
         fields = ['name', 'avatar', 'avatar_url']
 
     def get_avatar_url(self, obj):
-        return obj.avatar_url() if obj.url else ''
+        return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
+

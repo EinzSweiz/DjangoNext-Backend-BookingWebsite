@@ -13,5 +13,5 @@ urlpatterns = [
     path('myreservations/', api.reservations_list, name='api_reservations_list'),
     path('<uuid:pk>/', api.landlord_detail, name='api_landlord_detail'),
     path('profile/<uuid:pk>/', api.profile_detail, name='profile_detail'),
-    path('profile/update/', api.update_profile, name='update_profile'),
+    path('profile/update/<uuid:pk>', api.update_profile, name='update_profile'),
 ]
