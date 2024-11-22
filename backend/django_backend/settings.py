@@ -33,10 +33,10 @@ AUTH_USER_MODEL = 'useraccounts.USER'
 
 SITE_ID = 1
 
-if DEBUG:
-    WEBSITE_URL = 'http://localhost:8010'
-else:
-    WEBSITE_URL = 'http://165.22.76.137:1337'
+# if DEBUG:
+#     WEBSITE_URL = 'http://localhost:8010'
+# else:
+WEBSITE_URL = 'http://165.22.76.137:1337'
 
 
 CHANNEL_LAYERS = {
