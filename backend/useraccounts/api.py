@@ -32,10 +32,13 @@ def profile_detail(request, pk):
 @api_view(['PUT'])
 @authentication_classes([])
 @permission_classes([])
-def update_profile(request):
-    user = request.user
+def update_profile(request, pk):
+    user = User.objects.get(pk=pk)
     serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data)
-    return JsonResponse(serializer.errors, status=400)
+    else:
+    # Log the serializer errors to check the exact issue
+        print(serializer.errors)
+        return JsonResponse(serializer.errors, status=400)
