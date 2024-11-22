@@ -24,7 +24,7 @@ class UserDetailSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'avatar_url']
+        fields = ['id', 'name', 'email', 'avatar_url']
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
@@ -34,7 +34,7 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'avatar', 'avatar_url']
+        fields = ['name', 'avatar', 'avatar_url']
 
     def get_avatar_url(self, obj):
         return obj.avatar_url() if obj.url else ''
