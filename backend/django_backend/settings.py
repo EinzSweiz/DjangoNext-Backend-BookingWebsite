@@ -27,7 +27,7 @@ SECRET_KEY = config('SECRET_KEY', cast=str, default=None)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', cast=bool, default=False)
 
-ALLOWED_HOSTS = config('DJANGO_ALLOWED_HOSTS').split(" ")
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', '0.0.0.0', '165.22.76.137']
 
 AUTH_USER_MODEL = 'useraccounts.USER'
 
