@@ -19,3 +19,22 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'name', 'avatar_url']
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'avatar_url']
+
+
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False)
+
+    avatar_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['username', 'avatar', 'avatar_url']
+
+    def get_avatar_url(self, obj):
+        return obj.avatar_url()
