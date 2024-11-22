@@ -59,15 +59,19 @@ def properties_list(request):
 
 @api_view(['POST', 'FILES'])
 def create_property(request):
-    form = PropertyForm(request.POST, request.FILES)
-    if form.is_valid():
-        property = form.save(commit=False)
-        property.landlord = request.user
-        property.save()
-        return JsonResponse({'success': True})
-    else:
-        print('Error', form.errors, form.non_field_errors)
-        return JsonResponse({'errors', form.errors.as_json()}, status=400)
+    try:
+        print("Received new property creation request")
+        form = PropertyForm(request.POST, request.FILES)
+        if form.is_valid():
+            property = form.save(commit=False)
+            property.landlord = request.user
+            property.save()
+            return JsonResponse({'success': True})
+        else:
+            print('Error', form.errors, form.non_field_errors)
+            return JsonResponse({'errors', form.errors.as_json()}, status=400)
+    except Exception as e:
+        print(f"Error: {e}")
     
 
 @api_view(['GET'])
