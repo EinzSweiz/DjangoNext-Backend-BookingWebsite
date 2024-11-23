@@ -44,8 +44,8 @@ def properties_list(request):
         qs = qs.exclude(id__in=all_matches)
 
     # Collect IDs of favorite properties
-    if user.is_authenticated:
-        favorites = qs.filter(favorited=user).values_list('id', flat=True)
+    # if user.is_authenticated:
+    #     favorites = qs.filter(favorited=user).values_list('id', flat=True)
     if guests:
         qs = qs.filter(guests__gte=guests)
     if bedrooms:
