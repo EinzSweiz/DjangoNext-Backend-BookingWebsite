@@ -35,4 +35,3 @@ class Reservation(models.Model):
     total_price = models.FloatField()
     created_by = models.ForeignKey(User, related_name='reservations', on_delete=models.CASCADE)
     created_at = models.DateField(auto_now_add=True)
-# now it should work!
