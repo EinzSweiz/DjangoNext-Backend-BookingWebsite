@@ -5,18 +5,28 @@ from .serializers import PropertyListSerializer, PropertyDetailSerializer, Resir
 from .forms import PropertyForm
 from django.shortcuts import get_object_or_404
 from useraccounts.models import User
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
 
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
+    user = None
     try:
+        # Extract token from Authorization header
         token = request.META['HTTP_AUTHORIZATION'].split('Bearer ')[1]
         token = AccessToken(token)
+        
+        # Extract user ID from token payload
         user_id = token.payload.get('user_id')
+        if user_id is None:
+            raise AuthenticationFailed('User ID not found in token')
+        
         user = User.objects.get(pk=user_id)
-    except Exception as e:
+    except KeyError:
+        raise AuthenticationFailed('Authorization token not provided')
+    except (AuthenticationFailed, User.DoesNotExist):
         user = None
     favorites = []
     country = request.GET.get('country', '')
@@ -33,7 +43,7 @@ def properties_list(request):
     landlord_id = request.GET.get('landlord_id')
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
-    if is_favorites:
+    if is_favorites and user:
         qs = qs.filter(favorited__in=[user])
     if checkin_date and checkout_date:
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
