@@ -60,7 +60,7 @@ def properties_list(request):
     serializer = PropertyListSerializer(qs, many=True)
     return JsonResponse({
         'data': serializer.data,
-        'favorites': list(favorites),
+        'favorites': favorites,
     })
 
 
