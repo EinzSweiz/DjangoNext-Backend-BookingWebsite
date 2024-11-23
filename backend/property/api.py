@@ -7,35 +7,35 @@ from django.shortcuts import get_object_or_404
 from useraccounts.models import User
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
+
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
     user = None
     try:
-        print("Extracting token from Authorization header...")
         # Extract token from Authorization header
-        token = request.META['HTTP_AUTHORIZATION'].split('Bearer ')[1]
-        print(f"Token extracted: {token}")
-        
+        auth_header = request.META.get('HTTP_AUTHORIZATION')
+        if not auth_header:
+            raise AuthenticationFailed('Authorization token not provided')
+
+        token = auth_header.split('Bearer ')[1]
         token = AccessToken(token)
-        print(f"Token decoded: {token}")
+
+        # Debugging the payload
+        print("Token Payload:", token.payload)
 
         # Extract user ID from token payload
         user_id = token.payload.get('user_id')
-        print(f"User ID extracted: {user_id}")
-
         if user_id is None:
             raise AuthenticationFailed('User ID not found in token')
         
         user = User.objects.get(pk=user_id)
-        print(f"User found: {user}")
-    except KeyError as e:
-        print(f"KeyError: {str(e)} - Authorization token not provided")
+    except KeyError:
         raise AuthenticationFailed('Authorization token not provided')
-    except (AuthenticationFailed, User.DoesNotExist) as e:
-        print(f"Exception occurred: {str(e)}")
+    except (AuthenticationFailed, User.DoesNotExist):
         user = None
+
 
     favorites = []
     country = request.GET.get('country', '')
@@ -47,75 +47,41 @@ def properties_list(request):
     guests = request.GET.get('numGuests', '')
     is_favorites = request.GET.get('is_favorites', '')
 
-    print(f"Query parameters - country: {country}, category: {category}, checkIn: {checkin_date}, checkOut: {checkout_date}")
-    print(f"bedrooms: {bedrooms}, bathrooms: {bathrooms}, guests: {guests}, is_favorites: {is_favorites}")
-
     # Filter properties based on query parameters
     qs = Property.objects.all()
     landlord_id = request.GET.get('landlord_id')
-    print(f"Filtering by landlord_id: {landlord_id}")
-    
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
-        print(f"Properties filtered by landlord_id: {qs}")
-
-    if is_favorites and user:
-        print(f"Filtering by favorites for user: {user}")
+    if is_favorites:
         qs = qs.filter(favorited__in=[user])
-        print(f"Properties after filtering by favorites: {qs}")
-
     if checkin_date and checkout_date:
-        print(f"Filtering by checkin and checkout dates: {checkin_date} to {checkout_date}")
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
         overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
         all_matches = []
         for reservation in exact_matches | overlap_matches:
             all_matches.append(reservation.property_id)
-        print(f"Reservations that match dates: {all_matches}")
         qs = qs.exclude(id__in=all_matches)
-        print(f"Properties after excluding overlapping reservations: {qs}")
 
     # Collect IDs of favorite properties
-    if user and user.is_authenticated:
-        print(f"Collecting favorite properties for user {user}")
-        favorites = qs.filter(favorited=request.user).values_list('id', flat=True)
-        print(f"Favorite properties IDs: {favorites}")
-
+    if user and favorites:
+        favorites = qs.filter(favorited__in=[user]).values_list('id', flat=True)
     if guests:
-        print(f"Filtering by guests: {guests}")
         qs = qs.filter(guests__gte=guests)
-        print(f"Properties after filtering by guests: {qs}")
-
     if bedrooms:
-        print(f"Filtering by bedrooms: {bedrooms}")
         qs = qs.filter(bedrooms__gte=bedrooms)
-        print(f"Properties after filtering by bedrooms: {qs}")
-
     if bathrooms:
-        print(f"Filtering by bathrooms: {bathrooms}")
         qs = qs.filter(bathrooms__gte=bathrooms)
-        print(f"Properties after filtering by bathrooms: {qs}")
-
     if country:
-        print(f"Filtering by country: {country}")
         qs = qs.filter(country=country)
-        print(f"Properties after filtering by country: {qs}")
-
     if category and category != 'undefined':
-        print(f"Filtering by category: {category}")
         qs = qs.filter(category=category)
-        print(f"Properties after filtering by category: {qs}")
+    print(f"Favorites: {favorites}")
 
-    print(f"Total properties after all filters: {qs.count()}")
-
-    # Serialize the queryset
     serializer = PropertyListSerializer(qs, many=True)
-    response_data = {
+    return JsonResponse({
         'data': serializer.data,
         'favorites': list(favorites),
-    }
-    print(f"Response data: {response_data}")
-    return JsonResponse(response_data)
+    })
 
 
 
