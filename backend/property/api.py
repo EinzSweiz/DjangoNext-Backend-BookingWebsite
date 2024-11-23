@@ -11,7 +11,13 @@ from rest_framework_simplejwt.tokens import AccessToken
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
-    user = request.user
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split('Bearer ')[1]
+        token = AccessToken(token)
+        user_id = token.payload('user_id')
+        user = User.objects.get(pk=user_id)
+    except Exception as e:
+        user = None
     favorites = []
     country = request.GET.get('country', '')
     category = request.GET.get('category', '')
@@ -20,14 +26,15 @@ def properties_list(request):
     bedrooms = request.GET.get('numBedrooms', '')
     bathrooms = request.GET.get('numBathrooms', '')
     guests = request.GET.get('numGuests', '')
+    is_favorites = request.GET.get('is_favorites', '')
 
     # Filter properties based on query parameters
     qs = Property.objects.all()
     landlord_id = request.GET.get('landlord_id')
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
-    if request.GET.get('is_favorite'):
-        qs = qs.filter(favorited=user)
+    if is_favorites:
+        qs = qs.filter(favorited__in=[user])
     if checkin_date and checkout_date:
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
         overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
@@ -141,13 +148,3 @@ def toggle_favorite(request, pk):
         property.favorited.add(request.user)
         return JsonResponse({'is_favorited': True})
     
-
-
-@api_view(['GET'])
-@authentication_classes([])
-@permission_classes([])
-def user_favorites(request, pk):
-    user = User.objects.get(pk=pk)
-    properties = Property.objects.prefetch_related('favorited').filter(favorited=user)
-    serializer = PropertyListSerializer(properties, many=True)
-    return JsonResponse(serializer.data)
