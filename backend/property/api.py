@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from .models import Property, Reservation
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, ResirvationListSerializer
 from .forms import PropertyForm
+from django.shortcuts import get_object_or_404
 from useraccounts.models import User
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -127,7 +128,11 @@ def book_property(request, pk):
 
 @api_view(['POST'])
 def toggle_favorite(request, pk):
-    property = Property.objects.get(pk=pk)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({'detail': 'Authentication required.'}, status=401)
+    
+    property = get_object_or_404(Property, pk=pk)
 
     if request.user in property.favorited.all():
         property.favorited.remove(request.user)
@@ -135,3 +140,14 @@ def toggle_favorite(request, pk):
     else:
         property.favorited.add(request.user)
         return JsonResponse({'is_favorited': True})
+    
+
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
+def user_favorites(request, pk):
+    user = User.objects.get(pk=pk)
+    properties = Property.objects.prefetch_related('favorited').filter(favorited=user)
+    serializer = PropertyListSerializer(properties, many=True)
+    return JsonResponse(serializer.data)
