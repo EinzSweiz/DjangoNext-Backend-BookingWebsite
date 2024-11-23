@@ -7,18 +7,17 @@ from django.shortcuts import get_object_or_404
 from useraccounts.models import User
 from rest_framework_simplejwt.tokens import AccessToken
 
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from django.http import JsonResponse
-from rest_framework.authentication import BaseAuthentication
-from rest_framework.permissions import IsAuthenticated
-
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
-    user = request.user  # Assuming `request.user` is the authenticated user
-    
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split('Bearer ')[1]
+        token = AccessToken(token)
+        user_id = token.payload.get('user_id')
+        user = User.objects.get(pk=user_id)
+    except Exception as e:
+        user = None
     favorites = []
     country = request.GET.get('country', '')
     category = request.GET.get('category', '')
@@ -31,24 +30,22 @@ def properties_list(request):
 
     # Filter properties based on query parameters
     qs = Property.objects.all()
-
     landlord_id = request.GET.get('landlord_id')
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
-
     if is_favorites:
         qs = qs.filter(favorited__in=[user])
-
     if checkin_date and checkout_date:
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
         overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
-        all_matches = [reservation.property_id for reservation in exact_matches | overlap_matches]
+        all_matches = []
+        for reservation in exact_matches | overlap_matches:
+            all_matches.append(reservation.property_id)
         qs = qs.exclude(id__in=all_matches)
 
-    # Collect IDs of favorite properties if user is authenticated
-    if user.is_authenticated:
-        favorites = qs.filter(favorited=user).values_list('id', flat=True)
-
+    # Collect IDs of favorite properties
+    if request.user and request.user.is_authenticated:
+        favorites = qs.filter(favorited=request.user).values_list('id', flat=True)
     if guests:
         qs = qs.filter(guests__gte=guests)
     if bedrooms:
@@ -59,10 +56,8 @@ def properties_list(request):
         qs = qs.filter(country=country)
     if category and category != 'undefined':
         qs = qs.filter(category=category)
-
     print(f"Favorites: {favorites}")
 
-    # Serialize the filtered properties and return response
     serializer = PropertyListSerializer(qs, many=True)
     return JsonResponse({
         'data': serializer.data,
