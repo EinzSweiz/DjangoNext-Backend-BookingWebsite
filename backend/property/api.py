@@ -7,7 +7,6 @@ from django.shortcuts import get_object_or_404
 from useraccounts.models import User
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import AccessToken
-
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -26,7 +25,7 @@ def properties_list(request):
         print("Token Payload:", token.payload)
 
         # Extract user ID from token payload
-        user_id = token.payload.get('user_id')
+        user_id = token.payload.get('user', {}).get('pk')  # Correct way to extract pk
         if user_id is None:
             raise AuthenticationFailed('User ID not found in token')
         
@@ -35,7 +34,6 @@ def properties_list(request):
         raise AuthenticationFailed('Authorization token not provided')
     except (AuthenticationFailed, User.DoesNotExist):
         user = None
-
 
     favorites = []
     country = request.GET.get('country', '')
@@ -53,7 +51,7 @@ def properties_list(request):
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
     if is_favorites:
-        qs = qs.filter(favorited__in=[user])
+        qs = qs.filter(favorited=user)  # Use favorited=user to filter the user's favorites
     if checkin_date and checkout_date:
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
         overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
@@ -63,8 +61,8 @@ def properties_list(request):
         qs = qs.exclude(id__in=all_matches)
 
     # Collect IDs of favorite properties
-    if user and favorites:
-        favorites = qs.filter(favorited__in=[user]).values_list('id', flat=True)
+    if user and user.is_authenticated:
+        favorites = Property.objects.filter(favorited=user).values_list('id', flat=True)  # Corrected filter for favorites
     if guests:
         qs = qs.filter(guests__gte=guests)
     if bedrooms:
@@ -75,6 +73,7 @@ def properties_list(request):
         qs = qs.filter(country=country)
     if category and category != 'undefined':
         qs = qs.filter(category=category)
+    
     print(f"Favorites: {favorites}")
 
     serializer = PropertyListSerializer(qs, many=True)
