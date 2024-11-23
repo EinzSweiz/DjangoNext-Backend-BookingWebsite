@@ -45,7 +45,7 @@ def properties_list(request):
 
     # Collect IDs of favorite properties
     if request.user and request.user.is_authenticated:
-        favorites = qs.filter(favorited=user).values_list('id', flat=True)
+        favorites = qs.filter(favorited=request.user).values_list('id', flat=True)
     if guests:
         qs = qs.filter(guests__gte=guests)
     if bedrooms:
@@ -60,7 +60,7 @@ def properties_list(request):
     serializer = PropertyListSerializer(qs, many=True)
     return JsonResponse({
         'data': serializer.data,
-        'favorites': favorites,
+        'favorites': list(favorites),
     })
 
 
