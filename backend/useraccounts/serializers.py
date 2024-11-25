@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User
+from .models import User, Note
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -38,4 +38,3 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
     def get_avatar_url(self, obj):
         return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
-
