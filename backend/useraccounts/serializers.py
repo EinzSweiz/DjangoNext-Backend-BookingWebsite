@@ -53,7 +53,8 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.name = self.data.get('name')
         if 'avatar' in self.data:
             user.avatar = self.data['avatar']
-        send_confirmation_message.delay(user.id)
+        user.is_active = False
         user.save()
+        send_confirmation_message.delay(user.id)
         
         return user
