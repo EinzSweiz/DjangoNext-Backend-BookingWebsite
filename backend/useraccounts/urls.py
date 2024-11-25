@@ -4,12 +4,13 @@ from dj_rest_auth.views import LoginView, LogoutView, UserDetailsView
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework_simplejwt.views import TokenVerifyView
 from useraccounts import api
-
+from .views import CustomTokenObtainPairView, CustomRefreshTokenView, logout
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='rest_register'),
     path('login/', LoginView.as_view(), name='rest_login'),
-    path('logout/', LogoutView.as_view(), name='rest_logout'),
-    path('token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
+    path('logout/', logout, name='rest_logout'),
+    path('token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pari'),
+    path('token/refresh/', CustomRefreshTokenView.as_view(), name='token_refresh'),
     path('myreservations/', api.reservations_list, name='api_reservations_list'),
     path('<uuid:pk>/', api.landlord_detail, name='api_landlord_detail'),
     path('profile/<uuid:pk>/', api.profile_detail, name='profile_detail'),
