@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import User
 from dj_rest_auth.registration.serializers import RegisterSerializer
+from .tasks import send_confirmation_message
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -52,6 +53,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.name = self.data.get('name')
         if 'avatar' in self.data:
             user.avatar = self.data['avatar']
+        send_confirmation_message.delay(user.id)
         user.save()
         
         return user
