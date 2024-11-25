@@ -11,3 +11,7 @@ channels
 requests
 daphne
 gunicorn
+redis 
+celery 
+django-celery-beat 
+django-celery-results

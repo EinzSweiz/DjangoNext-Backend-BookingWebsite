@@ -39,6 +39,33 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=djangodb
 
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  celery:
+    build:
+      context: .
+    container_name: celery
+    command: celery -A django-backend worker --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+
+  celery_beat:
+    build:
+      context: .
+    container_name: celery_beat
+    command: celery -A django-backend beat --loglevel=info
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+      - celery
+
 volumes:
   postgres_data:
   media_volume:
