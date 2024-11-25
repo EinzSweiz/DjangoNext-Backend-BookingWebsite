@@ -47,21 +47,21 @@ services:
 
   celery:
     build:
-      context: .
+      context: ./backend  # Adjust to point to the correct directory containing Dockerfile
     container_name: celery
-    command: celery -A django-backend worker --loglevel=info
+    command: celery -A django_backend worker --loglevel=info
     volumes:
-      - .:/app
+      - ./backend:/usr/src/backend
     depends_on:
       - redis
 
   celery_beat:
     build:
-      context: .
+      context: ./backend
     container_name: celery_beat
-    command: celery -A django-backend beat --loglevel=info
+    command: celery -A django_backend beat --loglevel=info
     volumes:
-      - .:/app
+      - ./backend:/usr/src/backend
     depends_on:
       - redis
       - celery
