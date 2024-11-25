@@ -65,7 +65,7 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Ensure users authenticate with their 
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        'useraccounts.authentication.CookiesJWTAuthentication',    
+        'rest_framework_simplejwt.authentication.JWTAuthentication',    
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
