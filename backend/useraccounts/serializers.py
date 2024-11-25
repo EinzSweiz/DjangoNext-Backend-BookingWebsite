@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User
+from dj_rest_auth.registration.serializers import RegisterSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -38,3 +39,19 @@ class UserProfileUpdateSerializer(serializers.ModelSerializer):
 
     def get_avatar_url(self, obj):
         return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
+
+
+class CustomRegisterSerializer(RegisterSerializer):
+    name = serializers.CharField(max_length=255)
+    avatar = serializers.ImageField(required=False)
+
+    def get_avatar_url(self, obj):
+        return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
+    def save(self, request):
+        user = super().save(request)
+        user.name = self.data.get('name')
+        if 'avatar' in self.data:
+            user.avatar = self.data['avatar']
+        user.save()
+        
+        return user
