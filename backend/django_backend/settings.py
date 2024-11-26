@@ -59,6 +59,7 @@ SITE_ID = 1
 #     WEBSITE_URL = 'http://localhost:8010'
 # else:
 WEBSITE_URL = 'http://165.22.76.137:1337'
+FRONTEND_URL = "http://165.22.76.137" 
 
 
 CHANNEL_LAYERS = {

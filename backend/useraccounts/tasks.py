@@ -11,7 +11,7 @@ def send_confirmation_message(user_id):
         user = User.objects.get(pk=user_id)
         token = default_token_generator.make_token(user)
         uid = urlsafe_base64_encode(str(user.id).encode())
-        confirmation_url = f"{settings.WEBSITE_URL}/api/auth/{uid}/{token}/"
+        confirmation_url = f"{settings.FRONTEND_URL}/email-confirmation?uid={uid}&token={token}"
         
         subject = 'Please confirm your email address'
         message = (
