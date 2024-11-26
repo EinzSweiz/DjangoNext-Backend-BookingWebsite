@@ -50,6 +50,6 @@ class User(AbstractBaseUser, PermissionsMixin):
         return ''
     
 class Email(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='emails')
     email = models.EmailField(unique=True)
     verified = models.BooleanField(default=False)
