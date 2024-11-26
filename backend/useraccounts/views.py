@@ -12,6 +12,7 @@ def confirm_email(request, uidb64, token):
         # Validate the token
         if default_token_generator.check_token(user, token):
             user.is_active = True  # Activate the user
+            user.is_verified = True
             user.save()
             return JsonResponse({"message": "Email confirmed successfully"}, status=200)
         else:
