@@ -48,8 +48,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         if self.avatar:
             return f'{settings.WEBSITE_URL}{self.avatar.url}'
         return ''
-    
-class Email(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='emails')
-    email = models.EmailField(unique=True)
-    verified = models.BooleanField(default=False)

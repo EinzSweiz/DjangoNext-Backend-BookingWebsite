@@ -1,8 +1,9 @@
 from django.http import JsonResponse
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
-from .models import User, Email
+from .models import User
 from dj_rest_auth.views import LoginView
+from allauth.account.models import EmailAddress
 from rest_framework.exceptions import AuthenticationFailed
 
 
@@ -18,7 +19,7 @@ def confirm_email(request, uidb64, token):
             user.is_verified = True
             user.save()
 
-            email = Email.objects.get(user=user)
+            email = EmailAddress.objects.get(user=user)
             email.verified = True
             email.save()
             return JsonResponse({"message": "Email confirmed successfully"}, status=200)
