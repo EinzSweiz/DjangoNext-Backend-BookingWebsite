@@ -24,9 +24,13 @@ def reservations_list(request):
 @authentication_classes([])
 @permission_classes([])
 def profile_detail(request, pk):
-    user = User.objects.get(pk=pk)
-    serializer = UserProfileSerializer(user)
-    return JsonResponse(serializer.data)
+    try:
+        user = User.objects.get(pk=pk)
+        serializer = UserProfileSerializer(user)
+        return JsonResponse(serializer.data)
+    except UnicodeDecodeError as e:
+        return JsonResponse({"error": f"Encoding error: {e}"}, status=400)
+
 
 
 @api_view(['PUT'])
