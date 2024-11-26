@@ -24,9 +24,23 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = ['id', 'name', 'email', 'avatar_url']
+
+    def get_name(self, obj):
+        return self.clean_text(obj.name)
+
+    def get_email(self, obj):
+        return self.clean_text(obj.email)
+
+    def clean_text(self, text):
+        if isinstance(text, str):
+            return text.encode('latin-1').decode('utf-8', errors='replace')
+        return text
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
