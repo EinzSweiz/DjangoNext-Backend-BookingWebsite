@@ -49,12 +49,27 @@ class CustomRegisterSerializer(RegisterSerializer):
     def get_avatar_url(self, obj):
         return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
     def save(self, request):
-        user = super().save(request)
-        user.name = self.data.get('name')
-        if 'avatar' in self.data:
-            user.avatar = self.data['avatar']
-        user.is_active = False
-        user.save()
-        send_confirmation_message.delay(user.id)
-        
-        return user
+        if not User.objects.filter(email=self.data.get('email')).exists():
+            # Call the parent save method to create the user
+            user = super().save(request)
+            
+            # Update the user instance with additional fields
+            user.name = self.data.get('name')
+            
+            # If an avatar is provided, save it
+            if 'avatar' in self.data:
+                user.avatar = self.data['avatar']
+                
+            user.is_active = False  # Deactivate the user until confirmation
+
+            # Save the user with the updated fields
+            user.save()
+
+            # Trigger the task to send confirmation email
+            send_confirmation_message.delay(user.id)
+
+            return user
+        else:
+            raise serializers.ValidationError("A user with this email already exists.")
+
+            

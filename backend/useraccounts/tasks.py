@@ -15,7 +15,7 @@ def send_confirmation_message(user_id):
         
         subject = 'Please confirm your email address'
         message = (
-            f"Hi {user.username},\n\n"
+            f"Hi {user.name},\n\n"
             f"Please confirm your email address by clicking the link below:\n"
             f"{confirmation_url}\n\n"
             f"Thank you!"
