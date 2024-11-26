@@ -21,6 +21,6 @@ def send_confirmation_message(user_id):
             f"Thank you!"
         )
         
-        send_message(subject, message, 'riad.sultanov.1999@gmail.com', [user.email])
+        send_message(subject, message, 'riad.sultanov.1999@gmail.com', user.email)
     except Exception as e:
         print(f"Error sending confirmation email: {e}")

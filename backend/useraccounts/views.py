@@ -24,8 +24,11 @@ def confirm_email(request, uidb64, token):
         return JsonResponse({"error": str(e)}, status=400)
     
 class CustomLoginView(LoginView):
-    def validate(self, attrs):
-        user = super().validate(attrs)
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        user = self.user
+        
         if not user.is_verified:
             raise AuthenticationFailed("E-mail is not verified.")
-        return user
+        
+        return response
