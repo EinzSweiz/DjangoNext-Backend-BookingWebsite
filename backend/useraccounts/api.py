@@ -5,7 +5,6 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from property.serializers import ResirvationListSerializer
 import logging
 from django.http import HttpResponseBadRequest
-import uuid
 
 logger = logging.getLogger(__name__)
 @api_view(['GET'])
@@ -28,28 +27,22 @@ def profile_detail(request, pk):
     try:
         logger.debug(f"Looking for user with pk={pk}")
         user = User.objects.get(pk=pk)
-        logger.debug(f"User found: {vars(user)}")
-        for user in User.objects.all():
-            try:
-                logger.debug(f"Checking user {user.id}")
-                str(user.name)
-                str(user.email)
-            except UnicodeDecodeError as ude:
-                logger.error(f"Problematic user: {user.id} due to {ude}")
-        logger.debug("Serializing user data")
+        # Clean problematic fields
+        print(user.email)
+
+        # Now serialize the data
         serializer = UserProfileSerializer(user)
         logger.debug(f"Serialized data: {serializer.data}")
         return JsonResponse(serializer.data)
+
     except User.DoesNotExist:
         logger.error(f"User with pk={pk} does not exist")
-        return JsonResponse({"error": f"User not found with pk={pk}"}, status=404)
-    except UnicodeDecodeError as e:
-        logger.error(f"Encoding error: {e}")
-        return JsonResponse({"error": f"Encoding error: {e}"}, status=400)
+        return JsonResponse({"error": "User not found"}, status=404)
     except Exception as e:
         logger.exception(f"Unexpected error: {e}")
         return JsonResponse({"error": "Internal server error"}, status=500)
 
+        
 
 @api_view(['PUT'])
 @authentication_classes([])
