@@ -24,19 +24,9 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    avatar_url = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = ['id', 'name', 'avatar_url']
-
-    def get_avatar_url(self, obj):
-        return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
-    def to_representation(self, instance):
-        try:
-            return super().to_representation(instance)
-        except UnicodeDecodeError as e:
-            raise serializers.ValidationError(f"Encoding error: {str(e)}")
-
+        fields = ['id', 'name']
 
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
