@@ -26,6 +26,13 @@ def reservations_list(request):
 def profile_detail(request, pk):
     try:
         user = User.objects.get(pk=pk)
+        print(vars(user))
+        for user in User.objects.all():
+            try:
+                str(user.name)  # Force decode fields to UTF-8
+                str(user.email)
+            except UnicodeDecodeError:
+                print(f"Problematic user: {user.id}")
         serializer = UserProfileSerializer(user)
         return JsonResponse(serializer.data)
     except UnicodeDecodeError as e:
