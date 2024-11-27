@@ -22,6 +22,9 @@ def reservations_list(request):
     serializer = ResirvationListSerializer(qs, many=True)
     return JsonResponse(serializer.data, safe=False)
 
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
 def profile_detail(request, pk):
     logger.debug("profile_detail function called")
     try:
