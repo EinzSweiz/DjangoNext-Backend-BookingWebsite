@@ -203,7 +203,10 @@ DATABASES = {
         'USER': config('SQL_USER'),
         'PASSWORD': config('SQL_PASSWORD'),
         'HOST': config('SQL_HOST'),
-        'PORT': config('SQL_PORT')
+        'PORT': config('SQL_PORT'),
+        'OPTIONS': {
+            'client_encoding': 'UTF8',
+        },
     }
 }
 
