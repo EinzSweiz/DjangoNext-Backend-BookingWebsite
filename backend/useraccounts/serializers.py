@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import User
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from .tasks import send_confirmation_message
+# from .tasks import send_confirmation_message
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -66,7 +66,7 @@ class CustomRegisterSerializer(RegisterSerializer):
             user.save()
 
             # Trigger the task to send confirmation email
-            send_confirmation_message.delay(user.id)
+            # send_confirmation_message.delay(user.id)
 
             return user
         else:
