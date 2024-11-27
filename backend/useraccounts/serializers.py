@@ -24,13 +24,14 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
+    avatar_url = serializers.SerializerMethodField()
     class Meta:
         model = User
         fields = ['id', 'name', 'avatar_url']
 
-    def get_name(self, obj):
-        return self.clean_text(obj.name)
+    def get_avatar_url(self, obj):
+        return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
+
 
 class UserProfileUpdateSerializer(serializers.ModelSerializer):
     avatar = serializers.ImageField(required=False)
