@@ -24,18 +24,31 @@ def reservations_list(request):
     return JsonResponse(serializer.data, safe=False)
 
 def profile_detail(request, pk):
+    logger.debug("profile_detail function called")
     try:
-        uuid_obj = uuid.UUID(pk)  # Validate UUID format
-        user = User.objects.get(pk=uuid_obj)
-        print(f"User details: {vars(user)}", flush=True)
+        logger.debug(f"Looking for user with pk={pk}")
+        user = User.objects.get(pk=pk)
+        logger.debug(f"User found: {vars(user)}")
+        for user in User.objects.all():
+            try:
+                logger.debug(f"Checking user {user.id}")
+                str(user.name)
+                str(user.email)
+            except UnicodeDecodeError as ude:
+                logger.error(f"Problematic user: {user.id} due to {ude}")
+        logger.debug("Serializing user data")
         serializer = UserProfileSerializer(user)
+        logger.debug(f"Serialized data: {serializer.data}")
         return JsonResponse(serializer.data)
-    except ValueError:
-        return HttpResponseBadRequest("Invalid UUID format")
     except User.DoesNotExist:
-        return JsonResponse({"error": "User not found"}, status=404)
+        logger.error(f"User with pk={pk} does not exist")
+        return JsonResponse({"error": f"User not found with pk={pk}"}, status=404)
     except UnicodeDecodeError as e:
+        logger.error(f"Encoding error: {e}")
         return JsonResponse({"error": f"Encoding error: {e}"}, status=400)
+    except Exception as e:
+        logger.exception(f"Unexpected error: {e}")
+        return JsonResponse({"error": "Internal server error"}, status=500)
 
 
 @api_view(['PUT'])
