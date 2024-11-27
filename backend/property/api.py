@@ -1,6 +1,7 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .models import Property, Reservation
+from rest_framework.permissions import IsAuthenticated
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, ResirvationListSerializer
 from .forms import PropertyForm
 from django.shortcuts import get_object_or_404
@@ -87,7 +88,7 @@ def properties_list(request):
 
 @api_view(['POST', 'FILES'])
 @authentication_classes([])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 def create_property(request):
     try:
         print("Received new property creation request")
