@@ -7,14 +7,15 @@ from django.conf import settings
 from django.utils import timezone
 
 @shared_task
-def send_property_creation_message(property_instance):
-
+def send_property_creation_message(property_data):
     try:
+        landlord_email = property_data.get('landlord_email', 'noreply@example.com')
+        landlord_name = property_data.get('landlord_name', 'User')
+    
         subject = 'New Property Created'
         from_email = 'riad.sultanov.1999@gmail.com'
-        to_email = property_instance.landlord.email
+        to_email = landlord_email
     
-        # Create the HTML message directly (without templates)
         html_message = f"""
         <html>
             <head>
@@ -27,22 +28,21 @@ def send_property_creation_message(property_instance):
                 </style>
             </head>
             <body>
-                <h1>Dear {property_instance.landlord.name},</h1><br>
+                <h1>Dear {landlord_name},</h1><br>
                 <h2>New Property Created</h2>
                 <p>A new property has been added:</p>
                 <div class="property-info">
-                    <strong>Name:</strong> {property_instance.title}<br>
-                    <strong>Location:</strong> {property_instance.country}<br>
-                    <strong>Price per Night:</strong> ${property_instance.price_per_night}<br>
-                    <strong>Bedrooms:</strong> {property_instance.bedrooms}<br>
-                    <strong>Bathrooms:</strong> {property_instance.bathrooms}
+                    <strong>Name:</strong> {property_data['title']}<br>
+                    <strong>Location:</strong> {property_data['country']}<br>
+                    <strong>Price per Night:</strong> ${property_data['price_per_night']}<br>
+                    <strong>Bedrooms:</strong> {property_data['bedrooms']}<br>
+                    <strong>Bathrooms:</strong> {property_data['bathrooms']}
                 </div>
                 <p>Thank you for using our service!</p>
             </body>
         </html>
         """
     
-        # Send the email using the helper function
         send_message(
             subject=subject,
             message=html_message,
