@@ -6,6 +6,7 @@ from .forms import PropertyForm
 from django.shortcuts import get_object_or_404
 from useraccounts.models import User
 from rest_framework.exceptions import AuthenticationFailed
+from .tasks import send_property_creation_message
 from rest_framework_simplejwt.tokens import AccessToken
 @api_view(['GET'])
 @authentication_classes([])
@@ -92,6 +93,7 @@ def create_property(request):
         if form.is_valid():
             property = form.save(commit=False)
             property.landlord = request.user
+            send_property_creation_message.delay(property)
             property.save()
             return JsonResponse({'success': True})
         else:

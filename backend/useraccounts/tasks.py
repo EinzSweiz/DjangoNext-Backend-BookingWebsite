@@ -3,7 +3,6 @@ from helpers.messaging import send_message
 from .models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
-from django.utils.http import urlsafe_base64_encode
 
 @shared_task
 def send_confirmation_message(user_id):
