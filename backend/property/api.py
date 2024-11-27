@@ -86,6 +86,8 @@ def properties_list(request):
 
 
 @api_view(['POST', 'FILES'])
+@authentication_classes([])
+@permission_classes([])
 def create_property(request):
     try:
         print("Received new property creation request")
@@ -98,9 +100,11 @@ def create_property(request):
             return JsonResponse({'success': True})
         else:
             print('Error', form.errors, form.non_field_errors)
-            return JsonResponse({'errors', form.errors.as_json()}, status=400)
+            return JsonResponse({'errors': form.errors.as_json()}, status=400)
     except Exception as e:
         print(f"Error: {e}")
+        return JsonResponse({'error': str(e)}, status=500)
+
     
 
 @api_view(['GET'])
