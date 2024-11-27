@@ -110,6 +110,8 @@ def create_property(request):
                 property_data['image'] = None
 
             # Pass serialized data to the message sender
+            property_data['landlord_email'] = request.user.email
+            property_data['landlord_name'] = request.user.name
             send_property_creation_message.delay(property_data)
 
             return JsonResponse({'success': True, 'property': property_data})
