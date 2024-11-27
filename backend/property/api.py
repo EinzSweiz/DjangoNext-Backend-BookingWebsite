@@ -86,6 +86,8 @@ def properties_list(request):
 
 
 
+from django.forms.models import model_to_dict
+
 @api_view(['POST', 'FILES'])
 def create_property(request):
     try:
@@ -95,16 +97,29 @@ def create_property(request):
         if form.is_valid():
             property = form.save(commit=False)
             property.landlord = request.user
-            property_data = model_to_dict(property)
-            send_property_creation_message.delay(property_data)
+
+            # Save the property instance first
             property.save()
-            return JsonResponse({'success': True})
+
+            # Serialize the property data
+            property_data = model_to_dict(property)
+            # Handle the image field manually
+            if property.image:
+                property_data['image'] = property.image.url
+            else:
+                property_data['image'] = None
+
+            # Pass serialized data to the message sender
+            send_property_creation_message.delay(property_data)
+
+            return JsonResponse({'success': True, 'property': property_data})
         else:
             print('Error', form.errors, form.non_field_errors)
             return JsonResponse({'errors': form.errors.as_json()}, status=400)
     except Exception as e:
         print(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
+
 
     
 
