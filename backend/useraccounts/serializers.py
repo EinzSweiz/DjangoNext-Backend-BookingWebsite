@@ -25,8 +25,6 @@ class UserDetailSerializer(serializers.ModelSerializer):
 
 class UserProfileSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    email = serializers.SerializerMethodField()
-
     class Meta:
         model = User
         fields = ['id', 'name', 'avatar_url']
