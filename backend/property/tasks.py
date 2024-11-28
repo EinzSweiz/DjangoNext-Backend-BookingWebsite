@@ -129,7 +129,7 @@ def send_property_report():
     
     # Send the email to the admins
     from_email = 'riad.sultanov.1999@gmail.com'  # Replace with a proper email address
-    to_email = settings.ADMIN_EMAILS  # Assuming you have a list of admin emails in settings.py
+    to_email = settings.ADMIN_USER_EMAIL  # Assuming you have a list of admin emails in settings.py
     
     send_message(
         subject=f"Property Report - {today.date()}",
