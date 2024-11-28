@@ -21,3 +21,10 @@ class CreateInquirySerializer(serializers.ModelSerializer):
         # Create and return the inquiry
         inquiry = Inquiry.objects.create(**validated_data)
         return inquiry
+
+class GetInquirySerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(source='user.name')  # If you want to include the user's name
+
+    class Meta:
+        model = Inquiry
+        fields = ('id', 'subject', 'message', 'response', 'status', 'created_at', 'updated_at', 'user_name')
