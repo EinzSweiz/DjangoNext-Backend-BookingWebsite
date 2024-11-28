@@ -22,9 +22,15 @@ class CustomUserManager(UserManager):
     def create_superuser(self, name, email, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("role", "admin")
         return self._create_user(name, email, password, **extra_fields)
     
 class User(AbstractBaseUser, PermissionsMixin):
+    class RoleChoises(models.TextChoices):
+        ADMIN = 'admin', 'Admin',
+        CUSTOMER_SERVICE = 'customer_service', 'Customer Service',
+        USER = 'user', 'user'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255, blank=True, null=True)
@@ -33,7 +39,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-
+    role = models.CharField(max_length=25, choices=RoleChoises, default=RoleChoises.USER.value)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
 
