@@ -4,7 +4,6 @@ from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from property.serializers import ResirvationListSerializer
 import logging
-from django.http import HttpResponseBadRequest
 
 logger = logging.getLogger(__name__)
 @api_view(['GET'])
