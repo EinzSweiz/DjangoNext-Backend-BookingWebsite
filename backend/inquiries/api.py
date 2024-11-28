@@ -4,7 +4,7 @@ from useraccounts.models import User
 from .serializers import CreateInquirySerializer
 
 
-@api_view('POST')
+@api_view(['POST'])
 def create_inquiry(request):
     try:
         serializer = CreateInquirySerializer(data=request.data)
