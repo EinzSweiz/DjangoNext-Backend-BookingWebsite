@@ -30,43 +30,38 @@ def inquiries_view(request):
     inquiries_serializer = GetInquirySerializer(inquiries, many=True)
     return JsonResponse(inquiries_serializer.data, safe=False)
 
-@api_view(['GET', 'PATCH', 'POST'])
+def handle_get_request(inquiry):
+    serializer = GetInquirySerializer(inquiry)
+    return JsonResponse(serializer.data, status=200)
+
+def handle_put_request(request, inquiry):
+    data = JSONParser().parse(request)
+    serializer = GetInquirySerializer(inquiry, data=data, partial=False)
+    if serializer.is_valid():
+        serializer.save()
+        return JsonResponse(serializer.data, status=200)
+    return JsonResponse(serializer.errors, status=400)
+
+def handle_post_request(request, inquiry):
+    data = JSONParser().parse(request)
+    message_data = {'inquiry': inquiry.id, 'sender': data.get('sender'), 'message': data.get('message')}
+    message_serializer = MessageSerializer(data=message_data)
+    if message_serializer.is_valid():
+        message_serializer.save()
+        return JsonResponse({'message': 'Message added successfully'}, status=201)
+    return JsonResponse(message_serializer.errors, status=400)
+
+@api_view(['GET', 'PUT', 'POST'])
 def inquiry_detail_api(request, pk):
     try:
         inquiry = Inquiry.objects.get(pk=pk)
-        
         if request.method == 'GET':
-            # Fetch inquiry details
-            serializer = GetInquirySerializer(inquiry)
-            return JsonResponse(serializer.data, status=200)
-        
+            return handle_get_request(inquiry)
         elif request.method == 'PUT':
-            # Replace the entire resource (or at least validate full data)
-            data = JSONParser().parse(request)
-            serializer = GetInquirySerializer(inquiry, data=data, partial=False)  # `partial=False` for PUT
-            if serializer.is_valid():
-                serializer.save()
-                return JsonResponse(serializer.data, status=200)
-            return JsonResponse(serializer.errors, status=400)
-        
+            return handle_put_request(request, inquiry)
         elif request.method == 'POST':
-            # Add a new message
-            data = JSONParser().parse(request)
-            message_data = {
-                'inquiry': inquiry.id,
-                'sender': data.get('sender'),  # e.g., 'user' or 'customer_service'
-                'message': data.get('message'),
-            }
-            
-            message_serializer = MessageSerializer(data=message_data)
-            if message_serializer.is_valid():
-                message_serializer.save()
-                return JsonResponse({'message': 'Message added successfully'}, status=201)
-            else:
-                return JsonResponse(message_serializer.errors, status=400)
-    
+            return handle_post_request(request, inquiry)
     except Inquiry.DoesNotExist:
         raise Http404("Inquiry not found")
-    
     except Exception as e:
         return JsonResponse({'error': 'An unexpected error occurred.', 'details': str(e)}, status=500)
