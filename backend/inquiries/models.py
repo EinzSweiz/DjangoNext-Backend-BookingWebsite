@@ -17,3 +17,17 @@ class Inquiry(models.Model):
 
     def __str__(self):
         return self.subject
+    
+
+class Message(models.Model):
+    class SenderChoice(models.TextChoices):
+        USER = 'user', 'User'
+        CUSTOMER_SERVICE = 'customer_service', 'Customer Service'
+
+    inquiry = models.ForeignKey(Inquiry, on_delete=models.CASCADE, related_name='messages')
+    sender = models.CharField(max_length=20, choices=SenderChoice.choices)
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.sender}: {self.message[:50]}...'

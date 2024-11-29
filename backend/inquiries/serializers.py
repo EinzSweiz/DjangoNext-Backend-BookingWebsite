@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Inquiry
+from .models import Inquiry, Message
 from useraccounts.models import User
 
 class CreateInquirySerializer(serializers.ModelSerializer):
@@ -22,9 +22,20 @@ class CreateInquirySerializer(serializers.ModelSerializer):
         inquiry = Inquiry.objects.create(**validated_data)
         return inquiry
 
+class MessageSerializer(serializers.ModelSerializer):
+    sender = serializers.CharField()
+    message = serializers.CharField()
+    timestamp = serializers.DateTimeField()
+
+    class Meta:
+        model = Message
+        fields = ['sender', 'message', 'timestamp']
+        
 class GetInquirySerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.name')  # If you want to include the user's name
+    messages = MessageSerializer(many=True)
 
     class Meta:
         model = Inquiry
         fields = ('id', 'subject', 'message', 'response', 'status', 'created_at', 'updated_at', 'user_name')
+

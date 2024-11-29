@@ -31,13 +31,19 @@ def inquiries_view(request):
 
 from django.http import Http404
 
+
 @api_view(['GET'])
 def inquiry_detail_api(request, pk):
     try:
         inquiry = Inquiry.objects.get(pk=pk)
+        
         serializer = GetInquirySerializer(inquiry)
+        
         return JsonResponse(serializer.data, status=200)
+
     except Inquiry.DoesNotExist:
         raise Http404("Inquiry not found")
+    
     except Exception as e:
-        return JsonResponse({'error': 'An unexpected error occurred.'}, status=500)
+        # Handle unexpected errors
+        return JsonResponse({'error': 'An unexpected error occurred.', 'details': str(e)}, status=500)
