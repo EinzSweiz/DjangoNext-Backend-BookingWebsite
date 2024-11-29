@@ -34,15 +34,14 @@ def inquiries_view(request):
 def add_message(request, pk):
     try:
         inquiry = Inquiry.objects.get(pk=pk)
-        data = JSONParser().parse(request)
-        message_data = {'inquiry': inquiry.id, 'sender': data.get('sender'), 'message': data.get('message')}
-        message_serializer = MessageSerializer(data=message_data)
+        data = request.data  # Expecting 'sender' and 'message'
+        serializer = MessageSerializer(data=data)
 
-        if message_serializer.is_valid():
-            message_serializer.save()
-            return JsonResponse({'message': 'Message added successfully'}, status=201)
-        return JsonResponse(message_serializer.errors, status=400)
-    
+        if serializer.is_valid():
+            message = serializer.save(inquiry=inquiry)  # Link message to inquiry
+            return JsonResponse(MessageSerializer(message).data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+
     except Inquiry.DoesNotExist:
         return JsonResponse({"error": "Inquiry not found"}, status=404)
     
