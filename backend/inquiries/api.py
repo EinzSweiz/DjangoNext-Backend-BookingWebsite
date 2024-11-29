@@ -26,4 +26,4 @@ def inquiries_view(request):
         inquiries = Inquiry.objects.filter(user=request.user)
 
     inquiries_serializer = GetInquirySerializer(inquiries, many=True)
-    return JsonResponse(inquiries_serializer.data)
+    return JsonResponse(inquiries_serializer.data, safe=False)
