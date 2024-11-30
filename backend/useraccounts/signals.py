@@ -4,10 +4,7 @@ from django.db.models.signals import post_save
 from useraccounts.models import User
 from django.dispatch import receiver
 
-if settings.DEBUG:
-    stripe.api_key = settings.STRIPE_PUBLISH_KEY
-else:
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def create_stripe_customer(user):
     # Check if user already has a customer ID in your database
