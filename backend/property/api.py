@@ -8,7 +8,14 @@ from useraccounts.models import User
 from rest_framework.exceptions import AuthenticationFailed
 from .tasks import send_property_creation_message
 from django.forms.models import model_to_dict
+import stripe
+from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken
+
+if settings.DEBUG:
+    stripe.api_key = settings.STRIPE_PUBLISH_KEY
+else:
+    stripe.api_key = settings.STRIPE_SECRET_KEY
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -147,20 +154,106 @@ def properties_reservations(request, pk):
         safe=False
     )
 
+# @api_view(['POST'])
+# def book_property(request, pk):
+#     try:
+#         # Accessing data from the request in DRF
+#         start_date = request.data.get('start_date', '')
+#         end_date = request.data.get('end_date', '')
+#         total_price = request.data.get('total_price', '')
+#         number_of_nights = request.data.get('number_of_nights', '')
+#         guests = request.data.get('guests', '')
+        
+#         # Retrieve the property and create a reservation
+#         property = Property.objects.get(pk=pk)
+
+#         Reservation.objects.create(
+#             property=property,
+#             start_date=start_date,
+#             end_date=end_date,
+#             number_of_nights=number_of_nights,
+#             total_price=total_price,
+#             guests=guests,
+#             created_by=request.user
+#         )
+#         return JsonResponse({'success': True})
+
+#     except Exception as e:
+#         print('Error', e)
+#         return JsonResponse({'success': False}, status=400)
+
+
 @api_view(['POST'])
 def book_property(request, pk):
     try:
-        # Accessing data from the request in DRF
+        # Accessing data from the request
         start_date = request.data.get('start_date', '')
         end_date = request.data.get('end_date', '')
         total_price = request.data.get('total_price', '')
         number_of_nights = request.data.get('number_of_nights', '')
         guests = request.data.get('guests', '')
-        
-        # Retrieve the property and create a reservation
+
+        # Retrieve the property
         property = Property.objects.get(pk=pk)
 
-        Reservation.objects.create(
+        # Create Stripe Checkout session
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'usd',  # You can change the currency
+                        'product_data': {
+                            'name': property.name,
+                        },
+                        'unit_amount': int(float(total_price) * 100),  # Stripe expects amount in cents
+                    },
+                    'quantity': 1,
+                },
+            ],
+            mode='payment',
+            success_url=request.build_absolute_uri(f'/payment/success/{pk}/'),  # Redirect to success URL after payment
+            cancel_url=request.build_absolute_uri(f'/payment/cancel/{pk}/'),  # Redirect to cancel URL if payment fails
+            customer_email=request.user.email,  # Optional: Prefill user email in checkout
+            metadata={
+                'property_id': pk,
+                'start_date': start_date,
+                'end_date': end_date,
+                'number_of_nights': number_of_nights,
+                'guests': guests,
+                'total_price': total_price,
+            }
+        )
+
+        # Return the checkout session URL to redirect the user
+        return JsonResponse({'url': checkout_session.url})
+
+    except Exception as e:
+        print('Error:', e)
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+@api_view(['GET'])
+def payment_success(request, pk):
+    try:
+        # Retrieve session ID from query parameters
+        session_id = request.GET.get('session_id')
+
+        # Retrieve session details from Stripe
+        session = stripe.checkout.Session.retrieve(session_id)
+
+        # Use the metadata to get the booking details
+        property_id = session.metadata['property_id']
+        start_date = session.metadata['start_date']
+        end_date = session.metadata['end_date']
+        total_price = session.metadata['total_price']
+        number_of_nights = session.metadata['number_of_nights']
+        guests = session.metadata['guests']
+        
+        # Retrieve the property
+        property = Property.objects.get(pk=property_id)
+
+        # Create the reservation in the database
+        reservation = Reservation.objects.create(
             property=property,
             start_date=start_date,
             end_date=end_date,
@@ -169,11 +262,17 @@ def book_property(request, pk):
             guests=guests,
             created_by=request.user
         )
-        return JsonResponse({'success': True})
 
+        return JsonResponse({'success': True, 'reservation_id': reservation.id})
+    
     except Exception as e:
-        print('Error', e)
-        return JsonResponse({'success': False}, status=400)
+        print('Error:', e)
+        return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+@api_view(['GET'])
+def payment_cancel(request, pk):
+    return JsonResponse({'success': False, 'message': 'Payment was canceled'})
 
 
 @api_view(['POST'])

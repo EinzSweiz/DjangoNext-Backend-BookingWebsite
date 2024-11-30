@@ -42,6 +42,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(max_length=25, choices=RoleChoises, default=RoleChoises.USER.value)
     date_joined = models.DateTimeField(auto_now_add=True)
     last_login = models.DateTimeField(auto_now=True)
+    stripe_customer_id = models.CharField(max_length=255, blank=True, null=True)
 
     objects = CustomUserManager()
 
