@@ -192,10 +192,7 @@ def book_property(request, pk):
         guests = request.data.get('guests', '')
 
         # Retrieve the property
-        try:
-            property = Property.objects.get(pk=pk)
-        except Property.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Property not found'}, status=404)
+        property = Property.objects.get(pk=pk)
 
         # Create Stripe Checkout session
         checkout_session = stripe.checkout.Session.create(
@@ -213,7 +210,7 @@ def book_property(request, pk):
                 },
             ],
             mode='payment',
-            success_url=request.build_absolute_uri(f'/payment/success/{checkout_session.id}/'),  # Include session ID in the success URL
+            success_url=request.build_absolute_uri(f'/payment/success/{pk}/'),  # Redirect to success URL after payment
             cancel_url=request.build_absolute_uri(f'/payment/cancel/{pk}/'),  # Redirect to cancel URL if payment fails
             customer_email=request.user.email,  # Optional: Prefill user email in checkout
             metadata={
@@ -232,7 +229,6 @@ def book_property(request, pk):
     except Exception as e:
         print('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
-
 
 @api_view(['GET'])
 def payment_success(request, pk):
@@ -261,10 +257,7 @@ def payment_success(request, pk):
             return JsonResponse({'success': False, 'errors': serializer.errors}, status=400)
 
         # Retrieve the property
-        try:
-            property = Property.objects.get(pk=pk)
-        except Property.DoesNotExist:
-            return JsonResponse({'success': False, 'error': 'Property not found'}, status=404)
+        property = Property.objects.get(pk=pk)
 
         # Create the reservation in the database
         reservation = Reservation.objects.create(
@@ -278,15 +271,19 @@ def payment_success(request, pk):
         )
 
         return JsonResponse({'success': True, 'reservation_id': reservation.id})
-
+    
+    except Property.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Property not found'}, status=404)
+    
     except Exception as e:
         print('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
-
 @api_view(['GET'])
 def payment_cancel(request, pk):
     return JsonResponse({'success': False, 'message': 'Payment was canceled'})
+
+
 @api_view(['POST'])
 def toggle_favorite(request, pk):
 
