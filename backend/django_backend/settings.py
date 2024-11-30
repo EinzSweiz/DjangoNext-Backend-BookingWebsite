@@ -257,3 +257,8 @@ CELERY_RESULT_BACKEND = "django-db"
 CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', default='redis://localhost:6379')
 # this allows you to schedule items in the Django admin.
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+
+
+#STRIPE KEYS
+STRIPE_PUBLISH_KEY=config('STRIPE_PUBLISH_KEY', cast=str, default=None)
+STRIPE_SECRET_KEY=config('STRIPE_SECRET_KEY', cast=str, default=None)
