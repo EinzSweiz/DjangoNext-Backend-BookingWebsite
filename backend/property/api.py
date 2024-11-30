@@ -12,10 +12,8 @@ import stripe
 from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken
 
-if settings.DEBUG:
-    stripe.api_key = settings.STRIPE_PUBLISH_KEY
-else:
-    stripe.api_key = settings.STRIPE_SECRET_KEY
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
