@@ -202,7 +202,7 @@ def book_property(request, pk):
                     'price_data': {
                         'currency': 'usd',  # You can change the currency
                         'product_data': {
-                            'name': property.name,
+                            'name': property.title,
                         },
                         'unit_amount': int(float(total_price) * 100),  # Stripe expects amount in cents
                     },
