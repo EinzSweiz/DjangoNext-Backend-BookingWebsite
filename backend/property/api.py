@@ -236,11 +236,8 @@ def payment_success(request, pk):
         # Retrieve session ID from query parameters
         session_id = request.GET.get('session_id')
 
-        if not session_id:
-            return JsonResponse({'success': False, 'error': 'Session ID is missing'}, status=400)
-
         # Retrieve session details from Stripe
-        session = stripe.checkout.Session.retrieve(session_id)
+        session = stripe.checkout.Session.retrieve(pk)
 
         # Use the metadata to get the booking details
         metadata = {
