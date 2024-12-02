@@ -4,7 +4,7 @@ from property.serializers import BookingSerializer
 from django.http import JsonResponse
 from .models import UserPayment
 from property.models import Property, Reservation
-
+from .tasks import send_property_creation_message
 
 @api_view(['GET'])
 def payment_success(request):
@@ -72,6 +72,7 @@ def payment_success(request):
                 "name": customer.name,
             },
         }
+        send_property_creation_message.delay(response_data)
 
         return JsonResponse(response_data, status=200)
 
