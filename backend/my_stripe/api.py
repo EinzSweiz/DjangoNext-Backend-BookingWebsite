@@ -1,8 +1,10 @@
 import stripe
 from rest_framework.decorators import api_view
+import stripe.webhook
 from property.serializers import BookingSerializer
 from django.http import JsonResponse
 from .models import UserPayment
+from django.conf import settings
 from property.models import Property, Reservation
 from .tasks import send_property_creation_message
 
@@ -45,6 +47,8 @@ def payment_success(request):
             number_of_nights=serializer.validated_data['number_of_nights'],
             total_price=serializer.validated_data['total_price'],
             guests=serializer.validated_data['guests'],
+            has_paid=serializer.validated_data['has_paid', False],
+            stripe_checkout_id=checkout_session_id,
             created_by=request.user
         )
 
@@ -58,6 +62,7 @@ def payment_success(request):
                 "total_price": float(reservation.total_price),
                 "number_of_nights": reservation.number_of_nights,
                 "guests": reservation.guests,
+                'has_paid': reservation.has_paid,
                 "created_by": request.user.name,
                 "property": {
                     "id": property.id,
@@ -88,3 +93,26 @@ def payment_success(request):
 @api_view(['GET'])
 def payment_cancel(request, pk):
     return JsonResponse({'success': False, 'message': 'Payment was canceled'})
+
+
+@api_view(['POST'])
+def stripe_webhook(request):
+    endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
+    payload = request.body
+    signature_header = request.META['HTTP_STRIPE_SIGNATURE']
+    event = None
+    try:
+        event = stripe.Webhook.construct_event(payload, signature_header, endpoint_secret)
+    except Exception as e:
+        return JsonResponse(e, status=400)
+    
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        checkout_session_id = session.get('id')
+        try:
+            reservation = Reservation.objects.get(stripe_checkout_id=checkout_session_id)
+            reservation.has_paid = True  # Mark the reservation as paid
+            reservation.save()
+        except Reservation.DoesNotExist:
+            return JsonResponse({'error': 'Reservation not found'}, status=404)
+    return JsonResponse({'status': 'success'}, status=200)
