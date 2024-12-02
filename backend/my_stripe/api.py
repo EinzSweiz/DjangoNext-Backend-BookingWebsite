@@ -61,9 +61,9 @@ def payment_success(request):
                 "created_by": request.user.name,
                 "property": {
                     "id": property.id,
-                    "name": property.name,
-                    "address": property.address,
-                    "image_url": property.image_url,
+                    "name": property.title,
+                    "address": property.country,
+                    "image_url": property.image_url(),
                 },
             },
             "customer": {
