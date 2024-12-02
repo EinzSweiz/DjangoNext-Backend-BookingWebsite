@@ -5,6 +5,8 @@ from property.serializers import BookingSerializer
 from django.http import JsonResponse
 from .models import UserPayment
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from property.models import Property, Reservation
 from .tasks import send_property_creation_message
 import logging
@@ -96,10 +98,9 @@ def payment_success(request):
 def payment_cancel(request, pk):
     return JsonResponse({'success': False, 'message': 'Payment was canceled'})
 
-
-@api_view(['POST'])
+@require_POST
+@csrf_exempt
 def stripe_webhook(request):
-    checkout_session_id = request.GET.get('session_id', None)
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
     payload = request.body
     signature_header = request.META.get('HTTP_STRIPE_SIGNATURE')
@@ -118,7 +119,7 @@ def stripe_webhook(request):
     # Handle the 'checkout.session.completed' event
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        checkout_session_id = checkout_session_id
+        checkout_session_id = session['id']
         
         try:
             reservation = Reservation.objects.get(stripe_checkout_id=checkout_session_id)
