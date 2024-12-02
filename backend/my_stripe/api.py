@@ -58,7 +58,7 @@ def payment_success(request):
                 "total_price": float(reservation.total_price),
                 "number_of_nights": reservation.number_of_nights,
                 "guests": reservation.guests,
-                "created_by": request.user.username,
+                "created_by": request.user.name,
                 "property": {
                     "id": property.id,
                     "name": property.name,
