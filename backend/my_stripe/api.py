@@ -50,7 +50,7 @@ def payment_success(request):
             total_price=serializer.validated_data['total_price'],
             guests=serializer.validated_data['guests'],
             has_paid=serializer.validated_data['has_paid', False],
-            stripe_checkout_id=checkout_session_id,
+            stripe_checkout_id=session.get('id'),
             created_by=request.user
         )
 
