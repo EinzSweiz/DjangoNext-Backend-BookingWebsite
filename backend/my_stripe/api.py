@@ -81,3 +81,9 @@ def payment_success(request):
     except Exception as e:
         print('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+
+
+@api_view(['GET'])
+def payment_cancel(request, pk):
+    return JsonResponse({'success': False, 'message': 'Payment was canceled'})
