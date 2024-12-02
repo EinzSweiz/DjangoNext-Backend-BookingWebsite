@@ -119,7 +119,7 @@ def stripe_webhook(request):
     # Handle the 'checkout.session.completed' event
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        checkout_session_id = session['id']
+        checkout_session_id = session.get('id')
         
         try:
             reservation = Reservation.objects.get(stripe_checkout_id=checkout_session_id)
