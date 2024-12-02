@@ -9,6 +9,7 @@ from rest_framework.exceptions import AuthenticationFailed
 from .tasks import send_property_creation_message
 from django.forms.models import model_to_dict
 import stripe
+from my_stripe.views import product_checkout_view
 from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken
 
@@ -195,34 +196,8 @@ def book_property(request, pk):
         property = Property.objects.get(pk=pk)
 
         # Create Stripe Checkout session
-        checkout_session = stripe.checkout.Session.create(
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'usd',  # You can change the currency
-                        'product_data': {
-                            'name': property.title,
-                        },
-                        'unit_amount': int(float(total_price) * 100),  # Stripe expects amount in cents
-                    },
-                    'quantity': 1,
-                },
-            ],
-            mode='payment',
-            success_url=request.build_absolute_uri(f'/payment/success/{pk}/'),  # Redirect to success URL after payment
-            cancel_url=request.build_absolute_uri(f'/payment/cancel/{pk}/'),  # Redirect to cancel URL if payment fails
-            customer_email=request.user.email,  # Optional: Prefill user email in checkout
-            metadata={
-                'property_id': pk,
-                'start_date': start_date,
-                'end_date': end_date,
-                'number_of_nights': number_of_nights,
-                'guests': guests,
-                'total_price': total_price,
-            }
-        )
-
+        
+        checkout_session = product_checkout_view(request, property, pk, total_price, start_date, end_date, number_of_nights, guests)
         # Return the checkout session URL to redirect the user
         return JsonResponse({'url': checkout_session.url})
 
