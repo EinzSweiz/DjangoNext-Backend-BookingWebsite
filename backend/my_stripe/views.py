@@ -5,7 +5,7 @@ from django.conf import settings
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
-def product_checkout_view(request, property, pk, total_price, start_date, end_date, number_of_nights, guests):
+def product_checkout_view(request, property, pk, total_price, start_date, end_date, number_of_nights, guests, has_paid):
     checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {
@@ -32,6 +32,7 @@ def product_checkout_view(request, property, pk, total_price, start_date, end_da
                 'number_of_nights': number_of_nights,
                 'guests': guests,
                 'total_price': total_price,
+                'has_paid': has_paid,
             }
         )
     return checkout_session

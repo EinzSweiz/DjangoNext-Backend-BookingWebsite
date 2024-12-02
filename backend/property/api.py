@@ -191,13 +191,14 @@ def book_property(request, pk):
         total_price = request.data.get('total_price', '')
         number_of_nights = request.data.get('number_of_nights', '')
         guests = request.data.get('guests', '')
+        has_paid = request.data.get('has_paid', False)
 
         # Retrieve the property
         property = Property.objects.get(pk=pk)
 
         # Create Stripe Checkout session
         
-        checkout_session = product_checkout_view(request, property, pk, total_price, start_date, end_date, number_of_nights, guests)
+        checkout_session = product_checkout_view(request, property, pk, total_price, start_date, end_date, number_of_nights, guests, has_paid)
         # Return the checkout session URL to redirect the user
         return JsonResponse({'url': checkout_session.url})
 
