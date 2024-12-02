@@ -148,6 +148,7 @@ INSTALLED_APPS = [
     'property',
     'chat',
     'inquiries',
+    'my_stripe',
 ]
 
 MIDDLEWARE = [
