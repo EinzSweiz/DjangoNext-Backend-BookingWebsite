@@ -122,7 +122,7 @@ def stripe_webhook(request):
         checkout_session_id = request.GET.get('session_id', None) or request.GET.get('id', None)
         
         try:
-            reservation = Reservation.objects.get(stripe_checkout_id=checkout_session_id)
+            reservation = Reservation.objects.filter(stripe_checkout_id=checkout_session_id).first()
             reservation.has_paid = True  # Mark the reservation as paid
             reservation.save()
         except Reservation.DoesNotExist:
