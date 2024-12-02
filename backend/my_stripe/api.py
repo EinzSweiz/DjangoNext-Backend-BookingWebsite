@@ -7,7 +7,9 @@ from .models import UserPayment
 from django.conf import settings
 from property.models import Property, Reservation
 from .tasks import send_property_creation_message
+import logging
 
+logger = logging.getLogger(__name__)
 @api_view(['GET'])
 def payment_success(request):
     try:
@@ -99,20 +101,29 @@ def payment_cancel(request, pk):
 def stripe_webhook(request):
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
     payload = request.body
-    signature_header = request.META['HTTP_STRIPE_SIGNATURE']
-    event = None
+    signature_header = request.META.get('HTTP_STRIPE_SIGNATURE')
+
+    # Verify webhook signature
     try:
         event = stripe.Webhook.construct_event(payload, signature_header, endpoint_secret)
+    except stripe.error.SignatureVerificationError as e:
+        logger.error(f"Signature verification failed: {e}")
+        return JsonResponse({'error': 'Invalid signature'}, status=400)
     except Exception as e:
-        return JsonResponse(e, status=400)
-    
+        logger.error(f"Error processing webhook: {e}")
+        return JsonResponse({'error': 'Webhook error'}, status=400)
+
+    # Handle the 'checkout.session.completed' event
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
         checkout_session_id = session.get('id')
+        
         try:
             reservation = Reservation.objects.get(stripe_checkout_id=checkout_session_id)
             reservation.has_paid = True  # Mark the reservation as paid
             reservation.save()
         except Reservation.DoesNotExist:
+            logger.warning(f"Reservation not found for session: {checkout_session_id}")
             return JsonResponse({'error': 'Reservation not found'}, status=404)
+
     return JsonResponse({'status': 'success'}, status=200)
