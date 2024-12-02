@@ -50,7 +50,7 @@ def payment_success(request):
             total_price=serializer.validated_data['total_price'],
             guests=serializer.validated_data['guests'],
             has_paid=serializer.validated_data['has_paid', False],
-            stripe_checkout_id=session.get('id'),
+            stripe_checkout_id=checkout_session_id,
             created_by=request.user
         )
 
@@ -99,6 +99,7 @@ def payment_cancel(request, pk):
 
 @api_view(['POST'])
 def stripe_webhook(request):
+    checkout_session_id = request.GET.get('session_id', None)
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
     payload = request.body
     signature_header = request.META.get('HTTP_STRIPE_SIGNATURE')
@@ -117,7 +118,7 @@ def stripe_webhook(request):
     # Handle the 'checkout.session.completed' event
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        checkout_session_id = session.get('id')
+        checkout_session_id = checkout_session_id
         
         try:
             reservation = Reservation.objects.get(stripe_checkout_id=checkout_session_id)
