@@ -206,11 +206,6 @@ def book_property(request, pk):
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
-@api_view(['GET'])
-def payment_cancel(request, pk):
-    return JsonResponse({'success': False, 'message': 'Payment was canceled'})
-
-
 @api_view(['POST'])
 def toggle_favorite(request, pk):
 
