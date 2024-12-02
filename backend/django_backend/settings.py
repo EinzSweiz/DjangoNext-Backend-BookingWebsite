@@ -261,5 +261,6 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 
 
 #STRIPE KEYS
-STRIPE_PUBLISH_KEY=config('STRIPE_PUBLISH_KEY', cast=str, default=None)
-STRIPE_SECRET_KEY=config('STRIPE_SECRET_KEY', cast=str, default=None)
+STRIPE_PUBLISH_KEY = config('STRIPE_PUBLISH_KEY', cast=str, default=None)
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', cast=str, default=None)
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', cast=str, default=None)

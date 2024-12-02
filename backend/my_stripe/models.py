@@ -10,6 +10,7 @@ class UserPayment(models.Model):
     quantity = models.IntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     currency = models.CharField(max_length=3)
+    stripe_checkout_id = models.CharField(max_length=255, null=True, blank=True)  # New field
     has_paid = models.BooleanField(default=False)
 
 
