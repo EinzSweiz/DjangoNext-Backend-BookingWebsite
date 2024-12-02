@@ -1,45 +1,86 @@
-from io import BytesIO
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
+from reportlab.lib import colors
+from io import BytesIO
+import requests
 from PIL import Image
 
+
 def generate_payment_pdf(response_data):
+    # Create a BytesIO buffer to hold the PDF
     buffer = BytesIO()
 
-    # Create PDF with ReportLab
-    p = canvas.Canvas(buffer, pagesize=letter)
+    # Set up the PDF canvas
+    pdf = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
 
-    # Add some text to the PDF
-    p.setFont("Helvetica", 12)
-    p.drawString(100, height - 100, f"Payment Successful for Reservation ID: {response_data['reservation']['id']}")
-    p.drawString(100, height - 120, f"Total Price: ${response_data['reservation']['total_price']}")
-    p.drawString(100, height - 140, f"Guests: {response_data['reservation']['guests']}")
-    
-    # Add reservation dates
-    p.drawString(100, height - 160, f"Start Date: {response_data['reservation']['start_date']}")
-    p.drawString(100, height - 180, f"End Date: {response_data['reservation']['end_date']}")
+    # Draw header with background color
+    pdf.setFillColorRGB(0.1, 0.4, 0.7)  # Blue
+    pdf.rect(0, height - 1.2 * inch, width, 1.2 * inch, fill=1)
+    pdf.setFont("Helvetica-Bold", 20)
+    pdf.setFillColor(colors.white)
+    pdf.drawString(1 * inch, height - 0.9 * inch, "Reservation Invoice")
 
-    # Add property information
-    p.drawString(100, height - 200, f"Property: {response_data['reservation']['property']['name']}")
-    p.drawString(100, height - 220, f"Address: {response_data['reservation']['property']['address']}")
-    
-    # If there's an image URL, add it to the PDF (optional)
-    img_path = response_data['reservation']['property']['image_url']
+    # Add a status (PAID or NOT PAID)
+    payment_status = "PAID" if response_data.get("reservation", {}).get("is_paid", False) else "NOT PAID"
+    pdf.setFont("Helvetica-Bold", 30)
+    pdf.setFillColor(colors.red if payment_status == "NOT PAID" else colors.green)
+    pdf.drawString(width - 3 * inch, height - 0.9 * inch, payment_status)
+
+    # Draw customer and reservation details
+    pdf.setFillColor(colors.black)
+    pdf.setFont("Helvetica", 12)
+    y_position = height - 1.6 * inch
+
+    # Customer details
+    pdf.drawString(1 * inch, y_position, f"Customer: {response_data['customer']['name']}")
+    y_position -= 0.3 * inch
+    pdf.drawString(1 * inch, y_position, f"Email: {response_data['customer']['email']}")
+    y_position -= 0.5 * inch
+
+    # Reservation details
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(1 * inch, y_position, "Reservation Details:")
+    pdf.setFont("Helvetica", 12)
+    y_position -= 0.3 * inch
+    pdf.drawString(1 * inch, y_position, f"Property: {response_data['reservation']['property']['name']}")
+    y_position -= 0.3 * inch
+    pdf.drawString(1 * inch, y_position, f"Location: {response_data['reservation']['property']['address']}")
+    y_position -= 0.3 * inch
+    pdf.drawString(1 * inch, y_position, f"Start Date: {response_data['reservation']['start_date']}")
+    y_position -= 0.3 * inch
+    pdf.drawString(1 * inch, y_position, f"End Date: {response_data['reservation']['end_date']}")
+    y_position -= 0.3 * inch
+    pdf.drawString(1 * inch, y_position, f"Total Price: ${response_data['reservation']['total_price']}")
+    y_position -= 0.5 * inch
+
+    # Attempt to fetch and add the property image
+    pdf.setFont("Helvetica-Bold", 14)
+    pdf.drawString(1 * inch, y_position, "Property Image:")
+    y_position -= 0.3 * inch
+
     try:
-        img = Image.open(img_path)
-        img_path_temp = "/tmp/temp_property_image.jpg"
-        img.save(img_path_temp)
-        p.drawImage(img_path_temp, 100, height - 300, width=200, height=200)  # Adjust coordinates as needed
+        image_url = response_data['reservation']['property']['image_url']
+        response = requests.get(image_url)
+        if response.status_code == 200:
+            # Load the image into PIL and draw it onto the PDF
+            image = Image.open(BytesIO(response.content))
+            image_path = "/tmp/property_image.jpg"
+            image.save(image_path)  # Save temporarily
+            pdf.drawImage(image_path, 1 * inch, y_position - 3 * inch, width=3 * inch, height=2 * inch)
     except Exception as e:
-        print("Error adding image to PDF:", e)
+        pdf.drawString(1 * inch, y_position, f"Error adding image: {e}")
+    y_position -= 2.5 * inch
 
-    # Add customer information
-    p.drawString(100, height - 320, f"Customer Name: {response_data['customer']['name']}")
-    p.drawString(100, height - 340, f"Customer Email: {response_data['customer']['email']}")
+    # Footer
+    pdf.setFont("Helvetica", 10)
+    pdf.setFillColor(colors.gray)
+    pdf.drawString(1 * inch, 0.5 * inch, "Thank you for choosing our service!")
+    pdf.drawString(width - 3 * inch, 0.5 * inch, "Generated on: 2024-12-02")
 
-    p.showPage()
-    p.save()
-
+    # Finalize the PDF
+    pdf.save()
     buffer.seek(0)
+
     return buffer
