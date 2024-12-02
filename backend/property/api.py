@@ -205,51 +205,6 @@ def book_property(request, pk):
         print('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
-@api_view(['GET'])
-def payment_success(request, pk):
-    try:
-        # Retrieve session ID from query parameters
-        session_id = request.GET.get('session_id')
-
-        # Retrieve session details from Stripe
-        session = stripe.checkout.Session.retrieve(pk)
-
-        # Use the metadata to get the booking details
-        metadata = {
-            'start_date': session.metadata['start_date'],
-            'end_date': session.metadata['end_date'],
-            'total_price': session.metadata['total_price'],
-            'number_of_nights': session.metadata['number_of_nights'],
-            'guests': session.metadata['guests'],
-        }
-
-        # Validate metadata using BookingSerializer
-        serializer = BookingSerializer(data=metadata)
-        if not serializer.is_valid():
-            return JsonResponse({'success': False, 'errors': serializer.errors}, status=400)
-
-        # Retrieve the property
-        property = Property.objects.get(pk=pk)
-
-        # Create the reservation in the database
-        reservation = Reservation.objects.create(
-            property=property,
-            start_date=serializer.validated_data['start_date'],
-            end_date=serializer.validated_data['end_date'],
-            number_of_nights=serializer.validated_data['number_of_nights'],
-            total_price=serializer.validated_data['total_price'],
-            guests=serializer.validated_data['guests'],
-            created_by=request.user
-        )
-
-        return JsonResponse({'success': True, 'reservation_id': reservation.id})
-    
-    except Property.DoesNotExist:
-        return JsonResponse({'success': False, 'error': 'Property not found'}, status=404)
-    
-    except Exception as e:
-        print('Error:', e)
-        return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 @api_view(['GET'])
 def payment_cancel(request, pk):

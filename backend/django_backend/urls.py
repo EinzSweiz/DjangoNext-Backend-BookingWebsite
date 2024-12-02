@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 from useraccounts import urls as user_urls
 from inquiries import urls as inquiries_urls
 from chat import urls as chat_urls
+from my_stripe import urls as stripe_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +31,5 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('api/inquiries/', include(inquiries_urls)),
     path('api/chat/', include(chat_urls)),
+    path('api/stripe/', include(stripe_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
