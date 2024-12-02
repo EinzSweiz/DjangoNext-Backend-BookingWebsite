@@ -102,7 +102,8 @@ def stripe_webhook(request):
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
     payload = request.body
     signature_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-
+    logger.debug(f"Stripe-Signature: {signature_header}")
+    logger.debug(f"Request Body: {payload}")
     # Verify webhook signature
     try:
         event = stripe.Webhook.construct_event(payload, signature_header, endpoint_secret)
