@@ -22,7 +22,7 @@ def product_checkout_view(request, property, pk, total_price, start_date, end_da
             mode='payment',
             payment_method_types=['card'],
             customer_creation='always',
-            success_url=request.build_absolute_uri(f'/payment/success/' + "?session_id={CHECKOUT_SESSION_ID}"),  # Redirect to success URL after payment
+            success_url=request.build_absolute_uri(f'/payment/success/?session_id=${checkout_session.id}'),  # Redirect to success URL after payment
             cancel_url=request.build_absolute_uri(f'/payment/cancel/{pk}/'),  # Redirect to cancel URL if payment fails
             customer_email=request.user.email,  # Optional: Prefill user email in checkout
             metadata={
