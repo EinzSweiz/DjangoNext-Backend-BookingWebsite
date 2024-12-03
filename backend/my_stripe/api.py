@@ -105,8 +105,6 @@ def stripe_webhook(request):
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
     payload = request.body
     signature_header = request.META.get('HTTP_STRIPE_SIGNATURE')
-    logger.debug(f"Stripe-Signature: {signature_header}")
-    logger.debug(f"Request Body: {payload}")
     # Verify webhook signature
     try:
         event = stripe.Webhook.construct_event(payload, signature_header, endpoint_secret)
@@ -118,16 +116,15 @@ def stripe_webhook(request):
         return JsonResponse({'error': 'Webhook error'}, status=400)
 
     # Handle the 'checkout.session.completed' event
-    if event['type'] == 'checkout.session.completed':
-        session = event['data']['object']
-        checkout_session_id = request.GET.get('session_id', None) or request.GET.get('id', None)
-        
+    session = event['data']['object']
+    reservation_id = session.metadata.get('reservation_id')
+    if reservation_id:
         try:
-            reservation = Reservation.objects.filter(stripe_checkout_id=checkout_session_id).first()
-            reservation.has_paid = True  # Mark the reservation as paid
+            reservation = Reservation.objects.get(id=reservation_id)
+            reservation.has_paid = True
             reservation.save()
         except Reservation.DoesNotExist:
-            logger.warning(f"Reservation not found for session: {checkout_session_id}")
+            logger.warning(f"Reservation not found for ID: {reservation_id}")
             return JsonResponse({'error': 'Reservation not found'}, status=404)
 
     return JsonResponse({'status': 'success'}, status=200)
