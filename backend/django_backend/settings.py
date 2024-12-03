@@ -27,7 +27,7 @@ EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool, default=True) # port 587 defa
 EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool, default=False) # port 465 default
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', cast=str, default=None)
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', cast=str, default=None)
-
+DEFAULT_FROM_EMAIL = config('ADMIN_USER_EMAIL', cast=str, default=None)
 ADMIN_USER_NAME = config('ADMIN_USER_NAME', cast=str, default= 'Admin User')
 ADMIN_USER_EMAIL = config('ADMIN_USER_EMAIL', cast=str, default= None)
 
