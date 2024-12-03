@@ -33,7 +33,7 @@ def payment_success(request):
             'total_price': session.metadata['total_price'],
             'number_of_nights': session.metadata['number_of_nights'],
             'guests': session.metadata['guests'],
-            'has_paid': False
+            'has_paid': session.metadata['has_paid']
         }
 
         # Validate metadata using BookingSerializer
