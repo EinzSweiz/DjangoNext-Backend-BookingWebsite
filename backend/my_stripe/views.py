@@ -21,12 +21,11 @@ def product_checkout_view(request, property, pk, total_price, start_date, end_da
             ],
             mode='payment',
             payment_method_types=[
-            'card',  # Credit/Debit cards
-            'blik',  # BLIK payments
-            'paypal',  # PayPal payments
-            'apple_pay',  # Apple Pay
-            'google_pay',  # Google Pay
-        ],
+                'card',  # Credit/Debit cards
+                'blik',  # BLIK payments
+                'paypal',  # PayPal payments
+            ],
+
             customer_creation='always',
             success_url='http://165.22.76.137/payment/success?session_id={CHECKOUT_SESSION_ID}',  # Redirect to success URL after payment  # Redirect to success URL after payment
             cancel_url=request.build_absolute_uri(f'/payment/cancel/{pk}/'),  # Redirect to cancel URL if payment fails
