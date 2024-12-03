@@ -22,8 +22,9 @@ def generate_payment_pdf(response_data):
     pdf.setFillColor(colors.white)
     pdf.drawString(1 * inch, height - 0.9 * inch, "Reservation Invoice")
 
+    #if response_data.get("reservation", {}).get("has_paid", False) else "NOT PAID"
     # Add a status (PAID or NOT PAID)
-    payment_status = "PAID" if response_data.get("reservation", {}).get("has_paid", False) else "NOT PAID"
+    payment_status = "PAID" 
     pdf.setFont("Helvetica-Bold", 30)
     pdf.setFillColor(colors.red if payment_status == "NOT PAID" else colors.green)
     pdf.drawString(width - 3 * inch, height - 0.9 * inch, payment_status)
