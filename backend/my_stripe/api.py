@@ -1,5 +1,6 @@
 import stripe
 from rest_framework.decorators import api_view
+import stripe.error
 import stripe.webhook
 from property.serializers import BookingSerializer
 from django.http import JsonResponse
@@ -108,7 +109,7 @@ def stripe_webhook(request):
     # Verify webhook signature
     try:
         event = stripe.Webhook.construct_event(payload, signature_header, endpoint_secret)
-    except stripe.error.SignatureVerificationError as e:
+    except stripe.error as e:
         logger.error(f"Signature verification failed: {e}")
         return JsonResponse({'error': 'Invalid signature'}, status=400)
     except Exception as e:
