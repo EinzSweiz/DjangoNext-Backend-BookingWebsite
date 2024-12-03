@@ -25,6 +25,7 @@ def product_checkout_view(request, property, pk, total_price, start_date, end_da
             },
         ],
         mode='payment',
+        payment_method=[i for i in ['card', 'blik', 'paypal']],
         payment_method_types=[
             'card',  # Credit/Debit cards
             'blik',  # BLIK payments
