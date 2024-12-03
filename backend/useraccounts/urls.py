@@ -1,6 +1,6 @@
 from django.urls import path
 from dj_rest_auth.jwt_auth import get_refresh_view
-from dj_rest_auth.views import LoginView, LogoutView
+from dj_rest_auth.views import LoginView, LogoutView, PasswordResetView, PasswordResetConfirmView
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework_simplejwt.views import TokenVerifyView
 from useraccounts import api
@@ -17,5 +17,7 @@ urlpatterns = [
     path('<uuid:user_id>/<token>/', confirm_email, name='confirm_email'),
     path('<uuid:pk>/', api.landlord_detail, name='api_landlord_detail'),
     path('profile/<uuid:pk>/', api.profile_detail, name='profile_detail'),
+    path('password/reset/', PasswordResetView.as_view(), name='rest_password_reset'),    
+    path('password/reset/confirm/', PasswordResetConfirmView.as_view(), name='rest_password_reset_confirm'),
     path('profile/update/<uuid:pk>', api.update_profile, name='update_profile'),
 ]
