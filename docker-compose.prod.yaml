@@ -1,13 +1,16 @@
 version: '3.8'
 services:
   nginx:
-    build: ./nginx
+    build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
     ports:
-      - 1337:80
+      - "1337:80"  # Expose Nginx on port 1337
+      - "443:443"  # Expose Nginx on port 443 for HTTPS traffic
     depends_on:
-      - web
+      - web  # Ensure the web service (backend) is ready before Nginx starts
     volumes:
-      - media_volume:/usr/src/backend/media  # Correct path to media volume
+      - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf  # Mount custom Nginx configuration
+      - /etc/letsencrypt/live:/etc/letsencrypt/live:ro  # Mount SSL certificates directory
 
   web:
     build: ./backend
