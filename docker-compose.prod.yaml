@@ -3,15 +3,12 @@ services:
   nginx:
     build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
     ports:
-      - "8443:443"  # Expose Nginx on port 8443
-      - "8080:80"
+      - "1773:443"  # Expose Nginx on port 8443
     depends_on:
       - web
     volumes:
       - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
-      - /etc/letsencrypt/live:/etc/letsencrypt/live  # Shared volume for certificates
-      - /var/www/certbot:/var/www/certbot            # Shared volume for Certbot challenge
-    command: /bin/bash -c "while [ ! -f /etc/letsencrypt/live/api.diplomaroad.pro/fullchain.pem ]; do echo 'Waiting for certbot to finish'; sleep 5; done && nginx -g 'daemon off;'"
+      - /etc/letsencrypt/live:/etc/letsencrypt/live      - /var/www/certbot:/var/www/certbot            # Shared volume for Certbot challenge
 
   web:
     build: ./backend
@@ -26,14 +23,6 @@ services:
     depends_on:
       - db
       - daphne
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - /etc/letsencrypt:/etc/letsencrypt        # Shared volume for certificates
-      - /var/www/certbot:/var/www/certbot        # Shared volume for Certbot challenge
-    command: certonly --webroot -w /var/www/certbot -d api.diplomaroad.pro
 
   daphne:
     build: ./backend
