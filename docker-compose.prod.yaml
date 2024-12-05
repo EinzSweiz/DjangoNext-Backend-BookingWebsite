@@ -1,15 +1,13 @@
 version: '3.8'
 services:
   nginx:
-    build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
+    build: ./nginx
     ports:
-      - "1773:443"  # Expose Nginx on port 8443
+      - "1773:80"  # Expose only HTTP
     depends_on:
       - web
     volumes:
-      - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
-      - /etc/letsencrypt/live:/etc/letsencrypt/live
-
+      - media_volume:/usr/src/backend/media
   web:
     build: ./backend
     command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010 --log-level debug"
