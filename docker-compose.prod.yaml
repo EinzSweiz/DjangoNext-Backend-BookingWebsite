@@ -8,9 +8,10 @@ services:
       - web
     volumes:
       - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
-      - /etc/letsencrypt/live:/etc/letsencrypt/live
-      - /var/www/certbot:/var/www/certbot
-      
+      - /etc/letsencrypt/live:/etc/letsencrypt/live  # Shared volume for certificates
+      - /var/www/certbot:/var/www/certbot            # Shared volume for Certbot challenge
+    command: /bin/bash -c "while [ ! -f /etc/letsencrypt/live/api.diplomaroad.pro/fullchain.pem ]; do echo 'Waiting for certbot to finish'; sleep 5; done && nginx -g 'daemon off;'"
+
   web:
     build: ./backend
     command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010 --log-level debug"
@@ -24,13 +25,13 @@ services:
     depends_on:
       - db
       - daphne
-
+      
   certbot:
     image: certbot/certbot
     container_name: certbot
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt
-      - /var/www/certbot:/var/www/certbot
+      - /etc/letsencrypt:/etc/letsencrypt        # Shared volume for certificates
+      - /var/www/certbot:/var/www/certbot        # Shared volume for Certbot challenge
     command: certonly --webroot -w /var/www/certbot -d api.diplomaroad.pro
 
   daphne:
