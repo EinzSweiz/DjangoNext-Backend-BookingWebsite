@@ -9,6 +9,7 @@ services:
     volumes:
       - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
       - /etc/letsencrypt/live:/etc/letsencrypt/live
+      - /var/www/certbot:/var/www/certbot
       
   web:
     build: ./backend
