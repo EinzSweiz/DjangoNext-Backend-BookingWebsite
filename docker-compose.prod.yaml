@@ -4,6 +4,7 @@ services:
     build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
     ports:
       - "8443:443"  # Expose Nginx on port 8443
+      - '80:80'
     depends_on:
       - web
     volumes:
@@ -25,7 +26,7 @@ services:
     depends_on:
       - db
       - daphne
-      
+
   certbot:
     image: certbot/certbot
     container_name: certbot
