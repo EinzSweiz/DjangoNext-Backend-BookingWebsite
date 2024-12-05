@@ -5,7 +5,7 @@ services:
     ports:
       - "1337:80"  # Expose Nginx on port 1337
     depends_on:
-      - web  # Ensure the web service (backend) is ready before Nginx starts
+      - web
     volumes:
       - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
       
