@@ -1,13 +1,13 @@
 version: '3.8'
 services:
-  # nginx:
-  #   build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
-  #   ports:
-  #     - "1337:80"  # Expose Nginx on port 1337
-  #   depends_on:
-  #     - web  # Ensure the web service (backend) is ready before Nginx starts
-  #   volumes:
-  #     - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
+  nginx:
+    build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
+    ports:
+      - "1337:80"  # Expose Nginx on port 1337
+    depends_on:
+      - web  # Ensure the web service (backend) is ready before Nginx starts
+    volumes:
+      - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
       
   web:
     build: ./backend
