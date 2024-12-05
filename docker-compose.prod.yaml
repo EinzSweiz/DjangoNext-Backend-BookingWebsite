@@ -8,6 +8,7 @@ services:
       - web
     volumes:
       - media_volume:/usr/src/backend/media  # Correct path to media volume (do not change)
+      - /etc/letsencrypt/live:/etc/letsencrypt/live
       
   web:
     build: ./backend
