@@ -42,6 +42,7 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    command: ["sh", "-c", "redis-server & redis-cli flushall"]
     
 
   celery:
