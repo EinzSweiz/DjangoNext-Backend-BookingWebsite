@@ -88,14 +88,22 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # Disable the email confirmation link trig
 ACCOUNT_EMAIL_REQUIRED = True  # Ensure email is required for registration
 ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Ensure users authenticate with their email
 #SOCIAL ACCOUNT
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY', cast=str, default=None)
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET', cast=str, default=None)
-AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GoogleOAuth2',  # Add this for Google OAuth
-    'django.contrib.auth.backends.ModelBackend',  # Default backend for Django authentication
-)
-SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = ['email']  # This requests the user's email
-SOCIAL_AUTH_GOOGLE_OAUTH2_EXTRA_DATA = ['name']  # This stores extra data like name
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',  # Default Django authentication
+    'allauth.account.auth_backends.AuthenticationBackend',  # Allauth backend
+]
+CORS_ALLOW_ALL_ORIGINS = False  # Restrict to specific origins
+
+# Google OAuth configuration
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY'),
+            'secret': config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET'),
+        },
+        'SCOPE': ['email', 'profile'],
+    }
+}
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -183,7 +191,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Add this line
-    'allauth.account.middleware.AccountMiddleware',
 ]
 
 
