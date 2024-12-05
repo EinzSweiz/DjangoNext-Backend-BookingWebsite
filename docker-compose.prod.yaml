@@ -4,7 +4,7 @@ services:
     build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
     ports:
       - "8443:443"  # Expose Nginx on port 8443
-      - 1337
+      - "8080:80"
     depends_on:
       - web
     volumes:
