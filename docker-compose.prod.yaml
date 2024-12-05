@@ -3,7 +3,7 @@ services:
   nginx:
     build: ./nginx  # Builds Nginx from the Dockerfile in ./nginx directory
     ports:
-      - "1337:80"  # Expose Nginx on port 1337
+      - "8443:443"  # Expose Nginx on port 8443
     depends_on:
       - web
     volumes:
@@ -23,6 +23,14 @@ services:
     depends_on:
       - db
       - daphne
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
+      - /var/www/certbot:/var/www/certbot
+    command: certonly --webroot -w /var/www/certbot -d api.diplomaroad.pro
 
   daphne:
     build: ./backend
