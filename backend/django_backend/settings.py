@@ -103,10 +103,11 @@ SOCIALACCOUNT_PROVIDERS = {
         },
         'SCOPE': ['email', 'profile'],
         'AUTH_PARAMS': {'access_type': 'online'},
+        'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
+        'REDIRECT_URI': 'https://api.diplomaroad.pro/oauth2callback', 
     }
 }
-
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTAuthentication',    

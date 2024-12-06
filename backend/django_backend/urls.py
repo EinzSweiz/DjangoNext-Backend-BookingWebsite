@@ -30,6 +30,7 @@ urlpatterns = [
     path('api/auth/', include(user_urls)),
     path('accounts/', include('allauth.urls')),
     path('api/inquiries/', include(inquiries_urls)),
+    path('oauth2callback/', include('allauth.urls')),  # This handles the Google OAuth2 callback
     path('api/chat/', include(chat_urls)),
     path('api/stripe/', include(stripe_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
