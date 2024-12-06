@@ -3,6 +3,7 @@ from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from .models import User
 from dj_rest_auth.views import LoginView
+from django.urls import reverse
 from allauth.account.models import EmailAddress
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -35,3 +36,16 @@ class CustomLoginView(LoginView):
             raise AuthenticationFailed("E-mail is not verified.")
         
         return response
+
+def google_login_view(request):
+    """
+    Custom view to provide Google OAuth login URL for frontend.
+    """
+    # Use Django reverse to get the login URL
+    login_url = reverse('socialaccount_login', args=['google'])
+    
+    # Build the full URL
+    full_url = request.build_absolute_uri(login_url)
+    
+    # Return as JSON response
+    return JsonResponse({'redirect_url': full_url})

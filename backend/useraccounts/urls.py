@@ -4,7 +4,7 @@ from dj_rest_auth.views import LoginView, LogoutView, PasswordResetConfirmView, 
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework_simplejwt.views import TokenVerifyView
 from useraccounts import api
-from .views import CustomLoginView
+from .views import CustomLoginView, google_login_view
 from .serializers import CustomRegisterSerializer
 from .views import confirm_email
 
@@ -14,6 +14,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='rest_logout'),
     path('token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
     path('myreservations/', api.reservations_list, name='api_reservations_list'),
+    path('accounts/google-login-url/', google_login_view, name='google_login_url'),
     path('<uuid:user_id>/<token>/', confirm_email, name='confirm_email'),
     path('<uuid:pk>/', api.landlord_detail, name='api_landlord_detail'),
     path('profile/<uuid:pk>/', api.profile_detail, name='profile_detail'),
