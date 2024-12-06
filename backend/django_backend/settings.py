@@ -102,6 +102,9 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET'),
         },
         'SCOPE': ['email', 'profile'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': True,
     }
 }
 
