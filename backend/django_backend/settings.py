@@ -94,20 +94,20 @@ AUTHENTICATION_BACKENDS = [
 ]
 CORS_ALLOW_ALL_ORIGINS = False  # Restrict to specific origins
 
-# Google OAuth configuration
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-#         'APP': {
-#             'client_id': config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY'),
-#             'secret': config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET'),
-#         },
-#         'SCOPE': ['email', 'profile'],
-#         'AUTH_PARAMS': {'access_type': 'online'},
-#         'METHOD': 'oauth2',
-#         'VERIFIED_EMAIL': True,
-#         'REDIRECT_URI': 'https://api.diplomaroad.pro/oauth2callback', 
-#     }
-# }
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY'),
+            'secret': config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET'),
+        },
+        'SCOPE': ['email', 'profile'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+        'METHOD': 'oauth2',
+        'VERIFIED_EMAIL': True,
+        'REDIRECT_URI': 'https://api.diplomaroad.pro/accounts/google/login/callback/',  # Correct URI
+    }
+}
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTAuthentication',    
