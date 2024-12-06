@@ -42,8 +42,7 @@ def google_login_view(request):
     Custom view to provide Google OAuth login URL for frontend.
     """
     # Use Django reverse to get the login URL
-    login_url = reverse('socialaccount_login', args=['google'])
-    
+    login_url = reverse('socialaccount_login', kwargs={'provider': 'google'})    
     # Build the full URL
     full_url = request.build_absolute_uri(login_url)
     
