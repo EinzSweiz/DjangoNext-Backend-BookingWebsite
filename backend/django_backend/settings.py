@@ -162,6 +162,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     #installed app
     'channels',
     'rest_framework',
@@ -175,7 +176,6 @@ INSTALLED_APPS = [
     'dj_rest_auth.registration',
     'corsheaders',  # Make sure this line is separate
     'django_celery_beat',
-    'django.contrib.sites',
     'django_celery_results',
     #myapps
     'useraccounts',
