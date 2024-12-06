@@ -106,6 +106,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERIFIED_EMAIL': True,
     }
 }
+USE_X_FORWARDED_HOST = True
 GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
 LOGIN_REDIRECT_URL = '/'
 REST_FRAMEWORK = {
