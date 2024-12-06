@@ -83,7 +83,7 @@ SIMPLE_JWT = {
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 # Disable email confirmation
-ACCOUNT_EMAIL_VERIFICATION = "mandatory"  # This will skip email verification after registration
+ACCOUNT_EMAIL_VERIFICATION = "None"  # This will skip email verification after registration
 ACCOUNT_CONFIRM_EMAIL_ON_GET = False  # Disable the email confirmation link trigger
 ACCOUNT_EMAIL_REQUIRED = True  # Ensure email is required for registration
 ACCOUNT_AUTHENTICATION_METHOD = 'email'  # Ensure users authenticate with their email
