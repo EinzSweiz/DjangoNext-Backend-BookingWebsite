@@ -103,7 +103,6 @@ SOCIALACCOUNT_PROVIDERS = {
         },
         'SCOPE': ['email', 'profile'],
         'AUTH_PARAMS': {'access_type': 'online'},
-        'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
     }
 }
