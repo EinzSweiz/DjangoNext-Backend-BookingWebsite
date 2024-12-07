@@ -11,8 +11,6 @@ from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.views.decorators.csrf import csrf_exempt
-from dj_rest_auth.views import PasswordResetView as DjRestAuthPasswordResetView
-
 import json
 
 logger = logging.getLogger(__name__)
@@ -111,10 +109,3 @@ def update_profile(request, pk):
 
 #     except Exception as e:
 #         return JsonResponse({'detail': str(e)}, status=500)
-
-class CustomPasswordResetView(DjRestAuthPasswordResetView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['protocol'] = 'https'
-        context['domain'] = 'www.diplomaroad.pro'  # Force the correct domain
-        return context

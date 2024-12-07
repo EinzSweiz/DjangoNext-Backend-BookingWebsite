@@ -2,6 +2,14 @@ from rest_framework import serializers
 from .models import User
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from .tasks import send_confirmation_message
+from dj_rest_auth.serializers import PasswordResetSerializer
+from django.contrib.sites.shortcuts import get_current_site
+
+class CustomPasswordResetSerializer(PasswordResetSerializer):
+    def save(self, **kwargs):
+        request = self.context.get('request')
+        domain_override = 'www.diplomaroad.pro'  # Force your frontend domain
+        super().save(domain_override=domain_override, request=request, **kwargs)
 
 
 class UserSerializer(serializers.ModelSerializer):

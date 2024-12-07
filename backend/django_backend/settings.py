@@ -169,6 +169,10 @@ REST_AUTH = {
     # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     # 'REFRESH_TOKEN_LIFETIME': timedelta(days=3)
 }
+
+REST_AUTH_SERIALIZERS = {
+    'PASSWORD_RESET_SERIALIZER': 'backend.useraccounts.CustomPasswordResetSerializer',
+}
 # Application definition
 
 INSTALLED_APPS = [
