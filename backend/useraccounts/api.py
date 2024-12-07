@@ -77,8 +77,8 @@ def google_login_callback(request):
         return JsonResponse('No user found')
     
 
-    token = SocialToken.objects.filter(account=social_account, account_providers='google').first()
-
+    token = SocialToken.objects.filter(account=social_account, app__provider='google').first()
+    
     if token:
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
