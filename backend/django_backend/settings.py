@@ -104,8 +104,7 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
-        'FETCH_USERINFO': True,
-        'REDIRECT_URI': 'https://api.diplomaroad.pro/api/auth/google/callback/',
+        'FETCH_USERINFO': True
     },
     'github': {
         'APP': {
@@ -118,7 +117,7 @@ SOCIALACCOUNT_PROVIDERS = {
 SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 USE_X_FORWARDED_HOST = True
-GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/api/auth/google/callback/'
+GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
 LOGIN_REDIRECT_URL = "https://www.diplomaroad.pro/"
 REST_FRAMEWORK = {
