@@ -104,7 +104,8 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
-        'FETCH_USERINFO': True
+        'FETCH_USERINFO': True,
+        'REDIRECT_URI': 'https://api.diplomaroad.pro/api/auth/google/callback/',
     },
     'github': {
         'APP': {
