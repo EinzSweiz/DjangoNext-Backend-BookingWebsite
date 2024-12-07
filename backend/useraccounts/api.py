@@ -71,20 +71,20 @@ def update_profile(request, pk):
 @login_required
 def google_login_callback(request):
     user = request.user
-    social_accounts = SocialAccount.objects.filter(user=user)
+    social_accounts = SocialAccount.objects.filter(user=user).first()
     social_account = social_accounts.first()
     if not social_accounts:
-        return JsonResponse('No user found')
+        return JsonResponse({'message': 'No user found'})
     
 
     token = SocialToken.objects.filter(account=social_account, app__provider='google').first()
-    
+
     if token:
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}')
     else:
-        return JsonResponse('No tokens found')
+        return JsonResponse({'message': 'No tokens found'})
     
 @api_view(['POST'])
 def validate_google_token(request):
