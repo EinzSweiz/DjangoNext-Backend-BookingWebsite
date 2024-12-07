@@ -9,7 +9,7 @@ def send_confirmation_message(user_id):
     try:
         user = User.objects.get(pk=user_id)
         token = default_token_generator.make_token(user)
-        confirmation_url = f"https://www.diplomaroad.pro/email-confirmation?uid={user.id}&token={token}"
+        confirmation_url = f"{settings.FRONTEND_URL}/email-confirmation?uid={user.id}&token={token}"
         
         subject = 'Please confirm your email address'
         message = (
