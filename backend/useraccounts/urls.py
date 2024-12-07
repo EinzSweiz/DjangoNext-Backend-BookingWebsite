@@ -4,7 +4,6 @@ from dj_rest_auth.views import LoginView, LogoutView, PasswordResetConfirmView, 
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework_simplejwt.views import TokenVerifyView
 from useraccounts import api
-from .api import GoogleLoginCallbackAPI
 from .views import CustomLoginView
 from .serializers import CustomRegisterSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
