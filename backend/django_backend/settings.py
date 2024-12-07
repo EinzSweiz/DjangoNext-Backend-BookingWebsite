@@ -110,8 +110,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': config('SOCIAL_AUTH_GITHUB_OAUTH2_KEY'),
             'secret': config('SOCIAL_AUTH_GITHUB_OAUTH2_SECRET'),
             'key': ''
-        },
-        'SCOPE': ['read:user', 'user:email'],
+        }
     }
 }
 SOCIALACCOUNT_LOGIN_ON_GET = True
