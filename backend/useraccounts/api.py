@@ -71,9 +71,8 @@ def update_profile(request, pk):
 @login_required
 def google_login_callback(request):
     user = request.user
-    social_accounts = SocialAccount.objects.filter(user=user).first()
-    social_account = social_accounts.first()
-    if not social_accounts:
+    social_account = SocialAccount.objects.filter(user=user).first()
+    if not social_account:
         return JsonResponse({'message': 'No user found'})
     
 
