@@ -106,10 +106,11 @@ SOCIALACCOUNT_PROVIDERS = {
         'VERIFIED_EMAIL': True,
     }
 }
+SOCIALACCOUNT_LOGIN_ON_GET = True
 USE_X_FORWARDED_HOST = True
 GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = "https://www.diplomaroad.pro/home/"
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTAuthentication',    
