@@ -121,7 +121,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 USE_X_FORWARDED_HOST = True
 GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL='https'
-LOGIN_REDIRECT_URL = '/callback/'
+LOGIN_REDIRECT_URL = 'https://www.diplomaroad.pro/'
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         'rest_framework_simplejwt.authentication.JWTAuthentication',    
@@ -165,8 +165,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_AUTH = {
     'USE_JWT': True,
     'JWT_AUTH_HTTPONLY': False,
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=3)
+    # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    # 'REFRESH_TOKEN_LIFETIME': timedelta(days=3)
 }
 # Application definition
 

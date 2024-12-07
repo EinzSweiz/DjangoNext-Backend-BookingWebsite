@@ -68,44 +68,44 @@ def update_profile(request, pk):
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=400)
 
-@login_required
-def google_login_callback(request):
-    user = request.user
-    social_account = SocialAccount.objects.filter(user=user).first()
-    if not social_account:
-        return JsonResponse({'message': 'No user found'})
+# @login_required
+# def google_login_callback(request):
+#     user = request.user
+#     social_account = SocialAccount.objects.filter(user=user).first()
+#     if not social_account:
+#         return JsonResponse({'message': 'No user found'})
     
 
-    token = SocialToken.objects.filter(account=social_account, app__provider='google').first()
+#     token = SocialToken.objects.filter(account=social_account, app__provider='google').first()
 
-    if token:
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}')
-    else:
-        return JsonResponse({'message': 'No tokens found'})
+#     if token:
+#         refresh = RefreshToken.for_user(user)
+#         access_token = str(refresh.access_token)
+#         return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}')
+#     else:
+#         return JsonResponse({'message': 'No tokens found'})
     
-@api_view(['POST'])
-def validate_google_token(request):
-    google_access_token = request.data.get('access_token')
+# @api_view(['POST'])
+# def validate_google_token(request):
+#     google_access_token = request.data.get('access_token')
 
-    if not google_access_token:
-        return JsonResponse({'detail': 'Access token is missing'}, status=400)
+#     if not google_access_token:
+#         return JsonResponse({'detail': 'Access token is missing'}, status=400)
     
-    # Assuming you have a way to validate the token and retrieve user info
-    try:
-        # Use the SocialAccount model to find the associated user
-        social_account = SocialAccount.objects.filter(
-            socialtoken__token=google_access_token
-        ).first()
+#     # Assuming you have a way to validate the token and retrieve user info
+#     try:
+#         # Use the SocialAccount model to find the associated user
+#         social_account = SocialAccount.objects.filter(
+#             socialtoken__token=google_access_token
+#         ).first()
 
-        if not social_account:
-            return JsonResponse({'detail': 'User not found'}, status=404)
+#         if not social_account:
+#             return JsonResponse({'detail': 'User not found'}, status=404)
 
-        user = social_account.user
-        user_id = str(user.id)  # Get the user ID as a string
+#         user = social_account.user
+#         user_id = str(user.id)  # Get the user ID as a string
 
-        return JsonResponse({'valid': True, 'user_id': user_id})
+#         return JsonResponse({'valid': True, 'user_id': user_id})
 
-    except Exception as e:
-        return JsonResponse({'detail': str(e)}, status=500)
+#     except Exception as e:
+#         return JsonResponse({'detail': str(e)}, status=500)
