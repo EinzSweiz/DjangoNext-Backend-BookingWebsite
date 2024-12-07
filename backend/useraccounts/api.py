@@ -1,9 +1,13 @@
 from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from property.serializers import ResirvationListSerializer
 import logging
+from django.conf import settings
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from allauth.socialaccount.models import SocialAccount
 
 logger = logging.getLogger(__name__)
 @api_view(['GET'])
@@ -59,3 +63,15 @@ def update_profile(request, pk):
     # Log the serializer errors to check the exact issue
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=400)
+
+class GoogleLoginCallbackAPI(APIView):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if not user.is_authenticated:
+            return JsonResponse({'error': 'User not authenticated'}, status=401)
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+        user_id = user.id
+        frontend_url = f"{settings.FRONTEND_URL}/auth/callback/{access_token}/{refresh_token}/{user_id}/"
+        return HttpResponseRedirect(frontend_url)
