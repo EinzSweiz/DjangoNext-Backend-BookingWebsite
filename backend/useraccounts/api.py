@@ -7,6 +7,8 @@ import logging
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
+from django.views.decorators.csrf import csrf_exempt
 from allauth.socialaccount.models import SocialAccount
 
 logger = logging.getLogger(__name__)
@@ -65,7 +67,11 @@ def update_profile(request, pk):
         return JsonResponse(serializer.errors, status=400)
 
 class GoogleLoginCallbackAPI(APIView):
+    permission_classes = [AllowAny]  # Allow any user to access this endpoint
+    
+    @csrf_exempt  # Disable CSRF for this view
     def get(self, request, *args, **kwargs):
+        # You can skip authentication checks
         user = request.user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
