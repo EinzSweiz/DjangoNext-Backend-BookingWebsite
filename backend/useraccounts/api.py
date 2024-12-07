@@ -116,6 +116,5 @@ class CustomPasswordResetView(DjRestAuthPasswordResetView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['protocol'] = 'https'
-        context['domain'] = 'www.diplomaroad.pro'
-        context['site_name'] = 'DiplomaRoad'
+        context['domain'] = 'www.diplomaroad.pro'  # Force the correct domain
         return context
