@@ -67,8 +67,6 @@ def update_profile(request, pk):
 class GoogleLoginCallbackAPI(APIView):
     def get(self, request, *args, **kwargs):
         user = request.user
-        if not user.is_authenticated:
-            return JsonResponse({'error': 'User not authenticated'}, status=401)
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
