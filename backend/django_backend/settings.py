@@ -104,6 +104,14 @@ SOCIALACCOUNT_PROVIDERS = {
         'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
+    },
+    'github': {
+        'APP': {
+            'client_id': config('SOCIAL_AUTH_GITHUB_OAUTH2_KEY'),
+            'secret': config('SOCIAL_AUTH_GITHUB_OAUTH2_SECRET'),
+            'key': ''
+        },
+        'SCOPE': ['read:user', 'user:email'],
     }
 }
 SOCIALACCOUNT_LOGIN_ON_GET = True
@@ -174,6 +182,7 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.github',
     'allauth.account',
     'dj_rest_auth',
     'dj_rest_auth.registration',
