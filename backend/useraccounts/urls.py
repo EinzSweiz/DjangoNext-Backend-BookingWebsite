@@ -4,7 +4,6 @@ from dj_rest_auth.views import LoginView, LogoutView, PasswordResetConfirmView, 
 from dj_rest_auth.registration.views import RegisterView
 from useraccounts import api
 from .views import CustomLoginView, confirm_email
-from .api import Custome
 from .serializers import CustomRegisterSerializer
 
 urlpatterns = [
