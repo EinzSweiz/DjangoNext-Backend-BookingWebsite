@@ -6,10 +6,9 @@ from property.serializers import ResirvationListSerializer
 import logging
 from django.conf import settings
 from rest_framework.views import APIView
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 from rest_framework.permissions import AllowAny
 from django.views.decorators.csrf import csrf_exempt
-from allauth.socialaccount.models import SocialAccount
 
 logger = logging.getLogger(__name__)
 @api_view(['GET'])
@@ -68,14 +67,30 @@ def update_profile(request, pk):
 
 class GoogleLoginCallbackAPI(APIView):
     permission_classes = [AllowAny]  # Allow any user to access this endpoint
-    
+
     @csrf_exempt  # Disable CSRF for this view
     def get(self, request, *args, **kwargs):
-        # You can skip authentication checks
-        user = request.user
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
-        user_id = user.id
-        frontend_url = f"{settings.FRONTEND_URL}/auth/callback/{access_token}/{refresh_token}/{user_id}/"
-        return HttpResponseRedirect(frontend_url)
+        # Get the token from the URL
+        token = request.GET.get('access_token', None)
+
+        if token is None:
+            return JsonResponse({'error': 'Access token not found in the request'}, status=400)
+
+        try:
+            # Decode the token
+            access_token = AccessToken(token)
+            user = access_token.payload.get('user_id')
+
+            if user is None:
+                return JsonResponse({'error': 'User not found in token payload'}, status=400)
+
+            user_instance = User.objects.get(id=user)
+
+            refresh = RefreshToken.for_user(user_instance)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
+            frontend_url = f"{settings.FRONTEND_URL}/auth/callback/{access_token}/{refresh_token}/{user_instance.id}/"
+            return HttpResponseRedirect(frontend_url)
+
+        except Exception as e:
+            return JsonResponse({'error': f'Error processing the token: {str(e)}'}, status=400)
