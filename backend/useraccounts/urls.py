@@ -7,6 +7,7 @@ from useraccounts import api
 from .api import GoogleLoginCallbackAPI
 from .views import CustomLoginView
 from .serializers import CustomRegisterSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import confirm_email
 
 urlpatterns = [
@@ -14,6 +15,8 @@ urlpatterns = [
     path('login/', CustomLoginView.as_view(), name='rest_login'),
     path('logout/', LogoutView.as_view(), name='rest_logout'),
     path('token/refresh/', get_refresh_view().as_view(), name='token_refresh'),
+    path('token/', TokenObtainPairView.as_view(), name='token_obtaion'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('myreservations/', api.reservations_list, name='api_reservations_list'),
     path('<uuid:user_id>/<token>/', confirm_email, name='confirm_email'),
     path('<uuid:pk>/', api.landlord_detail, name='api_landlord_detail'),

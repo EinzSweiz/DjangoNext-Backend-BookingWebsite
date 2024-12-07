@@ -99,12 +99,14 @@ SOCIALACCOUNT_PROVIDERS = {
         'APP': {
             'client_id': config('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY'),
             'secret': config('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET'),
+            'FETCH_USERINFO': True,
+            'OAUTH_PKCE_ENABLED': True,
+
         },
         'SCOPE': ['email', 'profile'],
         'AUTH_PARAMS': {'access_type': 'online'},
         'METHOD': 'oauth2',
         'VERIFIED_EMAIL': True,
-        'FETCH_USERINFO': True
     },
     'github': {
         'APP': {
@@ -162,7 +164,9 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 REST_AUTH = {
     'USE_JWT': True,
-    'JWT_AUTH_HTTPONLY': False
+    'JWT_AUTH_HTTPONLY': False,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=3)
 }
 # Application definition
 
