@@ -86,16 +86,27 @@ def google_login_callback(request):
     else:
         return JsonResponse('No tokens found')
     
-@csrf_exempt
+@api_view(['POST'])
 def validate_google_token(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            google_access_token = data.get('access_token')
-            
-            if not google_access_token:
-                return JsonResponse({'detail': 'Access token is missing'}, status=400)
-            return JsonResponse({'valid': True})
-        except json.JSONDecodeError:
-            return JsonResponse({'detail': 'Invalid Json'}, status=400)
-    return JsonResponse({'detail': 'Method not allowed'}, status=405)
+    google_access_token = request.data.get('access_token')
+
+    if not google_access_token:
+        return JsonResponse({'detail': 'Access token is missing'}, status=400)
+    
+    # Assuming you have a way to validate the token and retrieve user info
+    try:
+        # Use the SocialAccount model to find the associated user
+        social_account = SocialAccount.objects.filter(
+            socialtoken__token=google_access_token
+        ).first()
+
+        if not social_account:
+            return JsonResponse({'detail': 'User not found'}, status=404)
+
+        user = social_account.user
+        user_id = str(user.id)  # Get the user ID as a string
+
+        return JsonResponse({'valid': True, 'user_id': user_id})
+
+    except Exception as e:
+        return JsonResponse({'detail': str(e)}, status=500)
