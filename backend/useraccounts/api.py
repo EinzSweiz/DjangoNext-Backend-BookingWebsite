@@ -68,30 +68,38 @@ def update_profile(request, pk):
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=400)
 
+from django.http import JsonResponse, HttpResponse
+from allauth.socialaccount.models import SocialAccount, SocialToken
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.shortcuts import redirect
+
 @login_required
-def google_login_callback(request):
+def login_callback(request):
     user = request.user
-    social_account = SocialAccount.objects.get(user=user, provider='google')
-    if not social_account:
-        existing_user = User.objects.get(email=user.email)
-        if existing_user:
-            SocialAccount.objects.create(user=existing_user, provider='google')
-            user = existing_user
-        else:
-            return JsonResponse({'message': 'No social account found and no existing user to link.'}, status=404)
-    
+
+    # Check for the provider (either 'google' or 'github')
+    provider = request.GET.get('provider')
+
+    # Ensure the provider is valid
+    if provider not in ['google', 'github']:
+        return JsonResponse({'message': 'Invalid provider'}, status=400)
+
+    try:
+        social_account = SocialAccount.objects.get(user=user, provider=provider)
+    except SocialAccount.DoesNotExist:
+        return JsonResponse({'message': f'{provider.capitalize()} account not found'}, status=404)
 
     token = SocialToken.objects.filter(account=social_account).first()
-
     if token:
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
-        user_id = user.id
-        return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}')   
+
+        # Redirect to the frontend with the necessary tokens
+        return redirect(f'https://www.diplomaroad.pro/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user.id}')
     else:
-        return JsonResponse({'message': 'No tokens found'})
-    
+        return JsonResponse({'message': 'No token found for the account'}, status=404)
+
 @api_view(['POST'])
 def validate_google_token(request):
     google_access_token = request.data.get('access_token')

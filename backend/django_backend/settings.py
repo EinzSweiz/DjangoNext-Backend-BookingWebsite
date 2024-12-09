@@ -81,11 +81,12 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': config('SOCIAL_AUTH_GITHUB_OAUTH2_SECRET'),
             'key': ''
         },
-        'SCOPE': [
-            'user',
-            'repo',
-            'read:org',
-        ],
+        'SCOPE': ['user', 'repo'],  # Define necessary permissions
+        'AUTH_PARAMS': {
+            'force_verify': 'true',
+        },
+        'METHOD': 'oauth2',
+        'API_URL': 'https://api.github.com/user',
     }
 }
 
@@ -93,6 +94,7 @@ USE_X_FORWARDED_HOST = True
 SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
+GITHUB_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/github/login/callback/'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 LOGIN_REDIRECT_URL = '/callback/'
 
