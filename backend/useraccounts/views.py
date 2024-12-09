@@ -4,6 +4,8 @@ from django.contrib.auth.tokens import default_token_generator
 from .models import User
 from dj_rest_auth.views import LoginView
 from django.urls import reverse
+from dj_rest_auth.views import PasswordResetView
+from django.conf import settings
 from allauth.account.models import EmailAddress
 from rest_framework.exceptions import AuthenticationFailed
 
@@ -36,3 +38,37 @@ class CustomLoginView(LoginView):
             raise AuthenticationFailed("E-mail is not verified.")
         
         return response
+
+
+class CustomPasswordResetView(PasswordResetView):
+    def get_email_context(self, *args, **kwargs):
+        context = super().get_email_context(*args, **kwargs)
+        
+        # Get the generated reset URL by default
+        reset_url = context['reset_url']
+        
+        # Customize the reset URL if needed
+        # For example, you can prepend your custom domain
+        custom_reset_url = f"https://api.diplomaroad.pro/password/reset/confirm/{reset_url.split('/')[-2]}/{reset_url.split('/')[-1]}"
+        
+        # Add the custom reset URL to the context
+        context['reset_url'] = custom_reset_url
+        
+        return context
+    
+
+class CustomPasswordResetView(PasswordResetView):
+    def get_email_context(self, *args, **kwargs):
+        context = super().get_email_context(*args, **kwargs)
+        
+        # Get the generated reset URL by default
+        reset_url = context['reset_url']
+        
+        # Customize the reset URL if needed
+        # For example, you can prepend your custom domain
+        custom_reset_url = f"https://www.diplomaroad.pro/password/reset/confirm/{reset_url.split('/')[-2]}/{reset_url.split('/')[-1]}"
+        
+        # Add the custom reset URL to the context
+        context['reset_url'] = custom_reset_url
+        
+        return context
