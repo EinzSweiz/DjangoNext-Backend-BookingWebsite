@@ -60,7 +60,7 @@ SITE_ID = 1
 # else:
 # WEBSITE_URL = 'http://165.22.76.137:1337'
 # FRONTEND_URL = "https://www.diplomaroad.pro" 
-WEBSITE_URL = 'http://api.diplomaroad.pro'
+WEBSITE_URL = 'https://api.diplomaroad.pro'
 FRONTEND_URL = 'https://www.diplomaroad.pro'
 DEFAULT_DOMAIN = 'www.diplomaroad.pro'  # Custom domain for your site
 
