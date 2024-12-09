@@ -73,27 +73,22 @@ def google_login_callback(request):
     user = request.user
     social_account = SocialAccount.objects.get(user=user, provider='google')
     if not social_account:
-        return JsonResponse({'message': 'No user found'}, status=404)
+        existing_user = User.objects.get(email=user.email)
+        if existing_user:
+            SocialAccount.objects.create(user=existing_user, provider='google')
+            user = existing_user
+        else:
+            return JsonResponse({'message': 'No social account found and no existing user to link.'}, status=404)
     
 
     token = SocialToken.objects.filter(account=social_account).first()
 
     if token:
-        existing_user = User.objects.get(email=user.email)
-        if existing_user:
-            social_account.user = existing_user
-            social_account.save()
-            refresh = RefreshToken.for_user(existing_user)
-            access_token = str(refresh.access_token)
-            user_id =existing_user.id
-            return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}')
-
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         user_id = user.id
-        return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}')
-        
+        return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}')   
     else:
         return JsonResponse({'message': 'No tokens found'})
     
