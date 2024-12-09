@@ -89,7 +89,7 @@ SOCIALACCOUNT_STORE_TOKENS = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
 GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
-LOGIN_REDIRECT_URL = 'https://www.diplomaroad.pro/'
+LOGIN_REDIRECT_URL = '/callback/'
 
 # ==========================
 # CORS and CSRF
@@ -232,6 +232,15 @@ REST_AUTH = {
     'JWT_AUTH_HTTPONLY': False,
     # 'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
     # 'REFRESH_TOKEN_LIFETIME': timedelta(days=3)
+}
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',    
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
 }
 
 CHANNEL_LAYERS = {

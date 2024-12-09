@@ -22,17 +22,18 @@ from django.conf.urls.static import static
 from useraccounts import urls as user_urls
 from inquiries import urls as inquiries_urls
 from chat import urls as chat_urls
-# from useraccounts.api import google_login_callback, validate_google_token
+from useraccounts.api import google_login_callback, validate_google_token
 from my_stripe import urls as stripe_urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(property_urls)),
     path('api/auth/', include(user_urls)),
+    path('api/auth2/', include('rest_framework.urls', namespace='rest_framework')),
     path('accounts/', include('allauth.urls')),
     path('api/inquiries/', include(inquiries_urls)),
     path('api/chat/', include(chat_urls)),
-    # path('callback/', google_login_callback, name='callback'),
-    # path('api/google/validate_token', validate_google_token, name='validate_token_google'),
+    path('callback/', google_login_callback, name='callback'),
+    path('api/google/validate_token', validate_google_token, name='validate_token_google'),
     path('api/stripe/', include(stripe_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
