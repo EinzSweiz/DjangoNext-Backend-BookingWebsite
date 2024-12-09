@@ -9,6 +9,7 @@ services:
       - web
     volumes:
       - media_volume:/usr/src/backend/media
+      - static_volume:/usr/src/backend/staticfiles  # Ensure this matches STATIC_ROOT
     networks:
       - backend  # Attach nginx to the backend network
 
