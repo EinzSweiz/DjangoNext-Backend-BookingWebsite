@@ -4,7 +4,7 @@ from helpers.messaging import send_message
 from helpers.create_pdf import generate_payment_pdf
 
 @shared_task
-def send_property_creation_message(response_data):
+def send_invoice_creation_message(response_data):
     try:
         # Extract the necessary information from response_data
         landlord_email = response_data['customer']['email']

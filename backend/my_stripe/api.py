@@ -9,7 +9,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from property.models import Property, Reservation
-from .tasks import send_property_creation_message
+from .tasks import send_invoice_creation_message
 import logging
 
 logger = logging.getLogger(__name__)
@@ -83,7 +83,7 @@ def payment_success(request):
                 "name": customer.name,
             },
         }
-        send_property_creation_message.delay(response_data)
+        send_invoice_creation_message.delay(response_data)
 
         return JsonResponse(response_data, status=200)
 
