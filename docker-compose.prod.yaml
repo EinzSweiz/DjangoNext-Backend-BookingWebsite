@@ -8,6 +8,7 @@ services:
       - web
     volumes:
       - media_volume:/usr/src/backend/media
+
   web:
     build: ./backend
     command: sh -c "python manage.py makemigrations && python manage.py migrate && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010 --log-level debug"
@@ -27,6 +28,8 @@ services:
     command: daphne --bind 0.0.0.0 -p 8002 django_backend.asgi:application
     ports:
       - 8002:8002
+    volumes:
+      - ./backend:/usr/src/backend  # Ensure daphne has access to the backend
 
   db:
     image: postgres:15
@@ -42,8 +45,6 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
-    
-    
 
   celery:
     build:
@@ -52,6 +53,7 @@ services:
     command: celery -A django_backend worker --loglevel=info
     volumes:
       - ./backend:/usr/src/backend
+      - celery_volume:/usr/src/backend/celery  # Added a volume for celery to persist data if needed
     depends_on:
       - redis
 
@@ -62,6 +64,7 @@ services:
     command: celery -A django_backend beat --loglevel=info
     volumes:
       - ./backend:/usr/src/backend
+      - celery_beat_volume:/usr/src/backend/celery_beat  # Added a volume for celery_beat
     depends_on:
       - redis
       - celery
@@ -69,5 +72,5 @@ services:
 volumes:
   postgres_data:
   media_volume:
-
-#add for check
+  celery_volume:  # Added volume for celery
+  celery_beat_volume:  # Added volume for celery_beat
