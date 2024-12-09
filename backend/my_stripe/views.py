@@ -22,8 +22,8 @@ def product_checkout_view(request, property, pk, total_price, start_date, end_da
             mode='payment',
             payment_method_types=['card'],
             customer_creation='always',
-            success_url='http://165.22.76.137/payment/success?session_id={CHECKOUT_SESSION_ID}',  # Redirect to success URL after payment  # Redirect to success URL after payment
-            cancel_url=request.build_absolute_uri(f'/payment/cancel/'),  # Redirect to cancel URL if payment fails
+            success_url='https://www.diplomaroad.pro/payment/success?session_id={CHECKOUT_SESSION_ID}',  # Redirect to success URL after payment  # Redirect to success URL after payment
+            cancel_url=(f'https://www.diplomaroad.pro/payment/cancel/'),  # Redirect to cancel URL if payment fails
             customer_email=request.user.email,  # Optional: Prefill user email in checkout
             metadata={
                 'property_id': pk,
