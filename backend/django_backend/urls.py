@@ -22,7 +22,7 @@ from django.conf.urls.static import static
 from useraccounts import urls as user_urls
 from inquiries import urls as inquiries_urls
 from chat import urls as chat_urls
-from useraccounts.api import login_callback, validate_google_token
+from useraccounts.api import google_login_callback, validate_google_token
 from my_stripe import urls as stripe_urls
 
 urlpatterns = [
@@ -33,7 +33,7 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('api/inquiries/', include(inquiries_urls)),
     path('api/chat/', include(chat_urls)),
-    path('callback/', login_callback, name='callback'),
+    path('callback/', google_login_callback, name='callback'),
     path('api/google/validate_token', validate_google_token, name='validate_token_google'),
     path('api/stripe/', include(stripe_urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
