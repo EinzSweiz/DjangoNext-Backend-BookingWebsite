@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   nginx:
     build: ./nginx
@@ -8,6 +9,8 @@ services:
       - web
     volumes:
       - media_volume:/usr/src/backend/media
+    networks:
+      - backend  # Attach nginx to the backend network
 
   web:
     build: ./backend
@@ -22,6 +25,8 @@ services:
     depends_on:
       - db
       - daphne
+    networks:
+      - backend  # Attach web service to the backend network
 
   daphne:
     build: ./backend
@@ -30,6 +35,8 @@ services:
       - 8002:8002
     volumes:
       - ./backend:/usr/src/backend  # Ensure daphne has access to the backend
+    networks:
+      - backend  # Attach daphne service to the backend network
 
   db:
     image: postgres:15
@@ -39,12 +46,16 @@ services:
       - POSTGRES_USER=postgresuser
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=djangodb
+    networks:
+      - backend  # Attach db service to the backend network
 
   redis:
     image: redis:alpine
     container_name: redis
     ports:
       - "6379:6379"
+    networks:
+      - backend  # Attach redis service to the backend network
 
   celery:
     build:
@@ -56,6 +67,8 @@ services:
       - celery_volume:/usr/src/backend/celery  # Added a volume for celery to persist data if needed
     depends_on:
       - redis
+    networks:
+      - backend  # Attach celery service to the backend network
 
   celery_beat:
     build:
@@ -68,9 +81,15 @@ services:
     depends_on:
       - redis
       - celery
+    networks:
+      - backend  # Attach celery_beat service to the backend network
 
 volumes:
   postgres_data:
   media_volume:
   celery_volume:  # Added volume for celery
   celery_beat_volume:  # Added volume for celery_beat
+
+networks:
+  backend:
+    driver: bridge  # Define the network so that all services are connected to it
