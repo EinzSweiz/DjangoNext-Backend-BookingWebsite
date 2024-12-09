@@ -81,7 +81,11 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': config('SOCIAL_AUTH_GITHUB_OAUTH2_SECRET'),
             'key': ''
         },
-        'SCOPE': ['read:user', 'user:email'],
+        'SCOPE': [
+            'user',
+            'repo',
+            'read:org',
+        ],
     }
 }
 
