@@ -91,7 +91,7 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 GOOGLE_OAUTH2_REDIRECT_URI = 'https://api.diplomaroad.pro/accounts/google/login/callback/'
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
 LOGIN_REDIRECT_URL = '/callback/'
-ACCOUNT_ADAPTER = "backend.helpers.account_adapter.MyAccountAdapter"
+ACCOUNT_ADAPTER = "helpers.account_adapter.MyAccountAdapter"
 
 # ==========================
 # CORS and CSRF
