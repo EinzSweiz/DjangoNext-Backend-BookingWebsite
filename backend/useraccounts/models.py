@@ -52,5 +52,5 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def avatar_url(self):
         if self.avatar:
-            return f'{settings.WEBSITE_URL}{self.avatar.url}'
+            return f'{settings.WEBSITE_URL_PROFILE}{self.avatar.url}'
         return ''
