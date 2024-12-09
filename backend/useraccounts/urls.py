@@ -11,7 +11,6 @@ urlpatterns = [
     path('register/', RegisterView.as_view(serializer_class=CustomRegisterSerializer), name='rest_register'),
     path('login/', CustomLoginView.as_view(), name='rest_login'),
     path('logout/', LogoutView.as_view(), name='rest_logout'),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('myreservations/', api.reservations_list, name='api_reservations_list'),
     path('<uuid:user_id>/<token>/', confirm_email, name='confirm_email'),
