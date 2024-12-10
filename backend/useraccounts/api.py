@@ -1,16 +1,18 @@
-from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer
-from django.http import JsonResponse, HttpResponseRedirect
+from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer, PasswordResetSerializer
+from django.http import JsonResponse
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from property.serializers import ResirvationListSerializer
 import logging
 from django.shortcuts import redirect
-from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
-from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.views.decorators.csrf import csrf_exempt
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+from .tasks import send_reset_email
+from django.contrib.auth.tokens import default_token_generator
 import json
 
 logger = logging.getLogger(__name__)
@@ -116,3 +118,29 @@ def validate_google_token(request):
 
     except Exception as e:
         return JsonResponse({'detail': str(e)}, status=500)
+    
+@api_view(['POST'])
+@authentication_classes([])
+@permission_classes([])
+def password_reset(self, request, *args, **kwargs):
+    serializer = PasswordResetSerializer(data=request.data)
+    if not serializer.is_valid():
+        return JsonResponse(serializer.errors, status=400)
+    
+    email = serializer.validated_data['email']
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return JsonResponse({"error": "No user with this email"}, status=404)
+    
+    # Generate token and uid
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+    
+    # Build the password reset confirm URL
+    reset_url = f'www.diplomaroad.pro/api/auth/password/reset/confirm/{uid}/{token}/'
+    
+    # Send email asynchronously using Celery
+    send_reset_email.delay(email, reset_url)
+    
+    return JsonResponse({"message": "Password reset email sent successfully"}, status=200)

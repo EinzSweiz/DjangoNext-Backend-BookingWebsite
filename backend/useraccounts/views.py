@@ -39,36 +39,4 @@ class CustomLoginView(LoginView):
         
         return response
 
-
-class CustomPasswordResetView(PasswordResetView):
-    def get_email_context(self, *args, **kwargs):
-        context = super().get_email_context(*args, **kwargs)
-        
-        # Get the generated reset URL by default
-        reset_url = context['reset_url']
-        
-        # Customize the reset URL if needed
-        # For example, you can prepend your custom domain
-        custom_reset_url = f"https://api.diplomaroad.pro/password/reset/confirm/{reset_url.split('/')[-2]}/{reset_url.split('/')[-1]}"
-        
-        # Add the custom reset URL to the context
-        context['reset_url'] = custom_reset_url
-        
-        return context
     
-
-class CustomPasswordResetView(PasswordResetView):
-    def get_email_context(self, *args, **kwargs):
-        context = super().get_email_context(*args, **kwargs)
-        
-        # Get the generated reset URL by default
-        reset_url = context['reset_url']
-        
-        # Customize the reset URL if needed
-        # For example, you can prepend your custom domain
-        custom_reset_url = f"https://www.diplomaroad.pro/password/reset/confirm/{reset_url.split('/')[-2]}/{reset_url.split('/')[-1]}"
-        
-        # Add the custom reset URL to the context
-        context['reset_url'] = custom_reset_url
-        
-        return context
