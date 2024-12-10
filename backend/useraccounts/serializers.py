@@ -6,14 +6,23 @@ from .tasks import send_confirmation_message
 class SetPasswordSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(write_only=True)
     new_password2 = serializers.CharField(write_only=True)
+    uid = serializers.CharField(write_only=True)
+    token = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        password1 = attrs.get("new_password")
-        password2 = attrs.get("new_password2")
+        password1 = attrs.get("new_password1")  # Correct field name
+        password2 = attrs.get("new_password2")  # Correct field name
 
         if password1 != password2:
             raise serializers.ValidationError("Passwords do not match.")
-        
+
+        # Optionally, validate the token and uid if needed
+        uid = attrs.get("uid")
+        token = attrs.get("token")
+
+        # You can add custom validation for the uid and token if necessary
+        # For example, check if they are valid or match a user in your database
+
         return attrs
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
