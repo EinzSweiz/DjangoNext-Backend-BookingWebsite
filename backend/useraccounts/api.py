@@ -155,6 +155,9 @@ class CustomPasswordResetConfirmView(APIView):
     """
     Custom password reset confirm view to handle password reset functionality.
     """
+    authentication_classes = []  # No authentication required
+    permission_classes = [AllowAny]  # Allows any user to access this endpoint
+
     def post(self, request, uidb64, token):
         try:
             # Decode the UID to get the user ID
