@@ -12,6 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from .tasks import send_reset_email
+from rest_framework.views import APIView
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
 
@@ -119,30 +120,27 @@ def validate_google_token(request):
     except Exception as e:
         return JsonResponse({'detail': str(e)}, status=500)
     
-@api_view(['POST'])
-@authentication_classes([])
-@permission_classes([])
-def password_reset(request):
-    serializer = PasswordResetSerializer(data=request.data)
-    if not serializer.is_valid():
-        return JsonResponse(serializer.errors, status=400)
-    
-    email = serializer.validated_data['email']
-    try:
-        user = User.objects.get(email=email)
-    except User.DoesNotExist:
-        return JsonResponse({"error": "No user with this email"}, status=404)
-    
-    # Generate token and uid
-    uid = urlsafe_base64_encode(force_bytes(user.pk))  # Generate UID
-    token = PasswordResetTokenGenerator().make_token(user)  # Generate Token
+class CustomPasswordResetView(APIView):
+    def post(self, request):
+        # Validate the request data
+        serializer = PasswordResetSerializer(data=request.data)
+        if not serializer.is_valid():
+            return JsonResponse(serializer.errors, status=400)
 
-    
-    # Build the password reset confirm URL
-    reset_url = f'https://www.diplomaroad.pro/api/auth/password/reset/confirm/{uid}/{token}/'
+        email = serializer.validated_data['email']
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "No user with this email"}, status=404)
 
-    
-    # Send email asynchronously using Celery
-    send_reset_email.delay(email, reset_url)
-    
-    return JsonResponse({"message": "Password reset email sent successfully"}, status=200)
+        # Generate UID and Token
+        uid = urlsafe_base64_encode(force_bytes(user.pk))  # Generate UID
+        token = PasswordResetTokenGenerator().make_token(user)  # Generate Token
+
+        # Build the reset URL with https://
+        reset_url = f'https://www.diplomaroad.pro/api/auth/password/reset/confirm/{uid}/{token}/'
+
+        # Send the email with the reset URL using Celery (asynchronous task)
+        send_reset_email.delay(email, reset_url)
+
+        return JsonResponse({"message": "Password reset email sent successfully"}, status=200)
