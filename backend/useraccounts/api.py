@@ -122,7 +122,7 @@ def validate_google_token(request):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([])
-def password_reset(self, request, *args, **kwargs):
+def password_reset(request):
     serializer = PasswordResetSerializer(data=request.data)
     if not serializer.is_valid():
         return JsonResponse(serializer.errors, status=400)
