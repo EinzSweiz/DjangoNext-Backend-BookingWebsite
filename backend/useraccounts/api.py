@@ -11,6 +11,7 @@ from allauth.socialaccount.models import SocialAccount, SocialToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
+from rest_framework.permissions import AllowAny
 from .tasks import send_reset_email
 from rest_framework.views import APIView
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
@@ -121,6 +122,9 @@ def validate_google_token(request):
         return JsonResponse({'detail': str(e)}, status=500)
     
 class CustomPasswordResetView(APIView):
+    authentication_classes = []  # No authentication required
+    permission_classes = [AllowAny]  # Allows any user to access this endpoint
+
     def post(self, request):
         # Validate the request data
         serializer = PasswordResetSerializer(data=request.data)
