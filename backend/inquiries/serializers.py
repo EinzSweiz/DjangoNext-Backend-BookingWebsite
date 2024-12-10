@@ -52,3 +52,8 @@ class UpdateStatusSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError(f"Invalid status: {value}. Valid statuses are {valid_statuses}.")
         return value
 
+
+class AssignInquirySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Inquiry
+        fields = ['customer_service']

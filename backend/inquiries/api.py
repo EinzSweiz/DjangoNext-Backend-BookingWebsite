@@ -1,10 +1,11 @@
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import IsAdminUser
 from django.http import JsonResponse
 from .models import Inquiry
 from useraccounts.models import User
 from rest_framework.parsers import JSONParser
 from django.http import Http404
-from .serializers import CreateInquirySerializer, GetInquirySerializer, MessageSerializer, UpdateStatusSerializer
+from .serializers import CreateInquirySerializer, GetInquirySerializer, MessageSerializer, UpdateStatusSerializer, AssignInquirySerializer
 
 
 @api_view(['POST'])
@@ -22,8 +23,10 @@ def create_inquiry(request):
 
 @api_view(['GET'])
 def inquiries_view(request):
-    if request.user.role == User.RoleChoises.CUSTOMER_SERVICE:
+    if request.user.role == User.RoleChoises.ADMIN:
         inquiries = Inquiry.objects.all()
+    elif request.user.role == User.RoleChoises.CUSTOMER_SERVICE:
+        inquiries = Inquiry.objects.filter(customer_service=request.user, is_assigned_to_customer_service=True).select_related('user', 'customer_service')
     else:
         inquiries = Inquiry.objects.filter(user=request.user)
 
@@ -45,7 +48,28 @@ def add_message(request, pk):
     except Inquiry.DoesNotExist:
         return JsonResponse({"error": "Inquiry not found"}, status=404)
     
+@api_view(['PUT'])
+@permission_classes([IsAdminUser])
+def assign_inquiry(request, inquiry_id):
+    try:
+        inquiry = Inquiry.objects.get(id=inquiry_id)
+    except Inquiry.DoesNotExist:
+        return JsonResponse({'error': 'Inquiry not found'}, status=404)
 
+    serializer = AssignInquirySerializer(instance=inquiry, data=request.data)
+    if serializer.is_valid():
+        inquiry.is_assigned_to_customer_service = True
+        serializer.save()
+        return JsonResponse({'success': 'Inquiry successfully assigned to agent'}, status=200)
+    else:
+        return JsonResponse({'error': serializer.errors}, status=400)
+
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def get_customer_service_agents(request):
+    qs = User.objects.filter(role=User.RoleChoises.CUSTOMER_SERVICE)
+    users_data = [{"id": user.id, "name": user.name, 'email': user.email} for user in qs]
+    return JsonResponse(users_data, safe=False)
 
 @api_view(['PUT'])
 def update_inquiry_status(request, pk):
