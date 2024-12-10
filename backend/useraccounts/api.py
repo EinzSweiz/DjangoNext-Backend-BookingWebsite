@@ -139,7 +139,8 @@ def password_reset(request):
 
     
     # Build the password reset confirm URL
-    reset_url = f'www.diplomaroad.pro/api/auth/password/reset/confirm/{uid}/{token}/'
+    reset_url = f'https://www.diplomaroad.pro/api/auth/password/reset/confirm/{uid}/{token}/'
+
     
     # Send email asynchronously using Celery
     send_reset_email.delay(email, reset_url)
