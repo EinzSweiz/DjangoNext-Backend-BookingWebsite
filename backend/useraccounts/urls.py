@@ -16,6 +16,6 @@ urlpatterns = [
     path('<uuid:pk>/', api.landlord_detail, name='api_landlord_detail'),
     path('profile/<uuid:pk>/', api.profile_detail, name='profile_detail'),
     path('password/reset/', api.CustomPasswordResetView.as_view(), name='password_reset'),    
-    path('password/reset/confirm/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password/reset/confirm/<uidb64>/<token>/', api.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('profile/update/<uuid:pk>', api.update_profile, name='update_profile'),
 ]

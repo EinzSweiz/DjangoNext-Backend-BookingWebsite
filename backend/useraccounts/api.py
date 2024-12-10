@@ -1,4 +1,4 @@
-from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer, PasswordResetSerializer
+from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer, PasswordResetSerializer, SetPasswordSerializer
 from django.http import JsonResponse
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework.permissions import AllowAny
 from .tasks import send_reset_email
 from rest_framework.views import APIView
@@ -148,3 +148,32 @@ class CustomPasswordResetView(APIView):
         send_reset_email.delay(email, reset_url)
 
         return JsonResponse({"message": "Password reset email sent successfully"}, status=200)
+
+
+
+class CustomPasswordResetConfirmView(APIView):
+    """
+    Custom password reset confirm view to handle password reset functionality.
+    """
+    def post(self, request, uidb64, token):
+        try:
+            # Decode the UID to get the user ID
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, User.DoesNotExist):
+            return JsonResponse({"error": "Invalid token or UID."}, status=400)
+
+        # Check if the token is valid
+        token_generator = PasswordResetTokenGenerator()
+        if not token_generator.check_token(user, token):
+            return JsonResponse({"error": "Invalid token."}, status=400)
+
+        # Now validate the new password
+        serializer = SetPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            # Set the new password
+            user.set_password(serializer.validated_data["new_password1"])
+            user.save()
+            return JsonResponse({"message": "Password has been reset successfully."}, status=200)
+        
+        return JsonResponse(serializer.errors, status=400)

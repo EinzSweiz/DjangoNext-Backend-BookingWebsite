@@ -3,6 +3,18 @@ from .models import User
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from .tasks import send_confirmation_message
 
+class SetPasswordSerializer(serializers.Serializer):
+    new_password1 = serializers.CharField(write_only=True)
+    new_password2 = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        password1 = attrs.get("new_password")
+        password2 = attrs.get("new_password2")
+
+        if password1 != password2:
+            raise serializers.ValidationError("Passwords do not match.")
+        
+        return attrs
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
