@@ -12,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 from .tasks import send_reset_email
-from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 import json
 
 logger = logging.getLogger(__name__)
@@ -134,8 +134,9 @@ def password_reset(request):
         return JsonResponse({"error": "No user with this email"}, status=404)
     
     # Generate token and uid
-    uid = urlsafe_base64_encode(force_bytes(user.pk))
-    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))  # Generate UID
+    token = PasswordResetTokenGenerator().make_token(user)  # Generate Token
+
     
     # Build the password reset confirm URL
     reset_url = f'www.diplomaroad.pro/api/auth/password/reset/confirm/{uid}/{token}/'
