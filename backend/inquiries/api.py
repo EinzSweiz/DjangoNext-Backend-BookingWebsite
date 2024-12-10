@@ -5,7 +5,7 @@ from .models import Inquiry
 from useraccounts.models import User
 from rest_framework.parsers import JSONParser
 from django.http import Http404
-from .serializers import CreateInquirySerializer, GetInquirySerializer, MessageSerializer, UpdateStatusSerializer, AssignInquirySerializer
+from .serializers import CreateInquirySerializer, GetInquirySerializer, MessageSerializer, UpdateStatusSerializer, AssignInquirySerializer, CustomerServiceAgentSerializer
 
 
 @api_view(['POST'])
@@ -63,13 +63,22 @@ def assign_inquiry(request, inquiry_id):
         return JsonResponse({'success': 'Inquiry successfully assigned to agent'}, status=200)
     else:
         return JsonResponse({'error': serializer.errors}, status=400)
+    
+@api_view(['GET'])
+@permission_classes([IsAdminUser])
+def inquiry_queue(request):
+    try:
+        inquiry = Inquiry.objects.filter(is_assigned_to_customer_service=False)
+        return JsonResponse({'success': 'recieved all unissigned unquiries'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': e}, status=400)
 
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def get_customer_service_agents(request):
     qs = User.objects.filter(role=User.RoleChoises.CUSTOMER_SERVICE)
-    users_data = [{"id": user.id, "name": user.name, 'email': user.email} for user in qs]
-    return JsonResponse(users_data, safe=False)
+    serializer = CustomerServiceAgentSerializer(qs, many=True)
+    return JsonResponse(serializer.data)
 
 @api_view(['PUT'])
 def update_inquiry_status(request, pk):
