@@ -78,7 +78,7 @@ def inquiry_queue(request):
 def get_customer_service_agents(request):
     qs = User.objects.filter(role=User.RoleChoises.CUSTOMER_SERVICE)
     serializer = CustomerServiceAgentSerializer(qs, many=True)
-    return JsonResponse(serializer.data)
+    return JsonResponse(serializer.data, safe=False)
 
 @api_view(['PUT'])
 def update_inquiry_status(request, pk):
