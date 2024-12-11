@@ -53,7 +53,7 @@ class UpdateStatusSerializer(serializers.ModelSerializer):
         fields = ('id', 'status')
 
     def validate_status(self, value):
-        valid_statuses = ['open', 'in_progress', 'closed']  # Add valid statuses for your business logic
+        valid_statuses = ['active', 'pending', 'resolved']  # Add valid statuses for your business logic
         if value not in valid_statuses:
             raise serializers.ValidationError(f"Invalid status: {value}. Valid statuses are {valid_statuses}.")
         return value
@@ -63,3 +63,8 @@ class AssignInquirySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inquiry
         fields = ['customer_service']
+
+    def validate_customer_service(self, value):
+        if value.role != User.RoleChoises.CUSTOMER_SERVICE:
+            raise serializers.ValidationError("Selected user is not a customer service agent.")
+        return value

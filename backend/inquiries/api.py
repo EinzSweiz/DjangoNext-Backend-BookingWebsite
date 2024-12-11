@@ -56,14 +56,22 @@ def assign_inquiry(request, inquiry_id):
     except Inquiry.DoesNotExist:
         return JsonResponse({'error': 'Inquiry not found'}, status=404)
 
-    serializer = AssignInquirySerializer(instance=inquiry, data=request.data)
-    if serializer.is_valid():
-        inquiry.is_assigned_to_customer_service = True
-        serializer.save()
-        return JsonResponse({'success': 'Inquiry successfully assigned to agent'}, status=200)
-    else:
-        return JsonResponse({'error': serializer.errors}, status=400)
-    
+    # Ensure customer_service is provided
+    customer_service_id = request.data.get('customer_service')
+    if not customer_service_id:
+        return JsonResponse({'error': 'Customer service agent is required'}, status=400)
+
+    try:
+        customer_service = User.objects.get(id=customer_service_id, role=User.RoleChoises.CUSTOMER_SERVICE)
+    except User.DoesNotExist:
+        return JsonResponse({'error': 'Customer service agent not found'}, status=404)
+
+    inquiry.customer_service = customer_service
+    inquiry.status = Inquiry.StatusChoice.IN_PROGRESS  # Optionally update the status
+    inquiry.save()
+
+    return JsonResponse({'success': 'Inquiry successfully assigned to agent'}, status=200)
+
 @api_view(['GET'])
 @permission_classes([IsAdminUser])
 def inquiry_queue(request):
