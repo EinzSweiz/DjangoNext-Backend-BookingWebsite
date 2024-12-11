@@ -15,7 +15,6 @@ def send_property_creation_message(property_data):
         subject = 'New Property Created'
         from_email = 'riad.sultanov.1999@gmail.com'
         to_email = landlord_email
-    
         html_message = f"""
         <html>
             <head>
@@ -43,9 +42,11 @@ def send_property_creation_message(property_data):
         </html>
         """
     
+        # Send plain text if HTML is not provided
         send_message(
             subject=subject,
-            html_message=html_message,
+            message='',
+            html_message=html_message,  # Provide the HTML message
             from_email=from_email,
             to_email=to_email,
         )
@@ -133,6 +134,7 @@ def send_property_report():
     
     send_message(
         subject=f"Property Report - {today.date()}",
+        message='',
         html_message=html_message,
         from_email=from_email,
         to_email=to_email,
