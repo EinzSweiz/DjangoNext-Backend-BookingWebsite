@@ -44,7 +44,7 @@ class GetInquirySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Inquiry
-        fields = ('id', 'subject', 'message', 'response', 'status', 'created_at', 'updated_at', 'user_name', 'messages', 'user_email')
+        fields = ('id', 'subject', 'message', 'response', 'status', 'created_at', 'updated_at', 'user_name', 'messages', 'user_email', 'severity', 'customer_service')
 
 
 class UpdateStatusSerializer(serializers.ModelSerializer):
