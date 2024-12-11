@@ -51,7 +51,7 @@ class GetInquirySerializer(serializers.ModelSerializer):
 class UpdateStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Inquiry
-        fields = ('id', 'status')
+        fields = ('id', 'status', 'is_resolved')
 
     def validate_status(self, value):
         valid_statuses = ['active', 'pending', 'resolved']  # Add valid statuses for your business logic

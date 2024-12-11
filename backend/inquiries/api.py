@@ -67,7 +67,8 @@ def assign_inquiry(request, inquiry_id):
         return JsonResponse({'error': 'Customer service agent not found'}, status=404)
 
     inquiry.customer_service = customer_service
-    inquiry.status = Inquiry.StatusChoice.IN_PROGRESS  # Optionally update the status
+    inquiry.is_assigned_to_customer_service = True
+    inquiry.status = Inquiry.StatusChoice.IN_PROGRESS
     inquiry.save()
 
     return JsonResponse({'success': 'Inquiry successfully assigned to agent'}, status=200)
@@ -93,8 +94,9 @@ def update_inquiry_status(request, pk):
     try:
         inquiry = Inquiry.objects.get(pk=pk)
         data = JSONParser().parse(request)
+        if data.get('status') == 'resolved':
+            data['is_resolved'] = True
         serializer = UpdateStatusSerializer(inquiry, data=data, partial=True)  # partial=True allows for partial updates
-
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status=200)
