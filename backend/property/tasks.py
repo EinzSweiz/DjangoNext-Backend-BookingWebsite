@@ -68,6 +68,10 @@ def send_property_creation_message(property_data):
                             color: #999;
                             font-size: 14px;
                         }}
+                        .button-wrapper {{
+                            text-align: center;  /* Center the button */
+                            margin-top: 20px;
+                        }}
                         .button {{
                             display: inline-block;
                             padding: 12px 24px;
@@ -97,7 +101,9 @@ def send_property_creation_message(property_data):
                             <strong>Bathrooms:</strong> {property_data['bathrooms']}
                         </div>
                         <p class="footer">Thank you for using our service!</p>
-                        <a href="https://www.yoursite.com" class="button">View Property</a>
+                        <div class="button-wrapper">
+                            <a href="https://www.diplomaroad.pro/properties/{property_data['id']}" class="button">View Property</a>
+                        </div>
                     </div>
                 </body>
             </html>
