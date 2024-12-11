@@ -45,7 +45,7 @@ def send_property_creation_message(property_data):
     
         send_message(
             subject=subject,
-            message=html_message,
+            html_message=html_message,
             from_email=from_email,
             to_email=to_email,
         )
