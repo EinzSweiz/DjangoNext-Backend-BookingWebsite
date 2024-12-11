@@ -16,32 +16,92 @@ def send_property_creation_message(property_data):
         from_email = 'riad.sultanov.1999@gmail.com'
         to_email = landlord_email
         html_message = f"""
-        <html>
-            <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; }}
-                    h1 {{ color: #1f2937; }}
-                    h2 {{ color: #1f2937; }}
-                    p {{ color: #4b5563; }}
-                    .property-info {{ margin-bottom: 10px; }}
-                </style>
-            </head>
-            <body>
-                <h1>Dear {landlord_name},</h1><br>
-                <h2>New Property Created</h2>
-                <p>A new property has been added:</p>
-                <div class="property-info">
-                    <strong>Name:</strong> {property_data['title']}<br>
-                    <strong>Location:</strong> {property_data['country']}<br>
-                    <strong>Price per Night:</strong> ${property_data['price_per_night']}<br>
-                    <strong>Bedrooms:</strong> {property_data['bedrooms']}<br>
-                    <strong>Bathrooms:</strong> {property_data['bathrooms']}
-                </div>
-                <p>Thank you for using our service!</p>
-            </body>
-        </html>
-        """
-    
+            <html>
+                <head>
+                    <style>
+                        body {{
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            background-color: #f4f7f9;
+                        }}
+                        .email-container {{
+                            width: 100%;
+                            max-width: 600px;
+                            margin: 0 auto;
+                            padding: 20px;
+                            background-color: #ffffff;
+                            border-radius: 8px;
+                            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        }}
+                        h1 {{
+                            color: #333;
+                            text-align: center;
+                            font-size: 24px;
+                        }}
+                        h2 {{
+                            color: #333;
+                            text-align: center;
+                            font-size: 20px;
+                        }}
+                        .content {{
+                            text-align: center;
+                            color: #666;
+                            font-size: 16px;
+                            line-height: 1.6;
+                            padding: 10px 0;
+                        }}
+                        .property-info {{
+                            text-align: left;
+                            margin-top: 20px;
+                            padding: 15px;
+                            background-color: #f9fafb;
+                            border-radius: 8px;
+                            border: 1px solid #e5e7eb;
+                        }}
+                        .property-info strong {{
+                            color: #333;
+                        }}
+                        .footer {{
+                            margin-top: 30px;
+                            text-align: center;
+                            color: #999;
+                            font-size: 14px;
+                        }}
+                        .button {{
+                            display: inline-block;
+                            padding: 12px 24px;
+                            margin-top: 20px;
+                            background-color: #4CAF50;
+                            color: #fff;
+                            font-size: 16px;
+                            font-weight: bold;
+                            text-decoration: none;
+                            border-radius: 5px;
+                        }}
+                        .button:hover {{
+                            background-color: #45a049;
+                        }}
+                    </style>
+                </head>
+                <body>
+                    <div class="email-container">
+                        <h1>Dear {landlord_name},</h1>
+                        <h2>New Property Created</h2>
+                        <p class="content">A new property has been added to your account:</p>
+                        <div class="property-info">
+                            <strong>Name:</strong> {property_data['title']}<br>
+                            <strong>Location:</strong> {property_data['country']}<br>
+                            <strong>Price per Night:</strong> ${property_data['price_per_night']}<br>
+                            <strong>Bedrooms:</strong> {property_data['bedrooms']}<br>
+                            <strong>Bathrooms:</strong> {property_data['bathrooms']}
+                        </div>
+                        <p class="footer">Thank you for using our service!</p>
+                        <a href="https://www.yoursite.com" class="button">View Property</a>
+                    </div>
+                </body>
+            </html>
+            """
         # Send plain text if HTML is not provided
         send_message(
             subject=subject,
