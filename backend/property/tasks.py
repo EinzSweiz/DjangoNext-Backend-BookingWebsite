@@ -133,7 +133,7 @@ def send_property_report():
     
     send_message(
         subject=f"Property Report - {today.date()}",
-        message=html_message,
+        html_message=html_message,
         from_email=from_email,
         to_email=to_email,
     )
