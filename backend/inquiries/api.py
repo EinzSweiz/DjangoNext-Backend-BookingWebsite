@@ -24,11 +24,11 @@ def create_inquiry(request):
 @api_view(['GET'])
 def inquiries_view(request):
     if request.user.role == User.RoleChoises.ADMIN:
-        inquiries = Inquiry.objects.all()
+        inquiries = Inquiry.objects.all().order_by('created_at')
     elif request.user.role == User.RoleChoises.CUSTOMER_SERVICE:
-        inquiries = Inquiry.objects.filter(customer_service=request.user, is_assigned_to_customer_service=True).select_related('user', 'customer_service')
+        inquiries = Inquiry.objects.filter(customer_service=request.user, is_assigned_to_customer_service=True).select_related('user', 'customer_service').order_by('created_at')
     else:
-        inquiries = Inquiry.objects.filter(user=request.user)
+        inquiries = Inquiry.objects.filter(user=request.user).order_by('created_at')
 
     inquiries_serializer = GetInquirySerializer(inquiries, many=True)
     return JsonResponse(inquiries_serializer.data, safe=False)
