@@ -24,11 +24,22 @@ def create_inquiry(request):
 @api_view(['GET'])
 def inquiries_view(request):
     if request.user.role == User.RoleChoises.ADMIN:
-        inquiries = Inquiry.objects.all().order_by('created_at')
+        inquiries = Inquiry.objects.all()
     elif request.user.role == User.RoleChoises.CUSTOMER_SERVICE:
-        inquiries = Inquiry.objects.filter(customer_service=request.user, is_assigned_to_customer_service=True).select_related('user', 'customer_service').order_by('created_at')
+        inquiries = Inquiry.objects.filter(customer_service=request.user, is_assigned_to_customer_service=True).select_related('user', 'customer_service')
     else:
-        inquiries = Inquiry.objects.filter(user=request.user).order_by('created_at')
+        inquiries = Inquiry.objects.filter(user=request.user)
+
+    status = request.query_params.get('status')  # e.g., "active", "pending", "resolved"
+    in_queue = request.query_params.get('queue')  # e.g., "true" for unassigned inquiries
+
+    if status:
+        inquiries = inquiries.filter(status=status.upper())  # Assuming status values are stored as uppercase enums
+    if in_queue and request.user.role == User.RoleChoises.ADMIN:
+        inquiries = inquiries.filter(is_assigned_to_customer_service=False)
+
+    # Order the results
+    inquiries = inquiries.order_by('created_at')
 
     inquiries_serializer = GetInquirySerializer(inquiries, many=True)
     return JsonResponse(inquiries_serializer.data, safe=False)
@@ -72,15 +83,6 @@ def assign_inquiry(request, inquiry_id):
     inquiry.save()
 
     return JsonResponse({'success': 'Inquiry successfully assigned to agent'}, status=200)
-
-@api_view(['GET'])
-@permission_classes([IsAdminUser])
-def inquiry_queue(request):
-    try:
-        inquiry = Inquiry.objects.filter(is_assigned_to_customer_service=False)
-        return JsonResponse({'success': 'recieved all unissigned unquiries'}, status=200)
-    except Exception as e:
-        return JsonResponse({'error': e}, status=400)
 
 @api_view(['GET'])
 def get_customer_service_agents(request):
