@@ -34,7 +34,7 @@ def inquiries_view(request):
     in_queue = request.query_params.get('queue')  # e.g., "true" for unassigned inquiries
 
     if status:
-        inquiries = inquiries.filter(status=status.upper())  # Assuming status values are stored as uppercase enums
+        inquiries = inquiries.filter(status=status)  # Assuming status values are stored as uppercase enums
     if in_queue and request.user.role == User.RoleChoises.ADMIN:
         inquiries = inquiries.filter(is_assigned_to_customer_service=False)
 
