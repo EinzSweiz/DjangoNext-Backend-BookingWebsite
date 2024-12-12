@@ -35,7 +35,7 @@ def inquiries_view(request):
 
     if status:
         inquiries = inquiries.filter(status=status)  # Assuming status values are stored as uppercase enums
-    if in_queue and request.user.role == User.RoleChoises.ADMIN:
+    if in_queue:
         inquiries = inquiries.filter(is_assigned_to_customer_service=False)
 
     # Order the results
