@@ -39,7 +39,7 @@ def inquiries_view(request):
         inquiries = inquiries.filter(is_assigned_to_customer_service=False)
 
     # Order the results
-    inquiries = inquiries.order_by('created_at')
+    inquiries = inquiries.order_by('-created_at')
 
     inquiries_serializer = GetInquirySerializer(inquiries, many=True)
     return JsonResponse(inquiries_serializer.data, safe=False)
