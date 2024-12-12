@@ -55,7 +55,8 @@ def send_invoice_creation_message(response_data):
         # Send the email with the PDF
         send_message(
             subject=subject,
-            message=html_message,
+            message='',
+            html_message=html_message,
             from_email=from_email,
             to_email=to_email,
             attachment_name='reservation_invoice.pdf',
