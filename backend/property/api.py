@@ -59,7 +59,7 @@ def properties_list(request):
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
     if is_favorites:
-        if user and user.is_authenticated:
+        if user:
             # Filter properties that are favorited by the authenticated user
             qs = qs.filter(favorited=user)
         else:
@@ -74,7 +74,7 @@ def properties_list(request):
         qs = qs.exclude(id__in=all_matches)
 
     # Collect IDs of favorite properties
-    if user and user.is_authenticated:
+    if user:
         print(f"Authenticated User: {user.pk}")
         favorites = Property.objects.filter(favorited=user).values_list('id', flat=True)
         print(f"Favorite Properties IDs: {list(favorites)}")
