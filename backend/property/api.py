@@ -35,7 +35,7 @@ def properties_list(request):
         print("Token Payload:", token.payload)
 
         # Extract user ID from token payload
-        user_id = token.payload.get('user', {}).get('pk')  # Correct way to extract pk
+        user_id = token.payload.get('user_id')
         print('User_id:', user_id)
         if user_id is None:
             raise AuthenticationFailed('User ID not found in token')
