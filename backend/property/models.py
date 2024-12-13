@@ -15,7 +15,7 @@ class Property(models.Model):
     guests = models.IntegerField()
     country = models.CharField(max_length=255)
     country_code = models.CharField(max_length=10)
-    favorited = models.ManyToManyField(User, related_name='favorites', blank=True, )
+    favorited = models.ManyToManyField(User, related_name='favorites', default=False, )
     category = models.CharField(max_length=255)
     image = models.ImageField(upload_to='uploads/properties')
     landlord = models.ForeignKey(User, related_name='properties', on_delete=models.CASCADE)
