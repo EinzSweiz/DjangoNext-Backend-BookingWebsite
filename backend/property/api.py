@@ -23,7 +23,9 @@ def properties_list(request):
     try:
         # Extract token from Authorization header
         auth_header = request.META.get('HTTP_AUTHORIZATION')
+        print(f"Authorization Header: {auth_header}")
         if not auth_header:
+            print("Authorization header is missing")
             raise AuthenticationFailed('Authorization token not provided')
 
         token = auth_header.split('Bearer ')[1]
@@ -34,6 +36,7 @@ def properties_list(request):
 
         # Extract user ID from token payload
         user_id = token.payload.get('user', {}).get('pk')  # Correct way to extract pk
+        print('User_id:', user_id)
         if user_id is None:
             raise AuthenticationFailed('User ID not found in token')
         
