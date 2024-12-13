@@ -23,16 +23,13 @@ def properties_list(request):
     try:
         # Extract token from Authorization header
         auth_header = request.META.get('HTTP_AUTHORIZATION')
-        print(f"Authorization Header: {auth_header}")
         if not auth_header:
-            print("Authorization header is missing")
             raise AuthenticationFailed('Authorization token not provided')
 
         token = auth_header.split('Bearer ')[1]
         token = AccessToken(token)
 
         # Debugging the payload
-        print("Token Payload:", token.payload)
 
         # Extract user ID from token payload
         user_id = token.payload.get('user_id')
@@ -78,11 +75,8 @@ def properties_list(request):
 
     # Collect IDs of favorite properties
     if user:
-        print(f"Authenticated User: {user.pk}")
         favorites = Property.objects.filter(favorited=user).values_list('id', flat=True)
-        print(f"Favorite Properties IDs: {list(favorites)}")
     else:
-        print("User is not authenticated or does not exist")
         favorites = []
     if guests:
         qs = qs.filter(guests__gte=guests)

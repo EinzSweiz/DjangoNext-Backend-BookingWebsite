@@ -29,7 +29,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
         )
 
 class ResirvationListSerializer(serializers.ModelSerializer):
-    property = PropertyListSerializer(read_only=True, many=False)
+    property = PropertyDetailSerializer(read_only=True, many=False)
     class Meta:
         model = Reservation
         fields = (
