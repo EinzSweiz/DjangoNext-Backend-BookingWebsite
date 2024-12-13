@@ -59,7 +59,12 @@ def properties_list(request):
     if landlord_id:
         qs = qs.filter(landlord_id=landlord_id)
     if is_favorites:
-        qs = qs.filter(favorited=user)  # Use favorited=user to filter the user's favorites
+        if user and user.is_authenticated:
+            # Filter properties that are favorited by the authenticated user
+            qs = qs.filter(favorited=user)
+        else:
+            # If the user is not authenticated, return an empty queryset
+            qs = qs.none()
     if checkin_date and checkout_date:
         exact_matches = Reservation.objects.filter(start_date=checkin_date) | Reservation.objects.filter(end_date=checkout_date)
         overlap_matches = Reservation.objects.filter(start_date__lte=checkout_date, end_date__gte=checkin_date)
