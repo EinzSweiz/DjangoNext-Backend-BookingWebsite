@@ -121,6 +121,9 @@ CORS_ORIGINS_WHITELIST = [
     'http://www.diplomaroad.pro:1773', 'http://165.22.76.137:1337',
     'https://diplomaroad.pro', 'https://www.diplomaroad.pro',
 ]
+
+CORS_ALLOW_CREDENTIALS=True
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
