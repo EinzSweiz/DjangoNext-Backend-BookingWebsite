@@ -75,7 +75,12 @@ def properties_list(request):
 
     # Collect IDs of favorite properties
     if user and user.is_authenticated:
-        favorites = Property.objects.filter(favorited=user).values_list('id', flat=True)  # Corrected filter for favorites
+        print(f"Authenticated User: {user.pk}")
+        favorites = Property.objects.filter(favorited=user).values_list('id', flat=True)
+        print(f"Favorite Properties IDs: {list(favorites)}")
+    else:
+        print("User is not authenticated or does not exist")
+        favorites = []
     if guests:
         qs = qs.filter(guests__gte=guests)
     if bedrooms:
