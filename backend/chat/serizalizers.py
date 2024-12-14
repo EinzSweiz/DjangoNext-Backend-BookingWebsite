@@ -23,4 +23,4 @@ class ConversationMessageSerializer(serializers.ModelSerializer):
     created_by = UserDetailSerializer(many=False, read_only=True)
     class Meta:
         model = ConversationMessage
-        fields = ('id', 'body', 'sent_to', 'created_by', 'created_at')
+        fields = ('id', 'body', 'sent_to', 'created_by')
