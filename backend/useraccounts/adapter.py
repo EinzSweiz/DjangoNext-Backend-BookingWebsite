@@ -10,7 +10,7 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         existing_user = User.objects.filter(email=sociallogin.user.email).first()
         if existing_user:
             sociallogin.user = existing_user
-            sociallogin.save()  # Save the user and avoid the signup flow
+            sociallogin.save(request)  # Save the user and avoid the signup flow
         else:
             # Handle case where no existing user is found (you can choose to auto-create if needed)
             pass
