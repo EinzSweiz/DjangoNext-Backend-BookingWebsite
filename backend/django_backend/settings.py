@@ -1,7 +1,6 @@
 from pathlib import Path
 from decouple import config
-import datetime
-from datetime import timedelta
+from datetime import timedelta, datetime
 import watchtower
 import logging
 
