@@ -75,19 +75,17 @@ def update_profile(request, pk):
 @login_required
 def google_login_callback(request):
     user = request.user
-    social_account, created = SocialAccount.objects.get_or_create(user=user, provider='google')
-    if created:
-        # If a new social account was created, ensure it is linked to the current user
-        try:
-            existing_user = User.objects.get(email=user.email)
-            if existing_user != user:
-                # Link the social account to the existing user
-                social_account.user = existing_user
-                social_account.save()
-                user = existing_user
-        except User.DoesNotExist:
+    social_account = SocialAccount.objects.get(user=user, provider='google')
+    if not social_account:
+        existing_user = User.objects.get(email=user.email)
+        if existing_user:
+            return JsonResponse(
+                    {'message': 'You signed up without Google login. Please use your password to log in.'}, 
+                    status=400
+                )
+        else:
             return JsonResponse({'message': 'No social account found and no existing user to link.'}, status=404)
-
+    
 
     token = SocialToken.objects.filter(account=social_account).first()
 
