@@ -13,8 +13,8 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         if existing_user:
             print(f"Existing user found: {existing_user}")
             sociallogin.user = existing_user
-            sociallogin.save(request)  # Save the user and avoid the signup flow
-            print(f"User saved to sociallogin: {sociallogin.user}")
+            # Do not save yet to avoid triggering the email address check
+            print(f"User set in sociallogin: {sociallogin.user}")
         else:
             print("No existing user found with the given email.")
         
@@ -47,9 +47,6 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
         # Debug: Log the status of the email addresses
         all_email_addresses = EmailAddress.objects.filter(user=sociallogin.user)
         print(f"All email addresses for user {sociallogin.user}: {all_email_addresses}")
-        
-        # Skip calling setup_user_email to avoid the assertion error
-        # setup_user_email(request, sociallogin.user, sociallogin.user.email_addresses)
         
         # Call the parent method to continue with the social login
         print("Calling parent pre_social_login to continue with the login process.")
