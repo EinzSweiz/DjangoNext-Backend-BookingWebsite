@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+import datetime
 from datetime import timedelta
 import watchtower
 import logging
@@ -300,29 +301,60 @@ TEMPLATES = [
 #=========================
 # AWS LOGS
 #=========================
+
+import boto3
+
+logger_boto3_client = boto3.client(
+    'logs',
+    aws_access_key_id=config('AWS_ACCESS_KEY', cast=str, default=None),
+    aws_secret_access_key=config('AWS_SECRET_KEY', cast=str, default=None),
+    region_name='us-east-1'
+)
+ENV = 'production'
+CLOUDWATCH_DEFAULT_LOG_STREAM_NAME = f"app-log-stream-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': "[cid: %(cid)s] [%(asctime)s.%(msecs)03d] %(levelname)s [%(name)s:%(lineno)s] [%(funcName)s] %(message)s",
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        }
+    },
     'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(BASE_DIR) + '/logs/diplomaroad.log',
+            'formatter': 'default',
+            'filters': ['correlation'],
         },
         'cloudwatch': {
-            'level': 'INFO',
-            'class': 'watchtower.CloudWatchLogHandler',
-            'log_group': '/diplomaroad-log-group',  # your log group
-            'stream_name': 'django-logs',
+            "level": "DEBUG",
+            "class": "watchtower.CloudWatchLogHandler",
+            "boto3_client": logger_boto3_client,
+            "log_group": '/diplomaroad-log-group',
+            "stream_name": f"{ENV}-{CLOUDWATCH_DEFAULT_LOG_STREAM_NAME}",
+            "formatter": "default",
+            'filters': ['correlation'],
+        },
+    },
+    'filters': {
+        'correlation': {
+            '()': 'cid.log.CidContextFilter'
         },
     },
     'loggers': {
-        'django': {
-            'handlers': ['console', 'cloudwatch'],  # Add CloudWatch here
-            'level': 'INFO',
-            'propagate': True,
+        'default': {
+            'level': 'DEBUG',
+            'handlers': ['file', 'cloudwatch'],
+            'filters': ['correlation'],
+            'propagate': False,
         },
-    },
+    }
 }
+
 
 
 
