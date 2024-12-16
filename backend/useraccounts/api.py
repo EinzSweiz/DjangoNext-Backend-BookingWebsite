@@ -72,31 +72,44 @@ def update_profile(request, pk):
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=400)
 
-@login_required
 def google_login_callback(request):
-    user = request.user
-    social_account = SocialAccount.objects.get(user=user, provider='google')
-    if not social_account:
-        existing_user = User.objects.get(email=user.email)
-        if existing_user:
-            return JsonResponse(
-                    {'message': 'You signed up without Google login. Please use your password to log in.'}, 
-                    status=400
-                )
-        else:
-            return JsonResponse({'message': 'No social account found and no existing user to link.'}, status=404)
-    
+    # Step 1: Get email from the request or the callback payload
+    email = request.GET.get('email')  # Or extract from OAuth response
 
-    token = SocialToken.objects.filter(account=social_account).first()
+    if not email:
+        return JsonResponse({'message': 'Email not provided'}, status=400)
 
-    if token:
-        refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
-        refresh_token = str(refresh)
-        user_id = user.id
-        return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}')   
+    # Step 2: Check if user exists with this email
+    existing_user = User.objects.filter(email=email).first()
+
+    if existing_user:
+        # Step 3: If user exists, check if they already have a linked Google account
+        social_account = SocialAccount.objects.filter(user=existing_user, provider='google').first()
+
+        if not social_account:
+            # If no social account is linked, create the link
+            social_account = SocialAccount.objects.create(user=existing_user, provider='google')
     else:
-        return JsonResponse({'message': 'No tokens found'})
+        # Step 4: If user doesn't exist, create a new user
+        existing_user = User.objects.create(email=email, username=email)
+        social_account = SocialAccount.objects.create(user=existing_user, provider='google')
+
+    # Step 5: Get the token for the social account
+    token = SocialToken.objects.filter(account=social_account).first()
+    if not token:
+        return JsonResponse({'message': 'No tokens found for the Google account.'}, status=400)
+
+    # Step 6: Generate JWT tokens for the user
+    refresh = RefreshToken.for_user(existing_user)
+    access_token = str(refresh.access_token)
+    refresh_token = str(refresh)
+    user_id = existing_user.id
+
+    # Step 7: Redirect the user with the tokens
+    return redirect(
+        f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}'
+    )
+
 
 @api_view(['POST'])
 def validate_google_token(request):
