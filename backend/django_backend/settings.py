@@ -1,6 +1,9 @@
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+import watchtower
+import logging
+
 
 # Paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -293,6 +296,33 @@ TEMPLATES = [
         },
     },
 ]
+
+#=========================
+# AWS LOGS
+#=========================
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+        },
+        'cloudwatch': {
+            'level': 'INFO',
+            'class': 'watchtower.CloudWatchLogHandler',
+            'log_group': '/diplomaroad-log-group',  # your log group
+            'log_stream': 'django-logs',  # You can change this to whatever you want
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'cloudwatch'],  # Add CloudWatch here
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}
 
 
 LANGUAGE_CODE = 'en-us'

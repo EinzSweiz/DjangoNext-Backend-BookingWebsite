@@ -18,3 +18,5 @@ django-celery-results
 stripe
 social-auth-core
 reportlab
+boto3 
+watchtower
