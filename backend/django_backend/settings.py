@@ -340,6 +340,7 @@ LOGGING = {
             'log_group': '/diplomaroad-log-group',
             'stream_name': 'manual-test-log-stream',
             'formatter': 'default',
+            'send_interval': 0,  # Ensures logs are sent immediately
         },
         'console': {
             'level': 'WARNING',  # Show only warnings and above in the console

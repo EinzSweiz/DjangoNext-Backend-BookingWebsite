@@ -12,6 +12,10 @@ import stripe
 from my_stripe.views import product_checkout_view
 from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken
+import logging
+
+logger = logging.getLogger('default')
+
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -91,6 +95,10 @@ def properties_list(request):
     
     print(f"Favorites: {favorites}")
 
+    logger.debug(
+        f"Properties list API accessed. User: {user.id if user else 'Anonymous'}, "
+        f"Country: {country}, Guests: {guests}, Check-in: {checkin_date}, Check-out: {checkout_date}"
+    )
     serializer = PropertyListSerializer(qs, many=True)
     return JsonResponse({
         'data': serializer.data,  # List of properties
