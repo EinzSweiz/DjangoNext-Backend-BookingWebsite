@@ -346,6 +346,11 @@ LOGGING = {
             'stream_name': 'manual-test-log-stream',  # Use a fixed stream name for now
             'formatter': 'default',
         },
+    'console': {  # Add this handler
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'default',
+        },
     },
     'loggers': {
         'default': {
