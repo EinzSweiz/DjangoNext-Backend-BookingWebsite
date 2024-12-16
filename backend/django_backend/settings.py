@@ -302,6 +302,12 @@ TEMPLATES = [
 #=========================
 logging.basicConfig(level=logging.DEBUG)
 import boto3
+import logging
+
+logger = logging.getLogger('default')  # Use 'default' logger explicitly
+
+logger.debug("Testing CloudWatch log push!")
+
 
 logger_boto3_client = boto3.client(
     'logs',
