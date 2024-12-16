@@ -21,7 +21,11 @@ RUN pip install -r requirements.txt
 # Copy the rest of the project files into the container
 COPY . .
 
-RUN mkdir -p /src/backend/logs
+# Ensure logs directory exists and create the log file
+RUN mkdir -p /usr/src/backend/logs && touch /usr/src/backend/logs/diplomaroad.log
+
+# Ensure the right permissions for the logs directory
+RUN chown -R www-data:www-data /usr/src/backend/logs
 # Optionally, you could clean up unnecessary files (this reduces the image size)
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*

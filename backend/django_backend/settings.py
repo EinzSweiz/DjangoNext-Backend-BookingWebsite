@@ -325,7 +325,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': str(BASE_DIR) + '/logs/diplomaroad.log',
+            'filename': '/usr/src/backend/logs/diplomaroad.log',
             'formatter': 'default',
             # 'filters': ['correlation'],
         },
