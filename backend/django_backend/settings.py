@@ -300,7 +300,7 @@ TEMPLATES = [
 #=========================
 # AWS LOGS
 #=========================
-
+logging.basicConfig(level=logging.DEBUG)
 import boto3
 
 logger_boto3_client = boto3.client(
