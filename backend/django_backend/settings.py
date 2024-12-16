@@ -312,7 +312,7 @@ LOGGING = {
             'level': 'INFO',
             'class': 'watchtower.CloudWatchLogHandler',
             'log_group': '/diplomaroad-log-group',  # your log group
-            'log_stream': 'django-logs',  # You can change this to whatever you want
+            'stream_name': 'django-logs',
         },
     },
     'loggers': {
@@ -323,6 +323,7 @@ LOGGING = {
         },
     },
 }
+
 
 
 LANGUAGE_CODE = 'en-us'
