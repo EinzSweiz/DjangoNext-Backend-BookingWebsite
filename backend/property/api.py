@@ -112,6 +112,7 @@ def create_property(request):
 
             # Serialize the property data
             property_data = model_to_dict(property)
+            property_data['id'] = property.id
             # Handle the image field manually
             if property.image:
                 property_data['image'] = property.image.url
