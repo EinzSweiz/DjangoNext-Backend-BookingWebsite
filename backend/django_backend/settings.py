@@ -317,43 +317,39 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'default': {
-            'format': "[cid: %(cid)s] [%(asctime)s.%(msecs)03d] %(levelname)s [%(name)s:%(lineno)s] [%(funcName)s] %(message)s",
+            'format': '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S',
-        }
+        },
     },
     'handlers': {
         'file': {
             'level': 'DEBUG',
-            'class': 'logging.handlers.RotatingFileHandler',
+            'class': 'logging.FileHandler',
             'filename': '/usr/src/backend/logs/diplomaroad.log',
             'formatter': 'default',
-            # 'filters': ['correlation'],
         },
         'cloudwatch': {
-            "level": "DEBUG",
-            "class": "watchtower.CloudWatchLogHandler",
-            "boto3_client": logger_boto3_client,
-            "log_group": '/diplomaroad-log-group',
-            "stream_name": f"{ENV}-{CLOUDWATCH_DEFAULT_LOG_STREAM_NAME}",
-            "formatter": "default",
-            # 'filters': ['correlation'],
+            'level': 'DEBUG',
+            'class': 'watchtower.CloudWatchLogHandler',
+            'boto3_client': boto3.client(
+                'logs',
+                aws_access_key_id=config('AWS_ACCESS_KEY'),
+                aws_secret_access_key=config('AWS_SECRET_KEY'),
+                region_name=config('AWS_REGION', default='us-east-1'),
+            ),
+            'log_group': '/diplomaroad-log-group',
+            'stream_name': f"{ENV}-log-stream",
+            'formatter': 'default',
         },
     },
-    # 'filters': {
-    #     'correlation': {
-    #         '()': 'cid.log.CidContextFilter'
-    #     },
-    # },
     'loggers': {
         'default': {
-            'level': 'DEBUG',
             'handlers': ['file', 'cloudwatch'],
-            # 'filters': ['correlation'],
+            'level': 'DEBUG',
             'propagate': False,
         },
-    }
+    },
 }
-
 
 
 

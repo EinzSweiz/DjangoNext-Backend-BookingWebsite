@@ -95,6 +95,7 @@ volumes:
   celery_volume:  # Added volume for celery
   celery_beat_volume:  # Added volume for celery_beat
   
+  
 
 
 networks:

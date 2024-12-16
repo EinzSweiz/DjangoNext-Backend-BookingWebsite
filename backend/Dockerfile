@@ -21,6 +21,13 @@ RUN pip install -r requirements.txt
 # Copy the rest of the project files into the container
 COPY . .
 
+# Ensure logs directory exists
+RUN mkdir -p /usr/src/backend/logs
+
+# Change ownership of logs to root (optional, as root owns everything by default)
+RUN chown -R root:root /usr/src/backend/logs
+
+
 # Optionally, you could clean up unnecessary files (this reduces the image size)
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
