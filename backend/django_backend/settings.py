@@ -48,7 +48,7 @@ ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_SIGNUP_EMAIL_VERIFICATION = False
 SOCIALACCOUNT_EMAIL_REQUIRED = False
-
+SOCIALACCOUNT_ADAPTER = 'useraccounts.adapter.CustomSocialAccountAdapter'
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
