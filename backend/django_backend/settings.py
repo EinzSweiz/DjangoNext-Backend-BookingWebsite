@@ -339,16 +339,16 @@ LOGGING = {
             # 'filters': ['correlation'],
         },
     },
-    'filters': {
-        'correlation': {
-            '()': 'cid.log.CidContextFilter'
-        },
-    },
+    # 'filters': {
+    #     'correlation': {
+    #         '()': 'cid.log.CidContextFilter'
+    #     },
+    # },
     'loggers': {
         'default': {
             'level': 'DEBUG',
             'handlers': ['file', 'cloudwatch'],
-            'filters': ['correlation'],
+            # 'filters': ['correlation'],
             'propagate': False,
         },
     }
