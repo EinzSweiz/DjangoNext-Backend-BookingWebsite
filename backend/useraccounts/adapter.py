@@ -15,9 +15,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             # Handle case where no existing user is found (you can choose to auto-create if needed)
             pass
         
-        # Ensure the email is correctly set
+        # Ensure the email is correctly set, debug the email assignment
         if not sociallogin.user.email:
             sociallogin.user.email = sociallogin.account.extra_data.get('email')
+            print(f"Assigning email: {sociallogin.user.email}")  # Debug line
+
+        if not sociallogin.user.email:
+            raise AssertionError("Email not set properly for the user during social login.")
 
         # If the email exists but is not verified, mark it as verified automatically
         email_address = EmailAddress.objects.filter(email=sociallogin.user.email).first()
