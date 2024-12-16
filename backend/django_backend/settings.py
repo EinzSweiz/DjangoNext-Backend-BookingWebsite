@@ -327,7 +327,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': str(BASE_DIR) + '/logs/diplomaroad.log',
             'formatter': 'default',
-            'filters': ['correlation'],
+            # 'filters': ['correlation'],
         },
         'cloudwatch': {
             "level": "DEBUG",
@@ -336,7 +336,7 @@ LOGGING = {
             "log_group": '/diplomaroad-log-group',
             "stream_name": f"{ENV}-{CLOUDWATCH_DEFAULT_LOG_STREAM_NAME}",
             "formatter": "default",
-            'filters': ['correlation'],
+            # 'filters': ['correlation'],
         },
     },
     'filters': {
