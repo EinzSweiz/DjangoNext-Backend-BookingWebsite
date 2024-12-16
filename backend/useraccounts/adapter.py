@@ -15,6 +15,10 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             # Handle case where no existing user is found (you can choose to auto-create if needed)
             pass
         
+        # Ensure the email is correctly set
+        if not sociallogin.user.email:
+            sociallogin.user.email = sociallogin.account.extra_data.get('email')
+
         # If the email exists but is not verified, mark it as verified automatically
         email_address = EmailAddress.objects.filter(email=sociallogin.user.email).first()
         if email_address:
@@ -23,4 +27,3 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
 
         # Call the parent method to continue with the social login
         return super().pre_social_login(request, sociallogin)
-
