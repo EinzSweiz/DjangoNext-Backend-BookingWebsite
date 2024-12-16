@@ -21,6 +21,7 @@ RUN pip install -r requirements.txt
 # Copy the rest of the project files into the container
 COPY . .
 
+RUN mkdir -p /usr/src/backend/logs
 # Optionally, you could clean up unnecessary files (this reduces the image size)
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
