@@ -94,8 +94,7 @@ volumes:
   static_volume:
   celery_volume:  # Added volume for celery
   celery_beat_volume:  # Added volume for celery_beat
-  logs_volume:  # Add this for logs
-    external: true  # Optionally mark it external if it's a pre-existing volume on the host
+  
 
 
 networks:
