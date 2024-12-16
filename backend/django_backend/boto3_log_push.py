@@ -1,35 +1,23 @@
+import logging
+import watchtower
+from django.http import JsonResponse
 import boto3
-import datetime
-import os
 
-# Initialize CloudWatch client
-client = boto3.client(
-    'logs',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_KEY'),
-    region_name='us-east-1'
-)
+def test_logging(request):
+    logger = logging.getLogger('django_watchtower_test')
+    logger.setLevel(logging.DEBUG)
 
-# Create log stream (if not exists)
-log_group = '/diplomaroad-log-group'
-log_stream = 'manual-test-log-stream'
+    handler = watchtower.CloudWatchLogHandler(
+        log_group='/diplomaroad-log-group',
+        stream_name='manual-test-log-stream',
+        boto3_client=boto3.client(
+            'logs',
+            aws_access_key_id='your_access_key',
+            aws_secret_access_key='your_secret_key',
+            region_name='us-east-1'
+        )
+    )
+    logger.addHandler(handler)
 
-try:
-    client.create_log_stream(logGroupName=log_group, logStreamName=log_stream)
-except client.exceptions.ResourceAlreadyExistsException:
-    pass
-
-# Push log event
-timestamp = int(datetime.datetime.now().timestamp() * 1000)
-response = client.put_log_events(
-    logGroupName=log_group,
-    logStreamName=log_stream,
-    logEvents=[
-        {
-            'timestamp': timestamp,
-            'message': 'Manual test log to CloudWatch'
-        }
-    ]
-)
-
-print("Manual log push response:", response)
+    logger.debug("Testing logging from Django!")
+    return JsonResponse({'message': 'Logged to CloudWatch!'})

@@ -315,7 +315,6 @@ logger_boto3_client = boto3.client(
     aws_secret_access_key=config('AWS_SECRET_KEY', cast=str, default=None),
     region_name='us-east-1'
 )
-ENV = 'production'
 CLOUDWATCH_DEFAULT_LOG_STREAM_NAME = f"app-log-stream-{datetime.now().strftime('%Y%m%d-%H%M%S')}"
 
 LOGGING = {
@@ -344,18 +343,22 @@ LOGGING = {
                 region_name=config('AWS_REGION', default='us-east-1'),
             ),
             'log_group': '/diplomaroad-log-group',
-            'stream_name': f"{ENV}-log-stream",
+            'stream_name': 'manual-test-log-stream',  # Use a fixed stream name for now
             'formatter': 'default',
         },
     },
     'loggers': {
         'default': {
-            'handlers': ['file', 'cloudwatch'],
+            'handlers': ['file', 'cloudwatch', 'console'],  # Log to both file and CloudWatch
             'level': 'DEBUG',
-            'propagate': False,
+            'propagate': True,  # Ensure logs propagate to all handlers
         },
     },
 }
+# Test Logging
+logger = logging.getLogger('default')
+logger.debug("Testing CloudWatch logging from Django settings!")
+
 
 
 
