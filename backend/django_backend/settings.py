@@ -328,41 +328,44 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',
+            'level': 'DEBUG',  # Log everything to file
             'class': 'logging.FileHandler',
             'filename': '/usr/src/backend/logs/diplomaroad.log',
             'formatter': 'default',
         },
         'cloudwatch': {
-            'level': 'DEBUG',
+            'level': 'INFO',  # Send only INFO and above to CloudWatch
             'class': 'watchtower.CloudWatchLogHandler',
-            'boto3_client': boto3.client(
-                'logs',
-                aws_access_key_id=config('AWS_ACCESS_KEY'),
-                aws_secret_access_key=config('AWS_SECRET_KEY'),
-                region_name=config('AWS_REGION', default='us-east-1'),
-            ),
+            'boto3_client': logger_boto3_client,
             'log_group': '/diplomaroad-log-group',
-            'stream_name': 'manual-test-log-stream',  # Use a fixed stream name for now
+            'stream_name': 'manual-test-log-stream',
             'formatter': 'default',
         },
-    'console': {  # Add this handler
-            'level': 'DEBUG',
+        'console': {
+            'level': 'WARNING',  # Show only warnings and above in the console
             'class': 'logging.StreamHandler',
             'formatter': 'default',
         },
     },
     'loggers': {
         'default': {
-            'handlers': ['file', 'cloudwatch', 'console'],  # Log to both file and CloudWatch
+            'handlers': ['file', 'cloudwatch', 'console'],  # Log to all handlers
             'level': 'DEBUG',
-            'propagate': True,  # Ensure logs propagate to all handlers
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['file', 'cloudwatch', 'console'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'botocore': {
+            'handlers': ['file'],  # Only log to file to avoid spamming other outputs
+            'level': 'DEBUG',
+            'propagate': False,
         },
     },
 }
-# Test Logging
-logger = logging.getLogger('default')
-logger.debug("Testing CloudWatch logging from Django settings!")
+
 
 
 
