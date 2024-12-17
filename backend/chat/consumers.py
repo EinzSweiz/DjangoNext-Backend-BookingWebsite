@@ -2,7 +2,8 @@ import json
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ConversationMessage
-
+import logging
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
     async def connect(self):
@@ -18,14 +19,13 @@ class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
             return
         
         print(f"Received token: {token}")
-        # Here, add token validation logic (e.g., decode the JWT token and check if it's valid)
-        # If token is invalid, you should also reject the connection
 
         # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
+        logger.info(f"WebSocket connection attempt: room_name={self.room_name}, token={token}")
 
         await self.accept()
 
