@@ -1,7 +1,7 @@
 import json
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import ConversationMessage  # Move import here to avoid premature model loading
+from .models import ConversationMessage
 
 
 class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
@@ -83,9 +83,5 @@ class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
     @sync_to_async
     def save_message(self, conversation_id, body, sent_to_id):
         user = self.scope['user']
-        ConversationMessage.objects.create(
-            conversation_id=conversation_id, 
-            body=body, 
-            sent_to_id=sent_to_id, 
-            created_by=user
-        )
+
+        ConversationMessage.objects.create(conversation_id=conversation_id, body=body, sent_to_id=sent_to_id, created_by=user)
