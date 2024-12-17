@@ -303,9 +303,7 @@ TEMPLATES = [
 #=========================
 # AWS LOGS
 #=========================
-logging.basicConfig(level=logging.DEBUG)
 import boto3
-import logging
 
 logger = logging.getLogger('default')  # Use 'default' logger explicitly
 
