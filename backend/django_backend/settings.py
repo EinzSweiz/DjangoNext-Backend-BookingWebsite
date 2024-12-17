@@ -36,7 +36,7 @@ DEBUG = config('DEBUG', cast=bool, default=False)
 ALLOWED_HOSTS = [
     'localhost', '127.0.0.1', '[::1]', '0.0.0.0', '165.22.76.137',
     'diplomaroad.pro', 'www.diplomaroad.pro', 'www.diplomaroad.pro:1773',
-    'api.diplomaroad.pro',
+    'api.diplomaroad.pro', 'daphne'
 ]
 
 # ==========================
