@@ -15,7 +15,7 @@ services:
 
   web:
     build: ./backend
-    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010 --log-level debug"
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn django_backend.wsgi:application --bind 0.0.0.0:8010 --timeout 300 --log-level debug"
     volumes:
       - ./backend:/usr/src/backend
       - media_volume:/usr/src/backend/media  # Correct path to media volume
