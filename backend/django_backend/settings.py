@@ -216,8 +216,8 @@ MIDDLEWARE = [
 # ==========================
 # CELERY
 # ==========================
-CELERY_RESULT_BACKEND = "django-db"
-CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', default='redis://localhost:6379')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', cast=str, default='django-db')
+CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', cast=str, default='redis://localhost:6379')
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 
 # ==========================
@@ -260,8 +260,11 @@ REST_FRAMEWORK = {
 }
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis://redis:6379/0")],
+        },
     },
 }
 
