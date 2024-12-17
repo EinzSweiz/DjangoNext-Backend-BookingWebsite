@@ -36,11 +36,6 @@ services:
     command: daphne --bind 0.0.0.0 -p 8002 django_backend.asgi:application
     ports:
       - 8002:8002
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8002"]
-      interval: 30s
-      retries: 3
-      timeout: 10s
     volumes:
       - ./backend:/usr/src/backend  # Ensure daphne has access to the backend
       - ./backend/logs:/usr/src/backend/logs
