@@ -11,9 +11,6 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_backend.settings')
 
 from chat import routing
 from chat.token_auth import TokenAuthMiddleware
-import django 
-
-django.setup()
 
 application = ProtocolTypeRouter({
     'http': get_asgi_application(),

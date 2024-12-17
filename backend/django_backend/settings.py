@@ -36,7 +36,7 @@ DEBUG = config('DEBUG', cast=bool, default=False)
 ALLOWED_HOSTS = [
     'localhost', '127.0.0.1', '[::1]', '0.0.0.0', '165.22.76.137',
     'diplomaroad.pro', 'www.diplomaroad.pro', 'www.diplomaroad.pro:1773',
-    'api.diplomaroad.pro', 'daphne'
+    'api.diplomaroad.pro'
 ]
 
 # ==========================
@@ -275,7 +275,7 @@ CHANNEL_LAYERS = {
 WEBSITE_URL_PROFILE = 'http://www.diplomaroad.pro:1773'
 WEBSITE_URL = 'https://api.diplomaroad.pro'
 FRONTEND_URL = 'https://www.diplomaroad.pro'
-DEFAULT_DOMAIN = 'www.diplomaroad.pro'
+DEFAULT_DOMAIN = 'https://www.diplomaroad.pro'
 
 SITE_ID = 1
 
