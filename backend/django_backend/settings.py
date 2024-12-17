@@ -42,7 +42,7 @@ ALLOWED_HOSTS = [
 # ==========================
 # AUTHENTICATION AND JWT
 # ==========================
-AUTH_USER_MODEL = 'useraccounts.USER'
+AUTH_USER_MODEL = 'useraccounts.User'
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
