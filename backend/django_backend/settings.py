@@ -114,21 +114,21 @@ CORS_ALLOWED_ORIGINS = [
     'https://diplomaroad.pro', 'https://www.diplomaroad.pro',
     'http://127.0.0.1:3000', 'http://www.diplomaroad.pro:1773',
     'http://165.22.76.137', 'https://api.diplomaroad.pro',
-    'daphne',
+    'http://daphne:8002',
 ]
 CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:8010', 'http://165.22.76.137:1337',
     'https://diplomaroad.pro', 'https://www.diplomaroad.pro',
     'http://127.0.0.1:3000', 'https://api.diplomaroad.pro',
     'http://www.diplomaroad.pro:1773', 'http://165.22.76.137',
-    'daphne',
+    'http://daphne:8002',
 ]
 CORS_ORIGINS_WHITELIST = [
     'http://127.0.0.1:8010', 'https://api.diplomaroad.pro',
     'http://127.0.0.1:3000', 'http://165.22.76.137',
     'http://www.diplomaroad.pro:1773', 'http://165.22.76.137:1337',
     'https://diplomaroad.pro', 'https://www.diplomaroad.pro',
-    'daphne',
+    'http://daphne:8002',
 ]
 
 CORS_ALLOW_CREDENTIALS=True
