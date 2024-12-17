@@ -72,30 +72,39 @@ def update_profile(request, pk):
         print(serializer.errors)
         return JsonResponse(serializer.errors, status=400)
 
+
 @login_required
 def google_login_callback(request):
     user = request.user
-    social_account = SocialAccount.objects.get(user=user, provider='google')
-    if not social_account:
-        existing_user = User.objects.get(email=user.email)
-        if existing_user:
-            return redirect(f'https://www.diplomaroad.pro/')
-            # SocialAccount.objects.create(user=existing_user, provider='google')
-            # user = existing_user
-        else:
-            return JsonResponse({'message': 'No social account found and no existing user to link.'}, status=404)
-    
 
+    # Attempt to fetch or create the SocialAccount
+    social_account, created = SocialAccount.objects.get_or_create(
+        user=user,
+        provider='google',
+        defaults={"uid": user.email}  # Use email as a default UID
+    )
+
+    if created:
+        print("SocialAccount was created for user:", user.email)
+    else:
+        print("SocialAccount already exists for user:", user.email)
+
+    # Check for a SocialToken associated with the SocialAccount
     token = SocialToken.objects.filter(account=social_account).first()
 
     if token:
+        # Generate JWT tokens for the user
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         user_id = user.id
-        return redirect(f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}')   
+
+        # Redirect with tokens
+        return redirect(
+            f'https://www.diplomaroad.pro/login/callback/?access_token={access_token}&refresh_token={refresh_token}&user_id={user_id}'
+        )
     else:
-        return JsonResponse({'message': 'No tokens found'})
+        return JsonResponse({'message': 'No tokens found for this social account'}, status=404)
 
 @api_view(['POST'])
 def validate_google_token(request):
