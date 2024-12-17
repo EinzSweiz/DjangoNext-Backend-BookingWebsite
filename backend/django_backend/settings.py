@@ -328,7 +328,7 @@ LOGGING = {
     },
     'handlers': {
         'file': {
-            'level': 'DEBUG',  # Log everything to file
+            'level': 'INFO',  # Log everything to file
             'class': 'logging.FileHandler',
             'filename': '/usr/src/backend/logs/diplomaroad.log',
             'formatter': 'default',
@@ -366,9 +366,6 @@ LOGGING = {
         },
     },
 }
-
-
-
 
 
 LANGUAGE_CODE = 'en-us'
