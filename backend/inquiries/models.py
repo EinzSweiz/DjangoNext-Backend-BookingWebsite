@@ -11,7 +11,7 @@ class Inquiry(models.Model):
         HIGH = 'high', 'High'
         URGENT = 'urgent', 'Urgent'
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='inquiries')
-    customer_service = models.ForeignKey(User, on_delete=models.DO_NOTHING, null=True, blank=True, related_name='customer_service', limit_choices_to={'role': User.RoleChoises.CUSTOMER_SERVICE})
+    customer_service = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='customer_service', limit_choices_to={'role': User.RoleChoises.CUSTOMER_SERVICE})
     subject = models.CharField(max_length=255)
     message = models.TextField()
     response = models.TextField(blank=True, null=True)
