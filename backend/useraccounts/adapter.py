@@ -30,7 +30,13 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             sociallogin.user.save()
             print(f"New user saved with email: {sociallogin.user.email}")
 
-        # Step 2: Handle the EmailAddress model
+        # Step 2: Save the SocialAccount (if not already saved)
+        if not sociallogin.account.pk:
+            sociallogin.account.user = sociallogin.user  # Link to the user
+            sociallogin.account.save()
+            print(f"SocialAccount saved for user: {sociallogin.user.email}")
+
+        # Step 3: Handle the EmailAddress model
         email_address = EmailAddress.objects.filter(email=sociallogin.user.email).first()
         if email_address:
             if not email_address.verified:
@@ -45,19 +51,19 @@ class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
             )
             print(f"EmailAddress created and verified: {sociallogin.user.email}")
 
-        # Step 3: Save the SocialToken explicitly
+        # Step 4: Save the SocialToken explicitly
         if sociallogin.token:
             token = SocialToken.objects.filter(account=sociallogin.account).first()
             if not token:
                 SocialToken.objects.create(
                     account=sociallogin.account,
-                    token=sociallogin.token.token,  # Access token
+                    token=sociallogin.token.token,
                     token_secret=getattr(sociallogin.token, 'token_secret', None)
                 )
                 print(f"SocialToken saved for user: {sociallogin.user.email}")
             else:
                 print("SocialToken already exists.")
 
-        # Step 4: Finalize the social login
+        # Step 5: Finalize the social login
         print("Calling parent method to finalize social login.")
         return super().pre_social_login(request, sociallogin)
