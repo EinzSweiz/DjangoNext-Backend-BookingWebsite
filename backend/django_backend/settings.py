@@ -341,7 +341,7 @@ LOGGING = {
             'log_group': '/diplomaroad-log-group',
             'stream_name': 'manual-test-log-stream',
             'formatter': 'default',
-            'send_interval': 0,  # Ensures logs are sent immediately
+            'send_interval': 60,  # Ensures logs are sent immediately
         },
         'console': {
             'level': 'WARNING',  # Show only warnings and above in the console
@@ -352,7 +352,7 @@ LOGGING = {
     'loggers': {
         'default': {
             'handlers': ['file', 'cloudwatch', 'console'],  # Log to all handlers
-            'level': 'DEBUG',
+            'level': 'INFO',
             'propagate': True,
         },
         'django': {
@@ -362,7 +362,7 @@ LOGGING = {
         },
         'botocore': {
             'handlers': ['file'],  # Only log to file to avoid spamming other outputs
-            'level': 'DEBUG',
+            'level': 'WARNING',
             'propagate': False,
         },
     },
