@@ -238,7 +238,7 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 # ==========================
 # DJANGO REST
 # ==========================
-
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 REST_AUTH_SERIALIZERS = {
     'PASSWORD_RESET_SERIALIZER': 'backend.useraccounts.CustomPasswordResetSerializer',
 }
