@@ -52,9 +52,6 @@ def properties_list(request):
     cache_key = f"properties_list_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
     cached_response = cache.get(cache_key)  
     logger.info(f"Cache Key: {cache_key}")
-    if cached_response:
-        logger.info(f"Cache hit: Returning cached response for key {cache_key}")
-        return JsonResponse(cached_response)
     logger.info('Cache Miss')
     favorites = []
     country = request.GET.get('country', '')
@@ -85,6 +82,17 @@ def properties_list(request):
         for reservation in exact_matches | overlap_matches:
             all_matches.append(reservation.property_id)
         qs = qs.exclude(id__in=all_matches)
+
+    if cached_response:
+        cached_data_length = len(cached_response.get('data', []))
+        current_qs_length = qs.count()  # Use `.count()` to avoid retrieving all objects
+        if cached_data_length == current_qs_length:
+            logger.info(f"Cache hit: Returning cached response for key {cache_key}")
+            return JsonResponse(cached_response)
+        else:
+            logger.info("Cache invalid: Length mismatch. Continuing without cached data.")
+    
+    logger.info('Cache Miss')
 
     # Collect IDs of favorite properties
     if user:
@@ -142,8 +150,8 @@ def create_property(request):
             property_data['landlord_email'] = request.user.email
             property_data['landlord_name'] = request.user.name
             send_property_creation_message.delay(property_data)
-            cache.delete_pattern("property_list_*")
-            logger.info('Cache invalidated for properties list')
+            # cache.delete_pattern("property_list_*") for now will keep it as comment
+            # logger.info('Cache invalidated for properties list')
 
             return JsonResponse({'success': True, 'property': property_data})
         else:
