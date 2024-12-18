@@ -221,7 +221,7 @@ MIDDLEWARE = [
 CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', cast=str, default='django-db')
 CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', cast=str, default='redis://localhost:6379')
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
-
+CELERY_BEAT_SCHEDULER_MAX_INTERVAL = 60
 # ==========================
 # STRIPE CONFIGURATION
 # ==========================
