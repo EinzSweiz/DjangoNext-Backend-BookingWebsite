@@ -31,7 +31,7 @@ def inquiries_view(request):
         inquiries = Inquiry.objects.filter(customer_service=request.user, is_assigned_to_customer_service=True).select_related('user', 'customer_service')
     else:
         inquiries = Inquiry.objects.filter(user=request.user)
-
+    logger.debug(f"Requesting User: {request.user.email}, Role: {request.user.role}, user: {request.user}")
     status = request.query_params.get('status')  # e.g., "active", "pending", "resolved"
     in_queue = request.query_params.get('queue')  # e.g., "true" for unassigned inquiries
 
