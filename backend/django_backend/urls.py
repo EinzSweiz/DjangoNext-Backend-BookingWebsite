@@ -40,9 +40,6 @@ schema_view = get_schema_view(
     public=True,
     permission_classes=(AllowAny,)
 )
-def trigger_error(request):
-    division_by_zero = 1 / 0  # This triggers an intentional error
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(property_urls)),
@@ -56,5 +53,4 @@ urlpatterns = [
     path('api/stripe/', include(stripe_urls)),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('sentry-debug/', trigger_error),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

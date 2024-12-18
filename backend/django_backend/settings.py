@@ -373,6 +373,7 @@ LOGGING = {
 #=========================
 # SENTRY SETUP
 #=========================
+
 sentry_sdk.init(
     dsn="https://a2be57323f6ceab15e7015656130e5f3@o4508488518270976.ingest.de.sentry.io/4508488525676624",
     # Set traces_sample_rate to 1.0 to capture 100%
@@ -385,6 +386,22 @@ sentry_sdk.init(
         "continuous_profiling_auto_start": True,
     },
 )
+
+#===========================
+# CACHE SETTINGS
+#===========================
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/2',  # Use a different DB index if needed
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'IGNORE_EXCEPTIONS': True,  # Avoid crashing if Redis is unavailable
+        }
+    }
+}
+
 #=====================================================
 LANGUAGE_CODE = 'en-us'
 

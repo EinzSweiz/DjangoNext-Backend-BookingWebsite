@@ -12,7 +12,9 @@ import stripe
 from my_stripe.views import product_checkout_view
 from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken
+from django.core.cache import cache
 import logging
+
 
 logger = logging.getLogger('default')
 
@@ -47,6 +49,12 @@ def properties_list(request):
     except (AuthenticationFailed, User.DoesNotExist):
         user = None
 
+    cache_key = f"properties_list_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        logger.debug('Cache List')
+        return JsonResponse(cached_response)
+    logger.debug('Cache Miss')
     favorites = []
     country = request.GET.get('country', '')
     category = request.GET.get('category', '')
@@ -100,10 +108,13 @@ def properties_list(request):
         f"Country: {country}, Guests: {guests}, Check-in: {checkin_date}, Check-out: {checkout_date}"
     )
     serializer = PropertyListSerializer(qs, many=True)
-    return JsonResponse({
-        'data': serializer.data,  # List of properties
-        'favorites': list(favorites),  # List of favorite property IDs
-    })
+    response_data = {
+        'data': serializer.data,
+        'favorites': list(favorites),
+    }
+    cache.set(cache_key, response_data, timeout=600)
+    return JsonResponse(response_data)
+
 
 @api_view(['POST'])
 def create_property(request):
