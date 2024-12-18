@@ -114,8 +114,11 @@ def update_inquiry_status(request, pk):
 @api_view(['GET'])
 def get_inquiry(request, pk):
     try:
+        requsting_user = request.user
         inquiry = Inquiry.objects.get(pk=pk)
         serializer = GetInquirySerializer(inquiry)
+        response_data = serializer.data
+        response_data['user_role'] = requsting_user.role
         logger.info(f"Serialized Inquiry Data for ID {pk}: {serializer.data}")
         return JsonResponse(serializer.data, status=200)
     except Inquiry.DoesNotExist:

@@ -40,13 +40,12 @@ class CustomerServiceAgentSerializer(serializers.ModelSerializer):
 class GetInquirySerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.name', read_only=True)  # If you want to include the user's name
     user_email = serializers.EmailField(source='user.email', read_only=True)
-    user_role = serializers.CharField(source='user.role', read_only=True)
     messages = MessageSerializer(many=True)
     customer_service_name = serializers.CharField(source='customer_service.name', read_only=True)
 
     class Meta:
         model = Inquiry
-        fields = ('id', 'subject', 'message', 'response', 'status', 'created_at', 'updated_at', 'user_name', 'messages', 'user_email', 'severity', 'customer_service', 'customer_service_name', 'user_role')
+        fields = ('id', 'subject', 'message', 'response', 'status', 'created_at', 'updated_at', 'user_name', 'messages', 'user_email', 'severity', 'customer_service', 'customer_service_name')
 
 
 class UpdateStatusSerializer(serializers.ModelSerializer):
