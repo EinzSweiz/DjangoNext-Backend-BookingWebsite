@@ -17,8 +17,7 @@ import logging
 
 
 logger = logging.getLogger('default')
-CACHE_VERSION_KEY = "properties_list_version"
-DEFAULT_CACHE_VERSION = 1
+
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -26,7 +25,6 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
-    current_version = cache.get(CACHE_VERSION_KEY, DEFAULT_CACHE_VERSION)
     user = None
     try:
         # Extract token from Authorization header
@@ -51,14 +49,12 @@ def properties_list(request):
     except (AuthenticationFailed, User.DoesNotExist):
         user = None
 
-    cache_key = f"properties_list_v{current_version}_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
-    cached_response = cache.get(cache_key)
+    cache_key = f"properties_list_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
+    cached_response = cache.get(cache_key)  
     logger.info(f"Cache Key: {cache_key}")
-
     if cached_response:
         logger.info(f"Cache hit: Returning cached response for key {cache_key}")
         return JsonResponse(cached_response)
-    
     logger.info('Cache Miss')
     favorites = []
     country = request.GET.get('country', '')
@@ -118,7 +114,6 @@ def properties_list(request):
         'favorites': list(favorites),
     }
     cache.set(cache_key, response_data, timeout=600)
-    logger.info(len(serializer.data))
     return JsonResponse(response_data)
 
 
@@ -132,14 +127,9 @@ def create_property(request):
             property = form.save(commit=False)
             property.landlord = request.user
 
-            current_version = cache.get(CACHE_VERSION_KEY, DEFAULT_CACHE_VERSION)
-            new_version = current_version + 1
-            cache.set(CACHE_VERSION_KEY, new_version)
-            logger.info(f"Cache version incremented to {new_version}")
-            logger.info(f"Cache version incremented to {new_version}")
+            # Save the property instance first
+            property.save()
             # Serialize the property data
-            qs = Property.objects.all().order_by('-created_at')  # Ensure fresh data
-            logger.debug(f"Number of properties after creation: {qs.count()}")
             property_data = model_to_dict(property)
             property_data['id'] = property.id
             # Handle the image field manually
@@ -152,6 +142,8 @@ def create_property(request):
             property_data['landlord_email'] = request.user.email
             property_data['landlord_name'] = request.user.name
             send_property_creation_message.delay(property_data)
+            cache.delete_pattern("property_list_*")
+            logger.info('Cache invalidated for properties list')
 
             return JsonResponse({'success': True, 'property': property_data})
         else:
