@@ -24,6 +24,22 @@ from inquiries import urls as inquiries_urls
 from chat import urls as chat_urls
 from useraccounts.api import google_login_callback, validate_google_token
 from my_stripe import urls as stripe_urls
+from drf_yasg.views import  get_schema_view
+from drf_yasg import openapi
+from rest_framework.permissions import AllowAny
+
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title='Diploma Road API',
+        default_version='v1',
+        description='API Documenation for Diploma Road',
+        contact=openapi.Contact(email='riad.sultanov.1999@gmail.com'),
+        license=openapi.License(name='BSD License'),
+    ),
+    public=True,
+    permission_classes=(AllowAny,)
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,4 +52,6 @@ urlpatterns = [
     path('callback/', google_login_callback, name='callback'),
     path('api/google/validate_token', validate_google_token, name='validate_token_google'),
     path('api/stripe/', include(stripe_urls)),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

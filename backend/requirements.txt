@@ -21,3 +21,4 @@ reportlab
 boto3
 watchtower
 channels-redis
+drf-yasg
