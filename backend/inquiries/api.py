@@ -116,6 +116,7 @@ def get_inquiry(request, pk):
     try:
         inquiry = Inquiry.objects.get(pk=pk)
         serializer = GetInquirySerializer(inquiry)
+        logger.info(f"Serialized Inquiry Data for ID {pk}: {serializer.data}")
         return JsonResponse(serializer.data, status=200)
     except Inquiry.DoesNotExist:
         return JsonResponse({"error": "Inquiry not found"}, status=404)
