@@ -84,9 +84,8 @@ def properties_list(request):
         qs = qs.exclude(id__in=all_matches)
 
     if cached_response:
-        cached_data_length = len(cached_response.get('data', []))
-        current_qs_length = qs.count()  # Use `.count()` to avoid retrieving all objects
-        if cached_data_length == current_qs_length:
+        cached_count = cached_response.get('count', 0)
+        if cached_count== qs.count():
             logger.info(f"Cache hit: Returning cached response for key {cache_key}")
             return JsonResponse(cached_response)
         else:
@@ -118,6 +117,7 @@ def properties_list(request):
     response_data = {
         'data': serializer.data,
         'favorites': list(favorites),
+        'count': qs.count(),
     }
     cache.set(cache_key, response_data, timeout=600)
     return JsonResponse(response_data)
