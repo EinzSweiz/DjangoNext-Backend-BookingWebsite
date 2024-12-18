@@ -17,7 +17,8 @@ import logging
 
 
 logger = logging.getLogger('default')
-
+CACHE_VERSION_KEY = "properties_list_version"
+DEFAULT_CACHE_VERSION = 1
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -25,6 +26,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 @authentication_classes([])
 @permission_classes([])
 def properties_list(request):
+    current_version = cache.get(CACHE_VERSION_KEY, DEFAULT_CACHE_VERSION)
     user = None
     try:
         # Extract token from Authorization header
@@ -49,12 +51,14 @@ def properties_list(request):
     except (AuthenticationFailed, User.DoesNotExist):
         user = None
 
-    cache_key = f"properties_list_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
-    cached_response = cache.get(cache_key)  
+    cache_key = f"properties_list_v{current_version}_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
+    cached_response = cache.get(cache_key)
     logger.info(f"Cache Key: {cache_key}")
+
     if cached_response:
         logger.info(f"Cache hit: Returning cached response for key {cache_key}")
         return JsonResponse(cached_response)
+    
     logger.info('Cache Miss')
     favorites = []
     country = request.GET.get('country', '')
@@ -127,10 +131,10 @@ def create_property(request):
             property = form.save(commit=False)
             property.landlord = request.user
 
-            # Save the property instance first
-            property.save()
-            cache.delete_pattern("property_list_*")
-            logger.info('Cache invalidated for properties list')
+            current_version = cache.get(CACHE_VERSION_KEY, DEFAULT_CACHE_VERSION)
+            new_version = current_version + 1
+            cache.set(CACHE_VERSION_KEY, new_version)
+            logger.info(f"Cache version incremented to {new_version}")
             # Serialize the property data
             property_data = model_to_dict(property)
             property_data['id'] = property.id
