@@ -6,7 +6,9 @@ from useraccounts.models import User
 from rest_framework.parsers import JSONParser
 from django.http import Http404
 from .serializers import CreateInquirySerializer, GetInquirySerializer, MessageSerializer, UpdateStatusSerializer, AssignInquirySerializer, CustomerServiceAgentSerializer
+import logging
 
+logger = logging.getLogger(__name__)
 
 @api_view(['POST'])
 def create_inquiry(request):
@@ -88,7 +90,7 @@ def assign_inquiry(request, inquiry_id):
 def get_customer_service_agents(request):
     qs = User.objects.filter(role=User.RoleChoises.CUSTOMER_SERVICE)
     serializer = CustomerServiceAgentSerializer(qs, many=True)
-    print("Serialized Data:", serializer.data)  # Log the serialized data
+    logger.debug("Serialized Data:", serializer.data)  # Log the serialized data
     return JsonResponse(serializer.data, safe=False)
 
 @api_view(['PUT'])

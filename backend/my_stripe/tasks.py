@@ -2,6 +2,9 @@ from celery import shared_task
 from io import BytesIO
 from helpers.messaging import send_message
 from helpers.create_pdf import generate_payment_pdf
+import logging
+
+logger = logging.getLogger(__name__)
 
 @shared_task
 def send_invoice_creation_message(response_data):
@@ -121,4 +124,4 @@ def send_invoice_creation_message(response_data):
         )
 
     except Exception as e:
-        print(f"Error sending invoice email: {e}")
+        logger.error(f"Error sending invoice email: {e}")

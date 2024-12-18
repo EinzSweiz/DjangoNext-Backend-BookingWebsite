@@ -91,7 +91,7 @@ def payment_success(request):
         return JsonResponse({'success': False, 'error': 'Property not found'}, status=404)
 
     except Exception as e:
-        print('Error:', e)
+        logger.error('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 

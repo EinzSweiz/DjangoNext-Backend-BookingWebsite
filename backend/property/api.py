@@ -39,7 +39,7 @@ def properties_list(request):
 
         # Extract user ID from token payload
         user_id = token.payload.get('user_id')
-        print('User_id:', user_id)
+        logger.debug('User_id:', user_id)
         if user_id is None:
             raise AuthenticationFailed('User ID not found in token')
         
@@ -102,7 +102,7 @@ def properties_list(request):
     if category and category != 'undefined':
         qs = qs.filter(category=category)
     
-    print(f"Favorites: {favorites}")
+    logger.debug(f"Favorites: {favorites}")
 
     logger.debug(
         f"Properties list API accessed. User: {user.id if user else 'Anonymous'}, "
@@ -120,8 +120,8 @@ def properties_list(request):
 @api_view(['POST'])
 def create_property(request):
     try:
-        print("Received new property creation request")
-        print(request.user)
+        logger.debug("Received new property creation request")
+        logger.debug(request.user)
         form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
             property = form.save(commit=False)
@@ -146,10 +146,10 @@ def create_property(request):
 
             return JsonResponse({'success': True, 'property': property_data})
         else:
-            print('Error', form.errors, form.non_field_errors)
+            logger.error('Error', form.errors, form.non_field_errors)
             return JsonResponse({'errors': form.errors.as_json()}, status=400)
     except Exception as e:
-        print(f"Error: {e}")
+        logger.error(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
 
@@ -159,11 +159,21 @@ def create_property(request):
 @authentication_classes([])
 @permission_classes([])
 def properties_detail(request, pk):
-    object = Property.objects.get(id=pk)
-    serializer = PropertyDetailSerializer(object, many=False)
-    return JsonResponse(
-        serializer.data
-    )
+    cache_key = f"property_detail_{pk}"
+    cached_data = cache.get(cache_key)
+    if cached_data:
+        return JsonResponse(cached_data, safe=False)
+    try:
+        object = Property.objects.get(id=pk)
+        serializer = PropertyDetailSerializer(object, many=False)
+        cache.set(cache_key, serializer.data, timeout=3600)
+        return JsonResponse(
+            serializer.data,
+            safe=False
+        )
+    except Property.DoesNotExist:
+        return JsonResponse({"error": "Property not found"}, status=404)
+
 
 @api_view(['GET'])
 @authentication_classes([])
@@ -176,35 +186,6 @@ def properties_reservations(request, pk):
         serializer.data,
         safe=False
     )
-
-# @api_view(['POST'])
-# def book_property(request, pk):
-#     try:
-#         # Accessing data from the request in DRF
-#         start_date = request.data.get('start_date', '')
-#         end_date = request.data.get('end_date', '')
-#         total_price = request.data.get('total_price', '')
-#         number_of_nights = request.data.get('number_of_nights', '')
-#         guests = request.data.get('guests', '')
-        
-#         # Retrieve the property and create a reservation
-#         property = Property.objects.get(pk=pk)
-
-#         Reservation.objects.create(
-#             property=property,
-#             start_date=start_date,
-#             end_date=end_date,
-#             number_of_nights=number_of_nights,
-#             total_price=total_price,
-#             guests=guests,
-#             created_by=request.user
-#         )
-#         return JsonResponse({'success': True})
-
-#     except Exception as e:
-#         print('Error', e)
-#         return JsonResponse({'success': False}, status=400)
-
 
 @api_view(['POST'])
 def book_property(request, pk):
@@ -227,7 +208,7 @@ def book_property(request, pk):
         return JsonResponse({'url': checkout_session.url})
 
     except Exception as e:
-        print('Error:', e)
+        logger.error('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 

@@ -18,7 +18,7 @@ class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
             await self.close()
             return
         
-        print(f"Received token: {token}")
+        logger.info(f"Received token: {token}")
 
         # Join room group
         await self.channel_layer.group_add(

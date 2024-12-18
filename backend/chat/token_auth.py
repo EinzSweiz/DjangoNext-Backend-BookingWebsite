@@ -3,7 +3,9 @@ from channels.db import database_sync_to_async
 from channels.middleware import BaseMiddleware
 from rest_framework_simplejwt.tokens import AccessToken
 from useraccounts.models import User
+import logging
 
+logger = logging.getLogger(__name__)
 
 @database_sync_to_async
 def get_user(token_key):
@@ -12,7 +14,7 @@ def get_user(token_key):
         user_id = token.payload['user_id']
         return User.objects.get(pk=user_id)
     except Exception as e:
-        print(f"Error in getting user: {e}")  # You can log this for debugging
+        logger.error(f"Error in getting user: {e}")  # You can log this for debugging
         return AnonymousUser
 
 

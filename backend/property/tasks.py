@@ -5,6 +5,9 @@ from .models import Property
 from datetime import datetime, timedelta
 from django.conf import settings
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger(__name__)
 
 @shared_task
 def send_property_creation_message(property_data):
@@ -117,7 +120,7 @@ def send_property_creation_message(property_data):
             to_email=to_email,
         )
     except Exception as e:
-        print(f"Error sending confirmation email: {e}")
+        logger.error(f"Error sending confirmation email: {e}")
 
 
 

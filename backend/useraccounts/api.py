@@ -42,7 +42,7 @@ def profile_detail(request, pk):
         logger.debug(f"Looking for user with pk={pk}")
         user = User.objects.get(pk=pk)
         # Clean problematic fields
-        print(user.email)
+        logger.debug(user.email)
 
         # Now serialize the data
         serializer = UserProfileSerializer(user)
@@ -69,7 +69,7 @@ def update_profile(request, pk):
         return JsonResponse(serializer.data)
     else:
     # Log the serializer errors to check the exact issue
-        print(serializer.errors)
+        logger.error(serializer.errors)
         return JsonResponse(serializer.errors, status=400)
 
 
@@ -85,9 +85,9 @@ def google_login_callback(request):
     )
 
     if created:
-        print("SocialAccount was created for user:", user.email)
+        logger.debug("SocialAccount was created for user:", user.email)
     else:
-        print("SocialAccount already exists for user:", user.email)
+        logger.debug("SocialAccount already exists for user:", user.email)
 
     # Check for a SocialToken associated with the SocialAccount
     token = SocialToken.objects.filter(account=social_account).first()

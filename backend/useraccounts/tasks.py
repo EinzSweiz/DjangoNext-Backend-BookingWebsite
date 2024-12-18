@@ -3,6 +3,9 @@ from helpers.messaging import send_message
 from .models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 @shared_task
 def send_confirmation_message(user_id):
@@ -21,7 +24,7 @@ def send_confirmation_message(user_id):
         
         send_message(subject, message, 'riad.sultanov.1999@gmail.com', user.email)
     except Exception as e:
-        print(f"Error sending confirmation email: {e}")
+        logger.error(f"Error sending confirmation email: {e}")
 
 @shared_task
 def send_reset_email(email, reset_url):
