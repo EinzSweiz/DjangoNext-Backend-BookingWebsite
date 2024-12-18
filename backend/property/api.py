@@ -92,8 +92,6 @@ def properties_list(request):
         else:
             logger.info("Cache invalid: Length mismatch. Continuing without cached data.")
     
-    logger.info('Cache Miss')
-
     # Collect IDs of favorite properties
     if user:
         favorites = Property.objects.filter(favorited=user).values_list('id', flat=True)
