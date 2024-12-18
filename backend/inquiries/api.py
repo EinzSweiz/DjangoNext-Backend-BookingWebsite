@@ -119,7 +119,6 @@ def get_inquiry(request, pk):
         serializer = GetInquirySerializer(inquiry)
         response_data = serializer.data
         response_data['user_role'] = requsting_user.role
-        logger.debug(f"Serialized Inquiry Data for ID {pk}: {response_data}")
-        return JsonResponse(serializer.data, status=200)
+        return JsonResponse(response_data, status=200)
     except Inquiry.DoesNotExist:
         return JsonResponse({"error": "Inquiry not found"}, status=404)
