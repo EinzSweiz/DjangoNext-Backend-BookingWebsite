@@ -343,7 +343,7 @@ LOGGING = {
             'send_interval': 60,  # Ensures logs are sent immediately
         },
         'console': {
-            'level': 'DEBUG',  # Show only warnings and above in the console
+            'level': 'INFO',  # Show only warnings and above in the console
             'class': 'logging.StreamHandler',
             'formatter': 'default',
         },
