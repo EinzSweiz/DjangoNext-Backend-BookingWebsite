@@ -309,9 +309,6 @@ import boto3
 
 logger = logging.getLogger('default')  # Use 'default' logger explicitly
 
-logger.debug("Testing CloudWatch log push!")
-
-
 logger_boto3_client = boto3.client(
     'logs',
     aws_access_key_id=config('AWS_ACCESS_KEY', cast=str, default=None),
@@ -346,7 +343,7 @@ LOGGING = {
             'send_interval': 60,  # Ensures logs are sent immediately
         },
         'console': {
-            'level': 'WARNING',  # Show only warnings and above in the console
+            'level': 'DEBUG',  # Show only warnings and above in the console
             'class': 'logging.StreamHandler',
             'formatter': 'default',
         },

@@ -50,9 +50,10 @@ def properties_list(request):
         user = None
 
     cache_key = f"properties_list_{request.GET.urlencode()}_{user.id if user else 'anonymous'}"
-    cached_response = cache.get(cache_key)
+    cached_response = cache.get(cache_key)  
+    logger.debug(f"Cache Key: {cache_key}")
     if cached_response:
-        logger.debug('Cache List')
+        logger.debug(f"Cache hit: Returning cached response for key {cache_key}")
         return JsonResponse(cached_response)
     logger.debug('Cache Miss')
     favorites = []
