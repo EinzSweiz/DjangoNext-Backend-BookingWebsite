@@ -105,7 +105,7 @@ def properties_list(request):
         'favorites': list(favorites),  # List of favorite property IDs
     })
 
-@api_view(['POST', 'FILES'])
+@api_view(['POST'])
 def create_property(request):
     try:
         print("Received new property creation request")
