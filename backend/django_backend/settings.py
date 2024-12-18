@@ -3,6 +3,7 @@ from decouple import config
 from datetime import timedelta, datetime
 import watchtower
 import logging
+import sentry_sdk
 
 
 # Paths
@@ -369,7 +370,22 @@ LOGGING = {
     },
 }
 
-
+#=========================
+# SENTRY SETUP
+#=========================
+sentry_sdk.init(
+    dsn="https://a2be57323f6ceab15e7015656130e5f3@o4508488518270976.ingest.de.sentry.io/4508488525676624",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    _experiments={
+        # Set continuous_profiling_auto_start to True
+        # to automatically start the profiler on when
+        # possible.
+        "continuous_profiling_auto_start": True,
+    },
+)
+#=====================================================
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
