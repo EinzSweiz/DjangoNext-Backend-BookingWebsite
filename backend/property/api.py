@@ -118,6 +118,7 @@ def properties_list(request):
         'favorites': list(favorites),
     }
     cache.set(cache_key, response_data, timeout=600)
+    logger.info(len(serializer.data))
     return JsonResponse(response_data)
 
 
@@ -135,7 +136,10 @@ def create_property(request):
             new_version = current_version + 1
             cache.set(CACHE_VERSION_KEY, new_version)
             logger.info(f"Cache version incremented to {new_version}")
+            logger.info(f"Cache version incremented to {new_version}")
             # Serialize the property data
+            qs = Property.objects.all().order_by('-created_at')  # Ensure fresh data
+            logger.debug(f"Number of properties after creation: {qs.count()}")
             property_data = model_to_dict(property)
             property_data['id'] = property.id
             # Handle the image field manually
