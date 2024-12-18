@@ -129,7 +129,8 @@ def create_property(request):
 
             # Save the property instance first
             property.save()
-
+            cache.delete_pattern("property_list_*")
+            logger.info('Cache invalidated for properties list')
             # Serialize the property data
             property_data = model_to_dict(property)
             property_data['id'] = property.id
