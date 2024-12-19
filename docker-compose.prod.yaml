@@ -59,7 +59,11 @@ services:
     ports:
       - "6379:6379"
     networks:
-      - backend  # Attach redis service to the backend network
+      - backend  #redis service to the backend network
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data 
+
 
   celery:
     build:
@@ -91,6 +95,7 @@ services:
 volumes:
   postgres_data:
   media_volume:
+  redis_data:  # Added a named volume for Redis persistence
   static_volume:
   celery_volume:  # Added volume for celery
   celery_beat_volume:  # Added volume for celery_beat

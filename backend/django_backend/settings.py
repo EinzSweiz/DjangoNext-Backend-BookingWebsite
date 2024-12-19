@@ -222,6 +222,14 @@ CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', cast=str, default='djang
 CELERY_BROKER_URL = config('CELERY_BROKER_REDIS_URL', cast=str, default='redis://localhost:6379')
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
 CELERY_BEAT_SCHEDULER_MAX_INTERVAL = 60
+
+broker_transport_options = {
+    'retry_on_timeout': True,
+    'max_retries': 5,
+    'interval_start': 0,   # Start retry delay immediately
+    'interval_step': 0.2,  # Step-up delay between retries
+    'interval_max': 0.5,   # Maximum delay between retries
+}
 # ==========================
 # STRIPE CONFIGURATION
 # ==========================
