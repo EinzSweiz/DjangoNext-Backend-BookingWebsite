@@ -63,6 +63,9 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data 
+      - ./redis.conf:/usr/local/etc/redis/redis.conf  # Mount the custom config
+    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]  # Use the custom config
+
 
 
   celery:
