@@ -50,7 +50,7 @@ urlpatterns = [
     path('api/inquiries/', include(inquiries_urls)),
     path('api/chat/', include(chat_urls)),
     path('callback/', google_login_callback, name='callback'),
-    path('api/review/', include(reviews_urls)),
+    path('api/reviews/', include(reviews_urls)),
     path('api/google/validate_token', validate_google_token, name='validate_token_google'),
     path('api/stripe/', include(stripe_urls)),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
