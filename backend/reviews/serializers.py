@@ -5,7 +5,7 @@ from property.serializers import PropertyDetailSerializer
 
 
 class ReviewViewSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = UserDetailSerializer(read_only=True)
 
     class Meta:
         model=Review
