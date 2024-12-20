@@ -33,13 +33,13 @@ def create_reviews_api(request, pk):
 
         serializer = ReviewCreateSerializer(data=data, context={'request': request})
         
-        # Debug: Log serializer validation
+        # Validate the serializer
         if not serializer.is_valid():
             print(f"Validation errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        # Save the review
-        serializer.save(user=request.user, property=property_instance)
+        # Save the serializer and explicitly pass the property instance
+        serializer.save(property=property_instance)
         
         return Response({'success': 'Review was created successfully'}, status=status.HTTP_201_CREATED)
     except Exception as e:
