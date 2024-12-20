@@ -23,7 +23,6 @@ class Property(models.Model):
 
     def image_url(self):
         return f'{settings.WEBSITE_URL}{self.image.url}'
-    
 
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -15,10 +15,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 from django.core.cache import cache
 import logging
 
-
 logger = logging.getLogger('default')
-
-
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 @api_view(['GET'])

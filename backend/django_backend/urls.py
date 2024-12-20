@@ -26,6 +26,7 @@ from useraccounts.api import google_login_callback, validate_google_token
 from my_stripe import urls as stripe_urls
 from drf_yasg.views import  get_schema_view
 from drf_yasg import openapi
+from reviews import urls as reviews_urls
 from rest_framework.permissions import AllowAny
 
 
@@ -49,6 +50,7 @@ urlpatterns = [
     path('api/inquiries/', include(inquiries_urls)),
     path('api/chat/', include(chat_urls)),
     path('callback/', google_login_callback, name='callback'),
+    path('api/review/', include(reviews_urls)),
     path('api/google/validate_token', validate_google_token, name='validate_token_google'),
     path('api/stripe/', include(stripe_urls)),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

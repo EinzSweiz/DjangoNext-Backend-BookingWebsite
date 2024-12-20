@@ -197,6 +197,7 @@ INSTALLED_APPS = [
     'chat',
     'inquiries',
     'my_stripe',
+    'reviews',
 ]
 
 # ==========================
