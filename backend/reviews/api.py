@@ -25,15 +25,14 @@ def create_reviews_api(request, pk):
     Create a review for a specific property.
     """
     try:
-        property = get_object_or_404(Property, pk=pk)
+        property_instance = get_object_or_404(Property, pk=pk)  # Retrieve the property instance
         data = request.data.copy()
-        data['property'] = property.id
         serializer = ReviewCreateSerializer(data=data, context={'request': request})
+        
         if serializer.is_valid():
-            serializer.save(user=request.user)
+            serializer.save(user=request.user, property=property_instance)  # Pass property instance explicitly
             return Response({'success': 'Review was created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
         return Response({"error": f"Something went wrong: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-

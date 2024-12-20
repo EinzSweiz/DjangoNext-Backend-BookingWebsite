@@ -11,7 +11,6 @@ class ReviewViewSerializer(serializers.ModelSerializer):
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
-
     class Meta:
         model=Review
         fields = ['id', 'property', 'text']
