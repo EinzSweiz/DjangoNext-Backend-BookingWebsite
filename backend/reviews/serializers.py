@@ -10,14 +10,10 @@ class ReviewViewSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'text', 'created_at']
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField()
+    user = serializers.StringRelatedField(read_only=True)
     class Meta:
         model=Review
         fields = ['id', 'property', 'text', 'user']
-
-    def create(self, validated_data):
-        validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
     
 
 class ReviewReportCreateSerializer(serializers.ModelSerializer):
