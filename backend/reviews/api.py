@@ -4,8 +4,11 @@ from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .serializers import ReviewViewSerializer, ReviewCreateSerializer
 from .models import Review, Property
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
 @api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
 def get_reviews_api(request, pk):
     """
     Retrieve all reviews for a specific property.
