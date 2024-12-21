@@ -10,6 +10,10 @@ class ReviewViewSerializer(serializers.ModelSerializer):
     class Meta:
         model=Review
         fields = ['id', 'user', 'text', 'created_at']
+class ReviewDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=Review
+        fields = ['id', 'text', 'created_at']
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
     user = UserDetailSerializer(read_only=True)
@@ -21,12 +25,14 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 
 class ReviewReportCreateSerializer(serializers.ModelSerializer):
-    
+    review = ReviewDetailSerializer(read_only=True)
+    reported_by = UserDetailSerializer(read_only=True)
+
     class Meta:
         model = ReviewReport
         fields = ['review', 'reported_by', 'reason']
 
     def validate(self, data):
-        if not data['reason']:
-            raise serializers.ValidationError("A reason is required for reporting a review.")
+        if not data.get('reason', '').strip():
+            raise serializers.ValidationError({"reason": "A reason is required for reporting a review."})
         return data

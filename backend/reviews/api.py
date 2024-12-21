@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .serializers import ReviewViewSerializer, ReviewCreateSerializer
+from .serializers import ReviewViewSerializer, ReviewCreateSerializer, ReviewReportCreateSerializer
 from .models import Review, Property
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.core.paginator import Paginator
@@ -64,4 +64,31 @@ def create_reviews_api(request, pk):
     except Exception as e:
         import traceback
         traceback.print_exc()  # Print full error traceback to the console
+        return Response({"error": f"Something went wrong: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def report_create_api(request, pk):
+    """
+    Create a report for a specific review.
+    """
+    try:
+        # Retrieve the review object
+        review = get_object_or_404(Review, pk=pk)
+
+        # Combine request data with the current user and review
+        data = request.data.copy()
+        data['review'] = review.id  # Add review ID to the data
+        data['reported_by'] = request.user.id  # Add the current user's ID to the data
+
+        # Use the serializer to validate and create the report
+        serializer = ReviewReportCreateSerializer(data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()  # Save the validated data to create a report
+            return Response({'success': 'Report was created successfully'}, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()  # Log the error for debugging
         return Response({"error": f"Something went wrong: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
