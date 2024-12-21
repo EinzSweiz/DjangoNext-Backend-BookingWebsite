@@ -5,22 +5,38 @@ from django.shortcuts import get_object_or_404
 from .serializers import ReviewViewSerializer, ReviewCreateSerializer
 from .models import Review, Property
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from django.core.paginator import Paginator
 
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
 def get_reviews_api(request, pk):
     """
-    Retrieve all reviews for a specific property.
+    Retrieve paginated reviews for a specific property.
     """
     try:
-        property = get_object_or_404(Property, pk=pk)
-        qs = Review.objects.filter(property=property)
-        serializer = ReviewViewSerializer(qs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        property_instance = get_object_or_404(Property, pk=pk)
+        qs = Review.objects.filter(property=property_instance)
+        
+        # Pagination parameters
+        page_number = request.GET.get('page', 1)  # Default to page 1 if not provided
+        page_size = request.GET.get('page_size', 5)  # Default page size
+
+        paginator = Paginator(qs, page_size)
+        page = paginator.get_page(page_number)
+
+        # Serialize the paginated data
+        serializer = ReviewViewSerializer(page.object_list, many=True)
+
+        # Return paginated response
+        return Response({
+            'total_pages': paginator.num_pages,
+            'current_page': page.number,
+            'total_reviews': paginator.count,
+            'reviews': serializer.data,
+        }, status=status.HTTP_200_OK)
     except Exception as e:
         return Response({"error": f"Something went wrong: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 @api_view(['POST'])
 def create_reviews_api(request, pk):
