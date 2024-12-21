@@ -16,7 +16,7 @@ def get_reviews_api(request, pk):
     """
     try:
         property_instance = get_object_or_404(Property, pk=pk)
-        qs = Review.objects.filter(property=property_instance)
+        qs = Review.objects.filter(property=property_instance).order_by('-created_at')
         
         # Pagination parameters
         page_number = request.GET.get('page', 1)  # Default to page 1 if not provided
