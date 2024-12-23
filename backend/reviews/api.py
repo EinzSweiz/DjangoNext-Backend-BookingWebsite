@@ -76,15 +76,11 @@ def report_create_api(request, pk):
         # Retrieve the review object
         review = get_object_or_404(Review, pk=pk)
 
-        # Combine request data with the current user and review
-        data = request.data.copy()
-        data['review'] = review # Add review ID to the data
-        data['reported_by'] = request.user  # Add the current user's ID to the data
-
-        # Use the serializer to validate and create the report
-        serializer = ReviewReportCreateSerializer(data=data, context={'request': request})
+        # Use the serializer
+        serializer = ReviewReportCreateSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()  # Save the validated data to create a report
+            # Save the report and manually associate the review and user
+            serializer.save(review=review, reported_by=request.user)
             return Response({'success': 'Report was created successfully'}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
