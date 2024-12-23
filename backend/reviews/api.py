@@ -78,8 +78,8 @@ def report_create_api(request, pk):
 
         # Combine request data with the current user and review
         data = request.data.copy()
-        data['review'] = review.id  # Add review ID to the data
-        data['reported_by'] = request.user.id  # Add the current user's ID to the data
+        data['review'] = review # Add review ID to the data
+        data['reported_by'] = request.user  # Add the current user's ID to the data
 
         # Use the serializer to validate and create the report
         serializer = ReviewReportCreateSerializer(data=data, context={'request': request})
