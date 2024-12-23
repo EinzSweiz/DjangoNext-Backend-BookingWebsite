@@ -11,7 +11,7 @@ class Review(models.Model):
 
 
     def __str__(self):
-        return f"Review by {self.user.name} on {self.property.title}"
+        return f"Review by {self.user.name} on {self.property.id} - review text: {self.text}"
     
 class ReviewReport(models.Model):
     class Status(models.TextChoices):
