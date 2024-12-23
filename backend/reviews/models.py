@@ -20,7 +20,7 @@ class ReviewReport(models.Model):
         DISMISSED = 'dismissed', 'Dismissed'
 
     review = models.ForeignKey(Review, on_delete=models.CASCADE, related_name='reports')
-    reported_by = models.ManyToManyField(User, related_name='reported_reviews')
+    reported_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reported_reviews')
     reason = models.TextField()
     status = models.CharField(max_length=10, choices=Status, default=Status.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
