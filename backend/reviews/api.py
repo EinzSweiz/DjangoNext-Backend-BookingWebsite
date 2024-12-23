@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from .serializers import ReviewViewSerializer, ReviewCreateSerializer, ReviewReportCreateSerializer
-from .models import Review, Property
+from .models import Review, Property, ReviewReport
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.core.paginator import Paginator
 
@@ -16,8 +16,11 @@ def get_reviews_api(request, pk):
     """
     try:
         property_instance = get_object_or_404(Property, pk=pk)
-        qs = Review.objects.filter(property=property_instance).order_by('-created_at')
-        
+        qs = Review.objects.filter(
+            property=property_instance,
+            reports__status__in=[ReviewReport.Status.PENDING, ReviewReport.Status.RESOLVED]
+        ).order_by('-created_at')
+
         # Pagination parameters
         page_number = request.GET.get('page', 1)  # Default to page 1 if not provided
         page_size = request.GET.get('page_size', 5)  # Default page size
