@@ -17,8 +17,9 @@ def get_reviews_api(request, pk):
     try:
         property_instance = get_object_or_404(Property, pk=pk)
         qs = Review.objects.filter(
-            property=property_instance,
-            reports__status__in=[ReviewReport.Status.PENDING, ReviewReport.Status.RESOLVED]
+            property=property_instance
+        ).exclude(
+            reports__status=ReviewReport.Status.DISMISSED
         ).order_by('-created_at')
 
         # Pagination parameters
