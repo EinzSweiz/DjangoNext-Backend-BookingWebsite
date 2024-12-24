@@ -25,7 +25,8 @@ predefined_responses = {
 def chatbot_response(request):
     # Debug: Log incoming request data
     print("Request data:", request.data)
-    logger.debug("Request data: %s", request.data)
+    logger.info("Raw body: %s", request.body)
+    logger.info("Parsed data: %s", request.data)
     
     # Get the question from the request
     data = request.data
