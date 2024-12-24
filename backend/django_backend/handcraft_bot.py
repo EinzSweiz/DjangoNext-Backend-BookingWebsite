@@ -1,5 +1,8 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+import logging
+
+logger = logging.getLogger(__name__)
 
 predefined_responses = {
     "What is this website about?": {
@@ -22,6 +25,7 @@ predefined_responses = {
 def chatbot_response(request):
     # Debug: Log incoming request data
     print("Request data:", request.data)
+    logger.debug("Request data: %s", request.data)
     
     # Get the question from the request
     data = request.data
