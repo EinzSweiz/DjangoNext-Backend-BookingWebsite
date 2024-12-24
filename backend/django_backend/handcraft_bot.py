@@ -76,3 +76,11 @@ def chatbot_response(request):
     )
 
     return JsonResponse(response)
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
+def get_all_questions(request):
+    """Return all available chatbot questions."""
+    questions = list(PREDEFINED_RESPONSES.keys())
+    return JsonResponse({"questions": questions})
