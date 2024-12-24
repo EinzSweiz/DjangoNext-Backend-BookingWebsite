@@ -1,7 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
-# Predefined responses
 predefined_responses = {
     "What is this website about?": {
         "response": "DiplomaRoad is a platform for managing and booking accommodations.",
@@ -21,9 +20,15 @@ predefined_responses = {
 @authentication_classes([])
 @permission_classes([])
 def chatbot_response(request):
+    # Debug: Log incoming request data
+    print("Request data:", request.data)
+    
     # Get the question from the request
     data = request.data
     question = data.get("question")
+
+    if not question:
+        return JsonResponse({"error": "Missing 'question' field"}, status=400)
 
     # Fetch the predefined response
     response = predefined_responses.get(
