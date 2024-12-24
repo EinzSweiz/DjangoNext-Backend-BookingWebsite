@@ -7,7 +7,7 @@ logger = logging.getLogger(__name__)
 # Predefined responses for chatbot queries
 PREDEFINED_RESPONSES = {
     "What is this website about?": {
-        "response": "DiplomaRoad is a platform for managing and booking accommodations. I will provide more details if needed.",
+        "response": "DiplomaRoad is a platform for managing and booking accommodations. You can check About Us for more details if needed.",
         "redirect": None,
     },
     "How do I contact support?": {
