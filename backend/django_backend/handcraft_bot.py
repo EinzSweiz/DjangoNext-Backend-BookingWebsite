@@ -23,21 +23,24 @@ predefined_responses = {
 @authentication_classes([])
 @permission_classes([])
 def chatbot_response(request):
-    # Debug: Log incoming request data
-    print("Request data:", request.data)
-    logger.info("Raw body: %s", request.body)
-    logger.info("Parsed data: %s", request.data)
-    
-    # Get the question from the request
-    data = request.data
-    question = data.get("question")
+    # Log raw body before accessing request.data
+    try:
+        raw_body = request.body.decode('utf-8')
+        logger.info("Raw body: %s", raw_body)
+    except Exception as e:
+        logger.error("Failed to decode raw body: %s", e)
 
+    # Access and log parsed data
+    logger.info("Parsed data: %s", request.data)
+
+    # Get the question from the request
+    question = request.data.get("question")
     if not question:
         return JsonResponse({"error": "Missing 'question' field"}, status=400)
 
     # Fetch the predefined response
     response = predefined_responses.get(
         question,
-        {"response": "I'm sorry, I don't understand that question.", "redirect": None}
+        {"response": "I'm sorry, I don't understand that question.", "redirect": None},
     )
     return JsonResponse(response)
