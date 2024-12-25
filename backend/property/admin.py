@@ -1,9 +1,14 @@
 from django.contrib import admin
-from .models import Property, Reservation
+from .models import Property, Reservation, PropertyImage
+
+class PropertyImagesInline(admin.TabularInline):
+    model = PropertyImage
+    extra = 1
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = ['id', 'title', 'description', 'country']
+    inlines = [PropertyImagesInline]
 
 @admin.register(Reservation)
 class PropertyAdmin(admin.ModelAdmin):
