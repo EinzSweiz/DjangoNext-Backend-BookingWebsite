@@ -168,7 +168,7 @@ def properties_detail(request, pk):
     if cached_data:
         return JsonResponse(cached_data, safe=False)
     try:
-        object = Property.objects.get(id=pk)
+        property_object = Property.objects.prefetch_related('extra_images').get(id=pk)
         serializer = PropertyDetailSerializer(object, many=False)
         cache.set(cache_key, serializer.data, timeout=3600)
         return JsonResponse(
