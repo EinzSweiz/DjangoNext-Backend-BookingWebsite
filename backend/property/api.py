@@ -126,27 +126,26 @@ from django.forms.models import model_to_dict
 def create_property(request):
     try:
         logger.debug("Received new property creation request")
-        logger.debug(request.user)
         form = PropertyForm(request.POST, request.FILES)
         if form.is_valid():
-            property = form.save(commit=False)
-            property.landlord = request.user
+            property_instance = form.save(commit=False)
+            property_instance.landlord = request.user
 
-            # Save the property instance first
-            property.save()
+            # Save the property instance
+            property_instance.save()
 
             # Handle extra images
             extra_images = request.FILES.getlist('extra_images')
             for image in extra_images:
-                PropertyImage.objects.create(property=property, image=image)
+                PropertyImage.objects.create(property=property_instance, image=image)
 
             # Serialize the property data
-            property_data = model_to_dict(property)
-            property_data['id'] = property.id
+            property_data = model_to_dict(property_instance)
+            property_data['id'] = property_instance.id
 
             # Handle the image field manually
-            if property.image:
-                property_data['image'] = property.image.url
+            if property_instance.image:
+                property_data['image'] = property_instance.image.url
             else:
                 property_data['image'] = None
 
@@ -155,7 +154,7 @@ def create_property(request):
                 {
                     'image_url': img.image.url,
                     'alt_text': img.alt_text
-                } for img in property.extra_images.all()
+                } for img in property_instance.extra_images.all()
             ]
 
             # Pass serialized data to the message sender
@@ -165,7 +164,7 @@ def create_property(request):
 
             return JsonResponse({'success': True, 'property': property_data})
         else:
-            logger.error('Error', form.errors, form.non_field_errors)
+            logger.error(f"Form errors: {form.errors.as_json()}")
             return JsonResponse({'errors': form.errors.as_json()}, status=400)
     except Exception as e:
         logger.error(f"Error: {e}")
