@@ -32,6 +32,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'bathrooms',
             'guests',
             'landlord',
+            'extra_images',
         )
 
 class ResirvationListSerializer(serializers.ModelSerializer):
