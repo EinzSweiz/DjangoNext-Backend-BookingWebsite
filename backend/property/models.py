@@ -32,11 +32,8 @@ class PropertyImage(models.Model):
 
     def image_url(self):
         return f"{settings.WEBSITE_URL}{self.image.url}"
+    
 
-    def __str__(self):
-        return f"Extra image for {self.property.title}"
-    
-    
 class Reservation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     property = models.ForeignKey(Property, related_name='reservations', on_delete=models.CASCADE)
