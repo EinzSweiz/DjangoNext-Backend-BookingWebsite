@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from .models import Property, Reservation
+from .models import Property, Reservation, PropertyImage
 from .serializers import PropertyListSerializer, PropertyDetailSerializer, ResirvationListSerializer, BookingSerializer
 from .forms import PropertyForm
 from django.shortcuts import get_object_or_404
@@ -120,6 +120,8 @@ def properties_list(request):
     return JsonResponse(response_data)
 
 
+from django.forms.models import model_to_dict
+
 @api_view(['POST'])
 def create_property(request):
     try:
@@ -132,21 +134,34 @@ def create_property(request):
 
             # Save the property instance first
             property.save()
+
+            # Handle extra images
+            extra_images = request.FILES.getlist('extra_images')
+            for image in extra_images:
+                PropertyImage.objects.create(property=property, image=image)
+
             # Serialize the property data
             property_data = model_to_dict(property)
             property_data['id'] = property.id
+
             # Handle the image field manually
             if property.image:
                 property_data['image'] = property.image.url
             else:
                 property_data['image'] = None
 
+            # Include extra images in the response
+            property_data['extra_images'] = [
+                {
+                    'image_url': img.image.url,
+                    'alt_text': img.alt_text
+                } for img in property.extra_images.all()
+            ]
+
             # Pass serialized data to the message sender
             property_data['landlord_email'] = request.user.email
             property_data['landlord_name'] = request.user.name
             send_property_creation_message.delay(property_data)
-            # cache.delete_pattern("property_list_*") for now will keep it as comment
-            # logger.info('Cache invalidated for properties list')
 
             return JsonResponse({'success': True, 'property': property_data})
         else:
@@ -156,8 +171,6 @@ def create_property(request):
         logger.error(f"Error: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
-
-    
 
 @api_view(['GET'])
 @authentication_classes([])

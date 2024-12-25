@@ -1,7 +1,9 @@
-from django.forms import ModelForm
-from .models import Property
+from django import forms
+from .models import Property, PropertyImage
 
-class PropertyForm(ModelForm):
+class PropertyForm(forms.ModelForm):
+    extra_images = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}), required=False)
+
     class Meta:
         model = Property
         fields = (
@@ -14,5 +16,5 @@ class PropertyForm(ModelForm):
             'country',
             'country_code',
             'category',
-            'image'
+            'image',
         )
