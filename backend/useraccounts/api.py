@@ -161,17 +161,17 @@ def validate_google_token(request):
     except Exception as e:
         return JsonResponse({'detail': str(e)}, status=500)
 
-@swagger_auto_schema(
-    method="post",
-    operation_summary="Request Password Reset",
-    operation_description="Send a password reset email to the user's email address.",
-    request_body=email_schema,
-    responses={200: password_reset_response_schema, 404: password_reset_error_schema}
-)  
+
 class CustomPasswordResetView(APIView):
     authentication_classes = []  # No authentication required
     permission_classes = [AllowAny]  # Allows any user to access this endpoint
-
+    @swagger_auto_schema(
+        method="post",
+        operation_summary="Request Password Reset",
+        operation_description="Send a password reset email to the user's email address.",
+        request_body=email_schema,
+        responses={200: password_reset_response_schema, 404: password_reset_error_schema}
+    )  
     def post(self, request):
         # Validate the request data
         serializer = PasswordResetSerializer(data=request.data)
@@ -197,19 +197,21 @@ class CustomPasswordResetView(APIView):
         return JsonResponse({"message": "Password reset email sent successfully"}, status=200)
 
 
-@swagger_auto_schema(
-    method="post",
-    operation_summary="Confirm Password Reset",
-    operation_description="Set a new password using the UID and token.",
-    request_body=set_password_request_schema,
-    responses={200: set_password_response_schema, 400: "Invalid token or data."}
-)
+
 class CustomPasswordResetConfirmView(APIView):
     """
     Custom password reset confirm view to handle password reset functionality.
     """
     authentication_classes = []  # No authentication required
     permission_classes = [AllowAny]  # Allows any user to access this endpoint
+
+    @swagger_auto_schema(
+        method="post",
+        operation_summary="Confirm Password Reset",
+        operation_description="Set a new password using the UID and token.",
+        request_body=set_password_request_schema,
+        responses={200: set_password_response_schema, 400: "Invalid token or data."}
+    )
     def post(self, request, uidb64, token):
         try:
             # Decode the UID to get the user ID

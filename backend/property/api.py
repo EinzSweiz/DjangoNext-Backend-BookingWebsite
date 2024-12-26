@@ -13,11 +13,21 @@ from my_stripe.views import product_checkout_view
 from django.conf import settings
 from rest_framework_simplejwt.tokens import AccessToken
 from django.core.cache import cache
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+from .swagger_usecases import property_detail_schema, property_list_schema, booking_request_schema, reservation_list_schema, favorite_toggle_response_schema
 import logging
 
 logger = logging.getLogger('default')
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+@swagger_auto_schema(
+    method='get',
+    operation_summary="List all properties",
+    operation_description="Retrieve a list of properties with optional filters (e.g., country, category, etc.).",
+    responses={200: property_list_schema},
+)
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -122,6 +132,27 @@ def properties_list(request):
 
 from django.forms.models import model_to_dict
 
+@swagger_auto_schema(
+    method='post',
+    operation_summary="Create a property",
+    operation_description="Landlord can create a new property by providing necessary details.",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "title": openapi.Schema(type=openapi.TYPE_STRING, description="Property title"),
+            "description": openapi.Schema(type=openapi.TYPE_STRING, description="Property description"),
+            "price_per_night": openapi.Schema(type=openapi.TYPE_INTEGER, description="Price per night"),
+            "bedrooms": openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of bedrooms"),
+            "bathrooms": openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of bathrooms"),
+            "guests": openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of guests"),
+            "country": openapi.Schema(type=openapi.TYPE_STRING, description="Country"),
+            "category": openapi.Schema(type=openapi.TYPE_STRING, description="Category"),
+            "image": openapi.Schema(type=openapi.TYPE_STRING, format="binary", description="Main property image"),
+        },
+        required=["title", "description", "price_per_night", "bedrooms", "bathrooms", "guests", "country"],
+    ),
+    responses={201: "Property successfully created"},
+)
 @api_view(['POST'])
 def create_property(request):
     try:
@@ -171,6 +202,12 @@ def create_property(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 
+@swagger_auto_schema(
+    method='get',
+    operation_summary="Property details",
+    operation_description="Retrieve the details of a specific property.",
+    responses={200: property_detail_schema, 404: "Property not found"},
+)
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -203,6 +240,13 @@ def properties_reservations(request, pk):
         safe=False
     )
 
+@swagger_auto_schema(
+    method='post',
+    operation_summary="Book a property",
+    operation_description="Book a property by providing booking details such as start and end dates, total price, etc.",
+    request_body=booking_request_schema,
+    responses={200: "Booking URL returned for payment"},
+)
 @api_view(['POST'])
 def book_property(request, pk):
     try:
@@ -227,7 +271,12 @@ def book_property(request, pk):
         logger.error('Error:', e)
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
-
+@swagger_auto_schema(
+    method='get',
+    operation_summary="Toggle property favorite status",
+    operation_description="Toggle the favorite status of a property for the authenticated user.",
+    responses={200: favorite_toggle_response_schema, 401: "Authentication required"},
+)
 @api_view(['POST'])
 def toggle_favorite(request, pk):
 
