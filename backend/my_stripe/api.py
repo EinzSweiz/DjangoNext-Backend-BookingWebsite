@@ -10,9 +10,22 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from property.models import Property, Reservation
 from .tasks import send_invoice_creation_message
+from drf_yasg.utils import swagger_auto_schema
+from .swagger_usecases import payment_success_response, payment_cancel_response, stripe_webhook_response
+
 import logging
 
+
+
 logger = logging.getLogger(__name__)
+
+
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Handle Successful Payments",
+    operation_description="Retrieve details about a successful Stripe payment, including reservation and customer information.",
+    responses={200: payment_success_response, 400: "Bad Request", 404: "Not Found"}
+)
 @api_view(['GET'])
 def payment_success(request):
     try:
@@ -95,11 +108,22 @@ def payment_success(request):
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 
-
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Handle Canceled Payments",
+    operation_description="Indicate that a payment was canceled.",
+    responses={200: payment_cancel_response}
+)
 @api_view(['GET'])
 def payment_cancel(request, pk):
     return JsonResponse({'success': False, 'message': 'Payment was canceled'})
 
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Stripe Webhook Handler",
+    operation_description="Process Stripe webhook events, including payment completions.",
+    responses={200: stripe_webhook_response, 400: "Bad Request"}
+)
 @require_POST
 @csrf_exempt
 def stripe_webhook(request):

@@ -15,9 +15,20 @@ from rest_framework.permissions import AllowAny
 from .tasks import send_reset_email
 from rest_framework.views import APIView
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from drf_yasg.utils import swagger_auto_schema
+from .swagger_usecases import email_schema, password_reset_error_schema, password_reset_response_schema, set_password_request_schema, set_password_response_schema, user_id_schema
 import json
 
 logger = logging.getLogger(__name__)
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Get Landlord Details",
+    operation_description="Fetch detailed information about a landlord by ID.",
+    responses={200: "Landlord detail retrieved successfully.", 404: "Landlord not found."}
+)
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([])
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -27,12 +38,24 @@ def landlord_detail(request, pk):
     return JsonResponse(serializer.data, safe=False)
 
 
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Get User Reservations",
+    operation_description="Fetch the list of reservations for the authenticated user.",
+    responses={200: "Reservations retrieved successfully."}
+)
 @api_view(['GET'])
 def reservations_list(request):
     qs = request.user.reservations.all()
     serializer = ResirvationListSerializer(qs, many=True)
     return JsonResponse(serializer.data, safe=False)
 
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Get User Profile",
+    operation_description="Fetch user profile details by user ID.",
+    responses={200: "User profile retrieved successfully.", 404: "User not found."}
+)
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -58,6 +81,13 @@ def profile_detail(request, pk):
 
         
 
+@swagger_auto_schema(
+    method="put",
+    operation_summary="Update User Profile",
+    operation_description="Update user profile information.",
+    request_body=UserProfileUpdateSerializer,
+    responses={200: "Profile updated successfully.", 400: "Invalid data provided."}
+)
 @api_view(['PUT'])
 @authentication_classes([])
 @permission_classes([])
@@ -130,7 +160,14 @@ def validate_google_token(request):
 
     except Exception as e:
         return JsonResponse({'detail': str(e)}, status=500)
-    
+
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Request Password Reset",
+    operation_description="Send a password reset email to the user's email address.",
+    request_body=email_schema,
+    responses={200: password_reset_response_schema, 404: password_reset_error_schema}
+)  
 class CustomPasswordResetView(APIView):
     authentication_classes = []  # No authentication required
     permission_classes = [AllowAny]  # Allows any user to access this endpoint
@@ -160,7 +197,13 @@ class CustomPasswordResetView(APIView):
         return JsonResponse({"message": "Password reset email sent successfully"}, status=200)
 
 
-
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Confirm Password Reset",
+    operation_description="Set a new password using the UID and token.",
+    request_body=set_password_request_schema,
+    responses={200: set_password_response_schema, 400: "Invalid token or data."}
+)
 class CustomPasswordResetConfirmView(APIView):
     """
     Custom password reset confirm view to handle password reset functionality.

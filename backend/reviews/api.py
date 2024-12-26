@@ -6,7 +6,15 @@ from .serializers import ReviewViewSerializer, ReviewCreateSerializer, ReviewRep
 from .models import Review, Property, ReviewReport
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.core.paginator import Paginator
+from drf_yasg.utils import swagger_auto_schema
+from .swagger_usecases import paginated_reviews_schema, report_create_response_schema, report_create_schema, review_create_response_schema, review_create_schema
 
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Retrieve Paginated Reviews",
+    operation_description="Fetch paginated reviews for a specific property, excluding dismissed reports.",
+    responses={200: paginated_reviews_schema, 500: "Internal Server Error"}
+)
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
@@ -42,6 +50,14 @@ def get_reviews_api(request, pk):
     except Exception as e:
         return Response({"error": f"Something went wrong: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Create a Review",
+    operation_description="Submit a review for a specific property.",
+    request_body=review_create_schema,
+    responses={201: review_create_response_schema, 400: "Validation Error", 500: "Internal Server Error"}
+)
 @api_view(['POST'])
 def create_reviews_api(request, pk):
     """
@@ -71,6 +87,13 @@ def create_reviews_api(request, pk):
         return Response({"error": f"Something went wrong: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Create a Review Report",
+    operation_description="Submit a report for a specific review.",
+    request_body=report_create_schema,
+    responses={201: report_create_response_schema, 400: "Validation Error", 500: "Internal Server Error"}
+)
 @api_view(['POST'])
 def report_create_api(request, pk):
     """

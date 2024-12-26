@@ -2,6 +2,11 @@ from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from .swagger_usecases import (
+    chatbot_request_schema,
+    chatbot_response_schema,
+    chatbot_questions_schema,
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -50,49 +55,18 @@ PREDEFINED_RESPONSES = {
     },
 }
 
-
-
 @swagger_auto_schema(
-    method='post',
+    method="post",
     operation_summary="Chatbot query handler",
     operation_description="Processes chatbot queries and provides predefined responses based on the question.",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "question": openapi.Schema(
-                type=openapi.TYPE_STRING, 
-                description="The user's question to the chatbot."
-            )
-        },
-        required=["question"]
-    ),
-    responses={
-        200: openapi.Response(
-            description="The chatbot's response to the user's question.",
-            examples={
-                "application/json": {
-                    "response": "DiplomaRoad is a platform for managing and booking accommodations. Redirecting you now...",
-                    "redirect": "/aboutus",
-                    "action": None,
-                }
-            },
-        ),
-        400: openapi.Response(description="Invalid request or missing 'question' field."),
-    },
+    request_body=chatbot_request_schema,
+    responses={200: chatbot_response_schema, 400: "Invalid request or missing 'question' field."},
 )
-@api_view(['POST'])
+@api_view(["POST"])
 @authentication_classes([])
 @permission_classes([])
 def chatbot_response(request):
     """Handle chatbot queries and provide predefined responses."""
-    try:
-        raw_body = request.body.decode('utf-8')
-        logger.info("Raw body: %s", raw_body)
-    except Exception as e:
-        logger.error("Failed to decode raw body: %s", e)
-
-    logger.info("Parsed data: %s", request.data)
-
     question = request.data.get("question")
     if not question:
         return JsonResponse({"error": "Missing 'question' field"}, status=400)
@@ -101,29 +75,16 @@ def chatbot_response(request):
         question,
         {"response": "I'm sorry, I don't understand that question.", "redirect": None, "action": None},
     )
-
     return JsonResponse(response)
 
 
 @swagger_auto_schema(
-    method='get',
+    method="get",
     operation_summary="Retrieve all chatbot questions",
     operation_description="Returns a list of all predefined questions that the chatbot can answer.",
-    responses={
-        200: openapi.Response(
-            description="A list of all available chatbot questions.",
-            examples={
-                "application/json": {
-                    "questions": [
-                        "What is this website about?",
-                        "How do I contact support?",
-                    ]
-                }
-            },
-        )
-    },
+    responses={200: chatbot_questions_schema},
 )
-@api_view(['GET'])
+@api_view(["GET"])
 @authentication_classes([])
 @permission_classes([])
 def get_all_questions(request):

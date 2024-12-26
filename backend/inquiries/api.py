@@ -6,10 +6,21 @@ from useraccounts.models import User
 from rest_framework.parsers import JSONParser
 from django.http import Http404
 from .serializers import CreateInquirySerializer, GetInquirySerializer, MessageSerializer, UpdateStatusSerializer, AssignInquirySerializer, CustomerServiceAgentSerializer
+from drf_yasg.utils import swagger_auto_schema
+from .swagger_usecases import (create_inquiry_request_schema, 
+create_inquiry_response_schema, update_status_request_schema,
+update_status_response_schema, add_message_request_schema, add_message_response_schema, get_inquiries_response_schema)
 import logging
 
 logger = logging.getLogger(__name__)
 
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Create an Inquiry",
+    operation_description="Allows a user to submit a new inquiry with a subject, message, and email.",
+    request_body=create_inquiry_request_schema,
+    responses={201: create_inquiry_response_schema, 400: "Validation Error", 500: "Server Error"}
+)
 @api_view(['POST'])
 def create_inquiry(request):
     try:
@@ -22,7 +33,12 @@ def create_inquiry(request):
     except Exception as e:
         return JsonResponse(e, status=500)
     
-
+@swagger_auto_schema(
+    method="get",
+    operation_summary="Retrieve Inquiries",
+    operation_description="Retrieves all inquiries for the current user based on their role and optional query parameters (status, queue).",
+    responses={200: get_inquiries_response_schema, 500: "Server Error"}
+)
 @api_view(['GET'])
 def inquiries_view(request):
     if request.user.role == User.RoleChoises.ADMIN:
@@ -47,6 +63,14 @@ def inquiries_view(request):
     inquiries_serializer = GetInquirySerializer(inquiries, many=True)
     return JsonResponse(inquiries_serializer.data, safe=False)
 
+
+@swagger_auto_schema(
+    method="post",
+    operation_summary="Add a Message",
+    operation_description="Allows a user or customer service agent to add a message to an existing inquiry.",
+    request_body=add_message_request_schema,
+    responses={201: add_message_response_schema, 400: "Validation Error", 404: "Inquiry Not Found"}
+)
 @api_view(['POST'])
 def add_message(request, pk):
     try:
@@ -62,6 +86,7 @@ def add_message(request, pk):
     except Inquiry.DoesNotExist:
         return JsonResponse({"error": "Inquiry not found"}, status=404)
     
+
 @api_view(['PUT'])
 @permission_classes([IsAdminUser])
 def assign_inquiry(request, inquiry_id):
@@ -94,6 +119,14 @@ def get_customer_service_agents(request):
     logger.debug("Serialized Data:", serializer.data)  # Log the serialized data
     return JsonResponse(serializer.data, safe=False)
 
+
+@swagger_auto_schema(
+    method="put",
+    operation_summary="Update Inquiry Status",
+    operation_description="Updates the status of an inquiry (e.g., active, pending, resolved) and marks it as resolved if applicable.",
+    request_body=update_status_request_schema,
+    responses={200: update_status_response_schema, 400: "Validation Error", 404: "Inquiry Not Found"}
+)
 @api_view(['PUT'])
 def update_inquiry_status(request, pk):
     try:
