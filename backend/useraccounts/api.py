@@ -29,9 +29,6 @@ logger = logging.getLogger(__name__)
 @api_view(['GET'])
 @authentication_classes([])
 @permission_classes([])
-@api_view(['GET'])
-@authentication_classes([])
-@permission_classes([])
 def landlord_detail(request, pk):
     user = User.objects.get(pk=pk)
     serializer = UserDetailSerializer(user, many=False)
@@ -166,12 +163,11 @@ class CustomPasswordResetView(APIView):
     authentication_classes = []  # No authentication required
     permission_classes = [AllowAny]  # Allows any user to access this endpoint
     @swagger_auto_schema(
-        method="post",
         operation_summary="Request Password Reset",
         operation_description="Send a password reset email to the user's email address.",
         request_body=email_schema,
         responses={200: password_reset_response_schema, 404: password_reset_error_schema}
-    )  
+    )
     def post(self, request):
         # Validate the request data
         serializer = PasswordResetSerializer(data=request.data)
