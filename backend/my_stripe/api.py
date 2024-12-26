@@ -119,7 +119,6 @@ def payment_cancel(request, pk):
     return JsonResponse({'success': False, 'message': 'Payment was canceled'})
 
 @swagger_auto_schema(
-    method="post",
     operation_summary="Stripe Webhook Handler",
     operation_description="Process Stripe webhook events, including payment completions.",
     responses={200: stripe_webhook_response, 400: "Bad Request"}
