@@ -272,7 +272,7 @@ def book_property(request, pk):
         return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
 @swagger_auto_schema(
-    method='get',
+    method='post',
     operation_summary="Toggle property favorite status",
     operation_description="Toggle the favorite status of a property for the authenticated user.",
     responses={200: favorite_toggle_response_schema, 401: "Authentication required"},
