@@ -202,7 +202,6 @@ class CustomPasswordResetConfirmView(APIView):
     permission_classes = [AllowAny]  # Allows any user to access this endpoint
 
     @swagger_auto_schema(
-        method="post",
         operation_summary="Confirm Password Reset",
         operation_description="Set a new password using the UID and token.",
         request_body=set_password_request_schema,
