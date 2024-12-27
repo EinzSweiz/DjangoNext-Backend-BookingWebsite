@@ -10,6 +10,7 @@ class PropertyListSerializer(serializers.ModelSerializer):
             'title',
             'price_per_night',
             'image_url'
+            'country'
         )
 
 class PropertyImagesSerializer(serializers.ModelSerializer):
