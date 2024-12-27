@@ -6,7 +6,7 @@ from io import BytesIO
 import requests
 from PIL import Image
 
-def generate_payment_pdf(response_data, logo_path):
+def generate_payment_pdf(response_data):
     # Create a BytesIO buffer to hold the PDF
     buffer = BytesIO()
 
@@ -16,7 +16,7 @@ def generate_payment_pdf(response_data, logo_path):
 
     # Add the company logo
     try:
-        pdf.drawImage(0.5 * inch, height - 1.2 * inch, width=1.5 * inch, height=1 * inch, mask='auto', logo_path="backend/media/uploads/avatars/images.jpeg")
+        pdf.drawImage("backend/media/uploads/avatars/images.jpeg", 0.5 * inch, height - 1.2 * inch, width=1.5 * inch, height=1 * inch, mask='auto')
     except Exception as e:
         print(f"Error loading logo: {e}")
 
