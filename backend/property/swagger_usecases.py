@@ -8,6 +8,8 @@ property_list_schema = openapi.Schema(
         "title": openapi.Schema(type=openapi.TYPE_STRING, description="Property title"),
         "price_per_night": openapi.Schema(type=openapi.TYPE_INTEGER, description="Price per night"),
         "image_url": openapi.Schema(type=openapi.TYPE_STRING, description="URL of the property image"),
+        "country": openapi.Schema(type=openapi.TYPE_STRING, description="Country"),
+
     },
 )
 
