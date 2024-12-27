@@ -8,7 +8,7 @@ from io import BytesIO
 import requests
 from PIL import Image
 
-# Example custom font usage (commented out):
+# If you have custom fonts (TTF), you can register them like so:
 # pdfmetrics.registerFont(TTFont("CustomFont", "/path/to/custom_font.ttf"))
 
 def generate_payment_pdf(response_data):
@@ -17,7 +17,7 @@ def generate_payment_pdf(response_data):
     width, height = letter
 
     # --------------------------------------------------------
-    # 1. HEADER SECTION
+    # 1. HEADER
     # --------------------------------------------------------
     header_height = 1.7 * inch
     pdf.setFillColorRGB(0.07, 0.45, 0.55)  # Teal
@@ -28,7 +28,7 @@ def generate_payment_pdf(response_data):
     pdf.drawString(1 * inch, height - 1.2 * inch, "Reservation Invoice")
 
     # Payment Status Badge (rounded rectangle)
-    payment_status = "PAID"  # Or "NOT PAID"
+    payment_status = "PAID"  # or "NOT PAID"
     status_color = colors.green if payment_status.upper() == "PAID" else colors.red
     badge_width = 1.5 * inch
     badge_height = 0.5 * inch
@@ -66,50 +66,58 @@ def generate_payment_pdf(response_data):
     # --------------------------------------------------------
     # 3. RESERVATION DETAILS & IMAGE SIDE-BY-SIDE
     # --------------------------------------------------------
-    # We’ll create two “columns” within one larger box:
-    #   - Left column for details
-    #   - Right column for the property image
-
-    # Outer box to visually group them
+    # Outer box to group reservation details and image
     big_box_height = 2.7 * inch
     big_box_y = box_y - 0.4 * inch - big_box_height
+
     pdf.setFillColorRGB(0.97, 0.97, 0.97)  # light gray
     pdf.roundRect(box_margin, big_box_y, box_width, big_box_height, 0.1 * inch, fill=1, stroke=0)
 
-    # Left column for reservation details
+    # --- Left Column for Reservation Details ---
     col_padding = 0.3 * inch
     col_width = (box_width / 2) - col_padding
+    left_col_x = box_margin + col_padding
+    left_col_y_top = big_box_y + big_box_height - 0.4 * inch
 
-    # Title
     pdf.setFillColor(colors.black)
     pdf.setFont("Helvetica-Bold", 14)
-    pdf.drawString(box_margin + col_padding, big_box_y + big_box_height - 0.4 * inch, "Reservation Details")
+    pdf.drawString(left_col_x, left_col_y_top, "Reservation Details")
 
-    # Details text
+    # Let's define the data in a 2-column format
+    # (label, value) pairs
+    reservation_table_data = [
+        ("Property:",  response_data['reservation']['property']['name']),
+        ("Location:",  response_data['reservation']['property']['address']),
+        ("Start Date:", response_data['reservation']['start_date']),
+        ("End Date:",   response_data['reservation']['end_date']),
+        ("Total Price:", f"${response_data['reservation']['total_price']}"),
+    ]
+
+    # Move down a bit for the actual table
     pdf.setFont("Helvetica", 11)
-    details_y = big_box_y + big_box_height - 0.8 * inch
-    pdf.drawString(box_margin + col_padding, details_y, f"Property: {response_data['reservation']['property']['name']}")
-    details_y -= 0.25 * inch
-    pdf.drawString(box_margin + col_padding, details_y, f"Location: {response_data['reservation']['property']['address']}")
-    details_y -= 0.25 * inch
-    pdf.drawString(box_margin + col_padding, details_y, f"Start Date: {response_data['reservation']['start_date']}")
-    details_y -= 0.25 * inch
-    pdf.drawString(box_margin + col_padding, details_y, f"End Date: {response_data['reservation']['end_date']}")
-    details_y -= 0.25 * inch
-    pdf.drawString(box_margin + col_padding, details_y, f"Total Price: ${response_data['reservation']['total_price']}")
+    row_height = 0.25 * inch
+    current_y = left_col_y_top - 0.5 * inch
 
-    # Right column for property image
-    img_col_x = box_margin + col_width + (2 * col_padding)
+    for label, value in reservation_table_data:
+        # Label in bold
+        pdf.setFont("Helvetica-Bold", 11)
+        pdf.drawString(left_col_x, current_y, label)
+        # Value in regular font, slightly shifted right
+        pdf.setFont("Helvetica", 11)
+        pdf.drawString(left_col_x + 1.2 * inch, current_y, str(value))
+        current_y -= row_height
+
+    # --- Right Column for Property Image ---
+    right_col_x = box_margin + col_width + (2 * col_padding)
     img_col_width = col_width - col_padding
     img_col_height = big_box_height - (2 * col_padding)
     img_y = big_box_y + big_box_height - img_col_height - col_padding
 
-    # Label above the image
     pdf.setFont("Helvetica-Bold", 13)
     pdf.setFillColor(colors.black)
-    pdf.drawString(img_col_x, big_box_y + big_box_height - 0.4 * inch, "Property Image")
+    pdf.drawString(right_col_x, left_col_y_top, "Property Image")
 
-    # Try loading the image
+    # Attempt to load and draw the image with a subtle border
     try:
         image_url = response_data['reservation']['property']['image_url']
         resp = requests.get(image_url)
@@ -118,17 +126,16 @@ def generate_payment_pdf(response_data):
             image_path = "/tmp/property_image.jpg"
             image.save(image_path)
 
-            # Let's maintain the aspect ratio but fit within the column
-            # We'll define a target width or height based on the box
             target_w = img_col_width
-            target_h = img_col_height - 0.3 * inch  # some top/bottom padding
+            target_h = img_col_height - 0.4 * inch  # some padding
 
-            # Draw a light border around the image area for a subtle frame
-            pdf.setFillColorRGB(1, 1, 1)  # white background behind image
-            pdf.roundRect(img_col_x, img_y, target_w, target_h, 0.1 * inch, fill=1, stroke=1)
+            # Border behind image
+            pdf.setFillColorRGB(1, 1, 1)  # white background
+            pdf.roundRect(right_col_x, img_y, target_w, target_h, 0.1 * inch, fill=1, stroke=1)
+
             pdf.drawImage(
                 image_path,
-                img_col_x,
+                right_col_x,
                 img_y,
                 width=target_w,
                 height=target_h,
@@ -138,7 +145,7 @@ def generate_payment_pdf(response_data):
             )
     except Exception as e:
         pdf.setFont("Helvetica", 9)
-        pdf.drawString(img_col_x, img_y + 0.2 * inch, f"Error loading image: {e}")
+        pdf.drawString(right_col_x, img_y + 0.2 * inch, f"Error loading image: {e}")
 
     # --------------------------------------------------------
     # 4. FOOTER
