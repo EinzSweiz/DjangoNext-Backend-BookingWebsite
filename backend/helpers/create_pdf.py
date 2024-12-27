@@ -16,7 +16,7 @@ def generate_payment_pdf(response_data, logo_path):
 
     # Add the company logo
     try:
-        pdf.drawImage("backend/media/uploads/avatars/images.jpeg", 0.5 * inch, height - 1.2 * inch, width=1.5 * inch, height=1 * inch, mask='auto')
+        pdf.drawImage(0.5 * inch, height - 1.2 * inch, width=1.5 * inch, height=1 * inch, mask='auto', logo_path="backend/media/uploads/avatars/images.jpeg")
     except Exception as e:
         print(f"Error loading logo: {e}")
 
