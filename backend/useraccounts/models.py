@@ -4,6 +4,10 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
 
 
+def generate_unique_anonymous_name():
+    """Generates a unique anonymous name using UUID."""
+    return f'Anon-{uuid.uuid4().hex[:8]}'
+
 class CustomUserManager(UserManager):
     def _create_user(self, name, email, password, **extra_fields):
         if not email:
@@ -33,7 +37,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True)
-    name = models.CharField(max_length=255)
+    name = models.CharField(
+        max_length=255, 
+        blank=True, 
+        null=True, 
+        default=generate_unique_anonymous_name  # Assign callable as default
+    )
     avatar = models.ImageField(upload_to='uploads/avatars', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
