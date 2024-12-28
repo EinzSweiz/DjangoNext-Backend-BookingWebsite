@@ -15,7 +15,7 @@ from .swagger_usecases import conversation_list_response_schema, conversation_st
 )
 @api_view(['GET'])
 def conversation_list(request):
-    conversations = request.user.conversations.all().order_by('-updated_at')
+    conversations = request.user.conversations.all().order_by('-modified_at')
     serializer = ConversationListSerializer(conversations, many=True)
     return JsonResponse(serializer.data, safe=False)
 
