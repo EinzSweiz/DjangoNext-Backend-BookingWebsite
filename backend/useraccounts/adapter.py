@@ -1,12 +1,37 @@
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.socialaccount.models import SocialAccount, SocialToken
 from allauth.account.models import EmailAddress
+import uuid
 from .models import User  # Import your custom User model
 import logging
 
 logger = logging.getLogger(__name__)
 
+
+def generate_unique_anonymous_name():
+    """Generates a unique anonymous name using UUID."""
+    return f'Anon-{uuid.uuid4().hex[:8]}'  # e.g., Anon-a1b2c3d4
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
+
+    def populate_user(self, request, sociallogin, data):
+        """
+        Populate the user instance with additional data from the social provider.
+        Assign a unique default name and a default avatar if not provided.
+        """
+        user = super().populate_user(request, sociallogin, data)
+        
+        # Handle the 'name' field
+        if not user.name:
+            user.name = generate_unique_anonymous_name()
+            logger.debug(f"Assigned default name: {user.name}")
+        
+        # Handle the 'avatar' field
+        if not user.avatar:
+            user.avatar = 'uploads/avatars/images.jpeg'  # Ensure this path is correct
+            logger.debug(f"Assigned default avatar for user: {user.email}")
+        
+        return user
+
     def pre_social_login(self, request, sociallogin):
         """
         Handle social login logic:
