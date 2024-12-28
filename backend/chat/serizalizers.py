@@ -9,14 +9,10 @@ class ConversationListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conversation
         fields = ('id', 'users', 'modified_at', 'has_unread_messages')
-    
-    def get_has_unread_messages(self, obj):
-        request = self.context.get('request')
-        if request:
-            user = request.user
-            return obj.messages.exclude(read_by=user).exists()
-        return False
 
+    def get_has_unread_messages(self, obj):
+        user = self.context['request'].user
+        return obj.messages.exclude(read_by=user).exists()
 
 class ConversationDetailSerializer(serializers.ModelSerializer):
     users = UserDetailSerializer(many=True, read_only=True)

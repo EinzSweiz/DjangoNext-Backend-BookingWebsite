@@ -28,13 +28,19 @@ def conversation_list(request):
 )
 @api_view(['GET'])
 def conversations_detail(request, pk): 
-    conversation = request.user.conversations.get(pk=pk)   
+    conversation = request.user.conversations.get(pk=pk)
+    user = request.user
+    conversation.messages.exclude(read_by=user).update()  
+    for msg in conversation.messages.exclude(read_by=user):
+        msg.read_by.add(user)
+
     conversation_serializer = ConversationDetailSerializer(conversation, many=False)
     messages_serializer = ConversationMessageSerializer(conversation.messages.all(), many=True)
     return JsonResponse({
         'conversation': conversation_serializer.data,
         'messages': messages_serializer.data
     }, safe=False)
+
 
 
 @swagger_auto_schema(
