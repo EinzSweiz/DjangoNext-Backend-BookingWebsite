@@ -13,7 +13,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         token = self.scope.get('query_string', '').decode()
         if not token:
-            await self.close()
+            await self.close(code=403)
             return
 
         await self.channel_layer.group_add(
@@ -32,6 +32,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         event = data.get('event')
+        logger.info(f"Received event: {event}, data: {data}")
 
         if event == "typing":
             name = data['data'].get('name')
@@ -91,14 +92,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         name = event['name']
 
         await self.send(text_data=json.dumps({
-            'body': body,
-            'name': name
+            'event': 'chat_message',
+            'data': {
+                'body': body,
+                'name': name
+            }
         }))
 
     @sync_to_async
     def save_message(self, conversation_id, body, sent_to_id):
         user = self.scope['user']
-        ConversationMessage.objects.create(
+        logger.info(f"Saving message: user={user}, conversation_id={conversation_id}, body={body}, sent_to_id={sent_to_id}")
+        return ConversationMessage.objects.create(
             conversation_id=conversation_id,
             body=body,
             sent_to_id=sent_to_id,
