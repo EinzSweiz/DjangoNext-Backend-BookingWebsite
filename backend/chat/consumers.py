@@ -3,34 +3,26 @@ from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import ConversationMessage
 import logging
+
 logger = logging.getLogger(__name__)
 
-class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
+class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Get the room name from URL
         self.room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = f'chat_{self.room_name}'
 
-        # Token authentication (example)
-        token = self.scope.get('query_string', '').decode()  # Get token from query string
+        token = self.scope.get('query_string', '').decode()
         if not token:
-            # Reject connection if no token is provided
             await self.close()
             return
-        
-        logger.info(f"Received token: {token}")
 
-        # Join room group
         await self.channel_layer.group_add(
             self.room_group_name,
             self.channel_name
         )
-        logger.info(f"WebSocket connection attempt: room_name={self.room_name}, token={token}")
-
         await self.accept()
 
     async def disconnect(self, code):
-        # Ensure room_group_name is set before attempting to discard from the group
         if hasattr(self, 'room_group_name'):
             await self.channel_layer.group_discard(
                 self.room_group_name,
@@ -38,43 +30,66 @@ class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
             )
 
     async def receive(self, text_data):
-        # Parse incoming message
         data = json.loads(text_data)
+        event = data.get('event')
 
-        conversation_id = data['data'].get('conversation_id')  # Use get() to avoid KeyError
-        sent_to_id = data['data'].get('sent_to_id')
-        name = data['data'].get('name')
-        body = data['data'].get('body')
+        if event == "typing":
+            name = data['data'].get('name')
+            sent_to_id = data['data'].get('sent_to_id')
+            conversation_id = data['data'].get('conversation_id')
 
-        # Handle missing fields with error responses
-        if not sent_to_id:
-            return await self.send(text_data=json.dumps({
-                'error': 'sent_to_id is missing'
-            }))
+            if not sent_to_id or not name:
+                return await self.send(text_data=json.dumps({
+                    'error': 'sent_to_id and name are required for typing event'
+                }))
 
-        if not name or not body:
-            return await self.send(text_data=json.dumps({
-                'error': 'name and body are required'
-            }))
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_typing',
+                    'name': name,
+                    'conversation_id': conversation_id,
+                }
+            )
+            return
 
-        # Process message (if all necessary fields are present)
-        # Save the message to the database (for example)
+        if event == "chat_message":
+            name = data['data'].get('name')
+            body = data['data'].get('body')
+            sent_to_id = data['data'].get('sent_to_id')
+            conversation_id = data['data'].get('conversation_id')
 
-        # Send message to the group
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'chat_message',
-                'body': body,
-                'name': name
+            if not sent_to_id or not name or not body:
+                return await self.send(text_data=json.dumps({
+                    'error': 'sent_to_id, name, and body are required for chat_message'
+                }))
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'body': body,
+                    'name': name,
+                }
+            )
+            await self.save_message(conversation_id, body, sent_to_id)
+
+    async def chat_typing(self, event):
+        name = event['name']
+        conversation_id = event['conversation_id']
+
+        await self.send(text_data=json.dumps({
+            'event': 'typing',
+            'data': {
+                'name': name,
+                'conversation_id': conversation_id,
             }
-        )
-        await self.save_message(conversation_id, body, sent_to_id)
+        }))
+
     async def chat_message(self, event):
         body = event['body']
         name = event['name']
 
-        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'body': body,
             'name': name
@@ -83,5 +98,9 @@ class ChatConsumer(AsyncWebsocketConsumer):  # Fixed typo in class name
     @sync_to_async
     def save_message(self, conversation_id, body, sent_to_id):
         user = self.scope['user']
-
-        ConversationMessage.objects.create(conversation_id=conversation_id, body=body, sent_to_id=sent_to_id, created_by=user)
+        ConversationMessage.objects.create(
+            conversation_id=conversation_id,
+            body=body,
+            sent_to_id=sent_to_id,
+            created_by=user
+        )
