@@ -7,12 +7,14 @@ class Conversation(models.Model):
     users = models.ManyToManyField(User, related_name='conversations')
     created = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+    has_unread_messages = models.BooleanField(default=False)
 
 
 class ConversationMessage(models.Model):
     id = models.UUIDField(primary_key=True, editable=False, default=uuid.uuid4)
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     body = models.TextField()
+    read_by = models.ManyToManyField(User, related_name="read_messages", blank=True)
     sent_to = models.ForeignKey(User, related_name='received_messages', on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, related_name='sent_messages', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
