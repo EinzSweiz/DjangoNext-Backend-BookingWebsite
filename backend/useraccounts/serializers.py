@@ -33,6 +33,23 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['name', 'email', 'password']
         extra_kwargs = {'password': {'write_only': True}}
 
+#Should be changed into Dynamic serializer(learned during prepaaration for interview 
+# added snippet how to reach this endpoints should be updated too for properly working)
+# class DynamicFieldModelSerializer(serializers.ModelSerializer):
+#     def __init__(self, *args, **kwargs):
+#         fields = kwargs.pop('fields', None)
+#         super.__init__(*args, **kwargs)
+
+#         if fields is not None:
+#             allowed = set(fields)
+#             existing = set(self.fields)
+#             for field_name in existing - allowed:
+#                 self.fields.pop(field_name)
+
+# class BookSerializer(DynamicFieldModelSerializer):
+#     class Meta:
+#         model = Book
+#         fields = ['id', 'name', 'author']
 
 
 class UserDetailSerializer(serializers.ModelSerializer):

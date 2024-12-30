@@ -108,7 +108,6 @@ LOGIN_REDIRECT_URL = '/callback/'
 # ==========================
 # CORS and CSRF
 # ==========================
-CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8010', 'http://165.22.76.137:1337',
@@ -128,7 +127,7 @@ CORS_ORIGINS_WHITELIST = [
     'http://www.diplomaroad.pro:1773', 'http://165.22.76.137:1337',
     'https://diplomaroad.pro', 'https://www.diplomaroad.pro',
 ]
-
+CSRF_COOKIE_SECURE=True
 CORS_ALLOW_CREDENTIALS=True
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -268,6 +267,11 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '1000/day',
+        'anon': '100/hour',
+        'login': '10/minute',
+    },
 }
 
 CHANNEL_LAYERS = {
