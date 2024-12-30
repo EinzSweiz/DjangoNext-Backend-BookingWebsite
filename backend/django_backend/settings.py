@@ -230,6 +230,20 @@ broker_transport_options = {
     'interval_step': 0.2,  # Step-up delay between retries
     'interval_max': 0.5,   # Maximum delay between retries
 }
+CELERY_WORKER_CONCURRENCY = 4  # Limit the number of concurrent worker threads (adjust as needed)
+
+# Soft and hard task time limits
+CELERY_TASK_SOFT_TIME_LIMIT = 300  # Abort task gracefully after 5 minutes
+CELERY_TASK_TIME_LIMIT = 360  # Hard limit of 6 minutes
+
+# Prefetch multiplier to control the number of tasks a worker prefetches
+CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Prevent worker from prefetching too many tasks
+
+# Max retries for tasks
+CELERY_TASK_MAX_RETRIES = 3
+
+# Task ignore result to avoid storing unnecessary results
+CELERY_TASK_IGNORE_RESULT = True  # Set to True if results are not needed
 # ==========================
 # STRIPE CONFIGURATION
 # ==========================
