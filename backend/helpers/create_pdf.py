@@ -5,6 +5,7 @@ from reportlab.lib import colors
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from io import BytesIO
+from datetime import datetime
 import requests
 from PIL import Image
 
@@ -15,7 +16,7 @@ def generate_payment_pdf(response_data):
     buffer = BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
-
+    current_date = datetime.now().strftime("%Y-%m-%d")
     # --------------------------------------------------------
     # 1. HEADER
     # --------------------------------------------------------
@@ -159,7 +160,7 @@ def generate_payment_pdf(response_data):
     pdf.drawString(1 * inch, 0.3 * inch, "Thank you for choosing DiplomaRoad!")
 
     pdf.setFont("Helvetica-Oblique", 8)
-    pdf.drawRightString(width - 1 * inch, 0.3 * inch, "Generated on: 2024-12-27")
+    pdf.drawRightString(width - 1 * inch, 0.3 * inch, f"Generated on: {current_date}")
 
     # --------------------------------------------------------
     # FINALIZE & RETURN
