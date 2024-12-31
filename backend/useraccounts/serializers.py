@@ -14,10 +14,14 @@ class UserModelDynamicSerializer(serializers.ModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+                
+    def get_avatar_url(self, obj):
+        return obj.avatar_url()
+
     class Meta:
         model = User
         fields = '__all__'
-        
+
 class SetPasswordSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(write_only=True)
     new_password2 = serializers.CharField(write_only=True)
