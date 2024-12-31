@@ -1,4 +1,4 @@
-from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer, PasswordResetSerializer, SetPasswordSerializer
+from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer, PasswordResetSerializer, SetPasswordSerializer, UserModelDynamicSerializer
 from django.http import JsonResponse
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 @permission_classes([])
 def landlord_detail(request, pk):
     user = User.objects.get(pk=pk)
-    serializer = UserDetailSerializer(user, many=False)
+    serializer = UserModelDynamicSerializer(user, fields=['id', 'name', 'avatar_url'], many=False)
     print('Serializer', serializer)
     return JsonResponse(serializer.data, safe=False)
 
