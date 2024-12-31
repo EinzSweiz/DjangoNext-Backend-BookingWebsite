@@ -1,4 +1,4 @@
-from .serializers import UserDetailSerializer, UserProfileUpdateSerializer, UserProfileSerializer, PasswordResetSerializer, SetPasswordSerializer, UserModelDynamicSerializer
+from .serializers import UserProfileUpdateSerializer, PasswordResetSerializer, SetPasswordSerializer, UserModelDynamicSerializer
 from django.http import JsonResponse
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -66,7 +66,7 @@ def profile_detail(request, pk):
         logger.debug(user.email)
 
         # Now serialize the data
-        serializer = UserProfileSerializer(user)
+        serializer = UserModelDynamicSerializer(user, fields=['id', 'email', 'name', 'avatar_url'])
         logger.debug(f"Serialized data: {serializer.data}")
         return JsonResponse(serializer.data)
 
