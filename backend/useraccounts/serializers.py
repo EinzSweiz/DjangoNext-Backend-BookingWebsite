@@ -5,6 +5,8 @@ from .tasks import send_confirmation_message
 
 
 class UserModelDynamicSerializer(serializers.ModelSerializer):
+    avatar_url = serializers.SerializerMethodField()
+
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
         super().__init__(*args, **kwargs)
@@ -14,13 +16,14 @@ class UserModelDynamicSerializer(serializers.ModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
-                
+
     def get_avatar_url(self, obj):
         return obj.avatar_url()
 
     class Meta:
         model = User
         fields = '__all__'
+
 
 class SetPasswordSerializer(serializers.Serializer):
     new_password1 = serializers.CharField(write_only=True)
