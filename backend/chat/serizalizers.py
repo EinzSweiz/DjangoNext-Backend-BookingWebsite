@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from .models import Conversation, ConversationMessage
-from useraccounts.serializers import UserDetailSerializer
+from useraccounts.serializers import UserModelDynamicSerializer
 
 class ConversationListSerializer(serializers.ModelSerializer):
     has_unread_messages = serializers.SerializerMethodField()
-    users = UserDetailSerializer(many=True, read_only=True)
+    users = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], many=True, read_only=True)
 
     class Meta:
         model = Conversation
@@ -15,7 +15,7 @@ class ConversationListSerializer(serializers.ModelSerializer):
         return obj.messages.exclude(read_by=user).exists()
 
 class ConversationDetailSerializer(serializers.ModelSerializer):
-    users = UserDetailSerializer(many=True, read_only=True)
+    users = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], many=True, read_only=True)
 
     class Meta:
         model = Conversation
@@ -23,8 +23,8 @@ class ConversationDetailSerializer(serializers.ModelSerializer):
 
 
 class ConversationMessageSerializer(serializers.ModelSerializer):
-    sent_to = UserDetailSerializer(many=False, read_only=True)
-    created_by = UserDetailSerializer(many=False, read_only=True)
+    sent_to = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], many=False, read_only=True)
+    created_by = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], many=False, read_only=True)
     class Meta:
         model = ConversationMessage
         fields = ('id', 'body', 'sent_to', 'created_by')

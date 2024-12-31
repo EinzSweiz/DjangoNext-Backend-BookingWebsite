@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Property, Reservation, PropertyImage
-from useraccounts.serializers import UserDetailSerializer
+from useraccounts.serializers import UserModelDynamicSerializer
 
 class PropertyListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,7 +20,7 @@ class PropertyImagesSerializer(serializers.ModelSerializer):
 
 class PropertyDetailSerializer(serializers.ModelSerializer):
     extra_images = PropertyImagesSerializer(many=True, read_only=True)
-    landlord = UserDetailSerializer(read_only=True, many=False)
+    landlord = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], many=False, read_only=True)
     class Meta:
         model = Property
         fields = (

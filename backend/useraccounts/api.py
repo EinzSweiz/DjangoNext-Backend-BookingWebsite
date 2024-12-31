@@ -1,4 +1,4 @@
-from .serializers import UserProfileUpdateSerializer, PasswordResetSerializer, SetPasswordSerializer, UserModelDynamicSerializer
+from .serializers import PasswordResetSerializer, SetPasswordSerializer, UserModelDynamicSerializer
 from django.http import JsonResponse
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -16,7 +16,8 @@ from .tasks import send_reset_email
 from rest_framework.views import APIView
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from drf_yasg.utils import swagger_auto_schema
-from .swagger_usecases import email_schema, password_reset_error_schema, password_reset_response_schema, set_password_request_schema, set_password_response_schema, user_id_schema
+from .swagger_usecases import (email_schema, password_reset_error_schema, password_reset_response_schema, 
+                            set_password_request_schema, set_password_response_schema, user_profile_update_schema)
 import json
 
 logger = logging.getLogger(__name__)
@@ -83,15 +84,18 @@ def profile_detail(request, pk):
     method="put",
     operation_summary="Update User Profile",
     operation_description="Update user profile information.",
-    request_body=UserProfileUpdateSerializer,
-    responses={200: "Profile updated successfully.", 400: "Invalid data provided."}
+    request_body=user_profile_update_schema,
+    responses={
+        200: "Profile updated successfully.",
+        400: "Invalid data provided."
+    }
 )
 @api_view(['PUT'])
 @authentication_classes([])
 @permission_classes([])
 def update_profile(request, pk):
     user = User.objects.get(pk=pk)
-    serializer = UserProfileUpdateSerializer(user, data=request.data, partial=True)
+    serializer = UserModelDynamicSerializer(user, fields=['name', 'avatar', 'avatar_url'], data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return JsonResponse(serializer.data)

@@ -46,3 +46,12 @@ set_password_response_schema = openapi.Response(
         }
     },
 )
+
+user_profile_update_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "name": openapi.Schema(type=openapi.TYPE_STRING, description="User's name"),
+        "avatar": openapi.Schema(type=openapi.TYPE_STRING, format=openapi.FORMAT_BINARY, description="Profile avatar (image file)"),
+    },
+    required=["name"],
+)

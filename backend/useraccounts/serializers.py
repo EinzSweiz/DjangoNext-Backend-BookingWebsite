@@ -5,6 +5,7 @@ from .tasks import send_confirmation_message
 
 
 class UserModelDynamicSerializer(serializers.ModelSerializer):
+    avatar = serializers.ImageField(required=False)  # Include avatar handling
     avatar_url = serializers.SerializerMethodField()
 
     def __init__(self, *args, **kwargs):
@@ -48,56 +49,6 @@ class SetPasswordSerializer(serializers.Serializer):
         return attrs
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['name', 'email', 'password']
-        extra_kwargs = {'password': {'write_only': True}}
-
-#Should be changed into Dynamic serializer(learned during prepaaration for interview 
-# added snippet how to reach this endpoints should be updated too for properly working)
-# class DynamicFieldModelSerializer(serializers.ModelSerializer):
-#     def __init__(self, *args, **kwargs):
-#         fields = kwargs.pop('fields', None)
-#         super.__init__(*args, **kwargs)
-
-#         if fields is not None:
-#             allowed = set(fields)
-#             existing = set(self.fields)
-#             for field_name in existing - allowed:
-#                 self.fields.pop(field_name)
-
-# class BookSerializer(DynamicFieldModelSerializer):
-#     class Meta:
-#         model = Book
-#         fields = ['id', 'name', 'author']
-
-
-class UserDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'name', 'avatar_url']
-
-
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'email', 'name', 'avatar_url']
-
-
-class UserProfileUpdateSerializer(serializers.ModelSerializer):
-    avatar = serializers.ImageField(required=False)
-
-    avatar_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = User
-        fields = ['name', 'avatar', 'avatar_url']
-
-    def get_avatar_url(self, obj):
-        return obj.avatar_url() if hasattr(obj, 'avatar_url') and obj.avatar_url() else ''
-
 
 class CustomRegisterSerializer(RegisterSerializer):
     name = serializers.CharField(max_length=255)

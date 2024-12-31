@@ -1,11 +1,11 @@
 from rest_framework import serializers
 from .models import Review, ReviewReport
-from useraccounts.serializers import UserDetailSerializer
+from useraccounts.serializers import UserModelDynamicSerializer
 from property.serializers import PropertyDetailSerializer
 
 
 class ReviewViewSerializer(serializers.ModelSerializer):
-    user = UserDetailSerializer(read_only=True)
+    user = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
 
     class Meta:
         model=Review
@@ -16,7 +16,7 @@ class ReviewDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'text', 'created_at']
 
 class ReviewCreateSerializer(serializers.ModelSerializer):
-    user = UserDetailSerializer(read_only=True)
+    user = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
     property = PropertyDetailSerializer(read_only=True)
 
     class Meta:
@@ -26,7 +26,7 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
 
 class ReviewReportCreateSerializer(serializers.ModelSerializer):
     review = ReviewDetailSerializer(read_only=True)
-    reported_by = UserDetailSerializer(read_only=True)
+    reported_by = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
 
     class Meta:
         model = ReviewReport
