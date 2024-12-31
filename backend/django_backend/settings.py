@@ -108,7 +108,7 @@ LOGIN_REDIRECT_URL = '/callback/'
 # ==========================
 # CORS and CSRF
 # ==========================
-
+CORS_ALLOW_ALL_ORIGINS = True  # Or specify your allowed domains
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8010', 'http://165.22.76.137:1337',
     'https://diplomaroad.pro', 'https://www.diplomaroad.pro',
