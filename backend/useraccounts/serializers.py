@@ -27,7 +27,6 @@ class SetPasswordSerializer(serializers.Serializer):
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
