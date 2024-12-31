@@ -301,7 +301,7 @@ CHANNEL_LAYERS = {
 #        DOMAINS
 # =======================
 
-WEBSITE_URL_PROFILE = 'http://www.diplomaroad.pro:1773'
+WEBSITE_URL_PROFILE = 'https://api.diplomaroad.pro'
 WEBSITE_URL = 'https://api.diplomaroad.pro'
 FRONTEND_URL = 'https://www.diplomaroad.pro'
 DEFAULT_DOMAIN = 'https://www.diplomaroad.pro'
