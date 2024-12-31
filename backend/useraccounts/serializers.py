@@ -79,5 +79,3 @@ class CustomRegisterSerializer(RegisterSerializer):
             return user
         else:
             raise serializers.ValidationError("A user with this email already exists.")
-
-            

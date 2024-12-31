@@ -18,91 +18,84 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_usecases import (email_schema, password_reset_error_schema, password_reset_response_schema, 
                             set_password_request_schema, set_password_response_schema, user_profile_update_schema)
-import json
 
 logger = logging.getLogger(__name__)
-@swagger_auto_schema(
-    method="get",
-    operation_summary="Get Landlord Details",
-    operation_description="Fetch detailed information about a landlord by ID.",
-    responses={200: "Landlord detail retrieved successfully.", 404: "Landlord not found."}
-)
-@api_view(['GET'])
-@authentication_classes([])
-@permission_classes([])
-def landlord_detail(request, pk):
-    user = User.objects.get(pk=pk)
-    serializer = UserModelDynamicSerializer(user, fields=['id', 'name', 'avatar_url'], many=False)
-    print('Serializer', serializer)
-    return JsonResponse(serializer.data, safe=False)
 
 
-@swagger_auto_schema(
-    method="get",
-    operation_summary="Get User Reservations",
-    operation_description="Fetch the list of reservations for the authenticated user.",
-    responses={200: "Reservations retrieved successfully."}
-)
-@api_view(['GET'])
-def reservations_list(request):
-    qs = request.user.reservations.all()
-    serializer = ResirvationListSerializer(qs, many=True)
-    return JsonResponse(serializer.data, safe=False)
+class LandlordDetailView(APIView):
+    permission_classes = []
+    authentication_classes = []
 
-@swagger_auto_schema(
-    method="get",
-    operation_summary="Get User Profile",
-    operation_description="Fetch user profile details by user ID.",
-    responses={200: "User profile retrieved successfully.", 404: "User not found."}
-)
-@api_view(['GET'])
-@authentication_classes([])
-@permission_classes([])
-def profile_detail(request, pk):
-    logger.debug("profile_detail function called")
-    try:
-        logger.debug(f"Looking for user with pk={pk}")
-        user = User.objects.get(pk=pk)
-        # Clean problematic fields
-        logger.debug(user.email)
+    @swagger_auto_schema(
+        operation_summary="Get Landlord Details",
+        operation_description="Fetch detailed information about a landlord by ID.",
+        responses={200: "Landlord detail retrieved successfully.", 404: "Landlord not found."}
+    )
+    def get(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = UserModelDynamicSerializer(user, fields=['id', 'name', 'avatar_url'], many=False)
+            return JsonResponse(serializer.data, safe=False)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Landlord not found"}, status=404)
 
-        # Now serialize the data
-        serializer = UserModelDynamicSerializer(user, fields=['id', 'email', 'name', 'avatar_url'])
-        logger.debug(f"Serialized data: {serializer.data}")
-        return JsonResponse(serializer.data)
 
-    except User.DoesNotExist:
-        logger.error(f"User with pk={pk} does not exist")
-        return JsonResponse({"error": "User not found"}, status=404)
-    except Exception as e:
-        logger.exception(f"Unexpected error: {e}")
-        return JsonResponse({"error": "Internal server error"}, status=500)
+
+class ReservationsListView(APIView):
+
+    @swagger_auto_schema(
+        operation_summary="Get User Reservations",
+        operation_description="Fetch the list of reservations for the authenticated user.",
+        responses={200: "Reservations retrieved successfully."}
+    )
+    def get(self, request):
+        qs = request.user.reservations.all()
+        serializer = ResirvationListSerializer(qs, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    
+
+class ProfileDetailView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(
+        operation_summary="Get User Profile",
+        operation_description="Fetch user profile details by user ID.",
+        responses={200: "User profile retrieved successfully.", 404: "User not found."}
+    )
+    def get(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = UserModelDynamicSerializer(user, fields=['id', 'email', 'name', 'avatar_url'])
+            return JsonResponse(serializer.data)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
 
         
 
-@swagger_auto_schema(
-    method="put",
-    operation_summary="Update User Profile",
-    operation_description="Update user profile information.",
-    request_body=user_profile_update_schema,
-    responses={
-        200: "Profile updated successfully.",
-        400: "Invalid data provided."
-    }
-)
-@api_view(['PUT'])
-@authentication_classes([])
-@permission_classes([])
-def update_profile(request, pk):
-    user = User.objects.get(pk=pk)
-    serializer = UserModelDynamicSerializer(user, fields=['name', 'avatar', 'avatar_url'], data=request.data, partial=True)
-    if serializer.is_valid():
-        serializer.save()
-        return JsonResponse(serializer.data)
-    else:
-    # Log the serializer errors to check the exact issue
-        logger.error(serializer.errors)
-        return JsonResponse(serializer.errors, status=400)
+class UpdateProfileView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    @swagger_auto_schema(
+        operation_summary="Update User Profile",
+        operation_description="Update user profile information.",
+        request_body=user_profile_update_schema,
+        responses={200: "Profile updated successfully.", 400: "Invalid data provided."}
+    )
+    def put(self, request, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            serializer = UserModelDynamicSerializer(
+                user, fields=['name', 'avatar', 'avatar_url'], data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data)
+            return JsonResponse(serializer.errors, status=400)
+        except User.DoesNotExist:
+            return JsonResponse({"error": "User not found"}, status=404)
+
 
 
 @login_required
