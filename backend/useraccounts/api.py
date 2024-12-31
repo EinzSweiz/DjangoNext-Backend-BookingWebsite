@@ -32,6 +32,7 @@ logger = logging.getLogger(__name__)
 def landlord_detail(request, pk):
     user = User.objects.get(pk=pk)
     serializer = UserDetailSerializer(user, many=False)
+    print('Serializer', serializer)
     return JsonResponse(serializer.data, safe=False)
 
 
