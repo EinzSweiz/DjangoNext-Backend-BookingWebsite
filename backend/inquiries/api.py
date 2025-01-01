@@ -2,15 +2,15 @@ from rest_framework.views import APIView
 from django.http import JsonResponse
 from rest_framework.permissions import IsAdminUser
 from django.shortcuts import get_object_or_404
-from .models import Inquiry, Message
-from useraccounts.models import User
+from .models import Inquiry
+from useraccounts.models import User    
 from .serializers import (
     CreateInquirySerializer,
     GetInquirySerializer,
     MessageSerializer,
     UpdateStatusSerializer,
-    UserModelDynamicSerializer,
 )
+from useraccounts.serializers import UserModelDynamicSerializer
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_usecases import (
     create_inquiry_request_schema,
