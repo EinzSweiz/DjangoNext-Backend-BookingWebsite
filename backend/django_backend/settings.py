@@ -240,9 +240,6 @@ CELERY_TASK_TIME_LIMIT = 360  # Hard limit of 6 minutes
 # Prefetch multiplier to control the number of tasks a worker prefetches
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Prevent worker from prefetching too many tasks
 
-# Max retries for tasks
-CELERY_TASK_MAX_RETRIES = 3
-
 # Task ignore result to avoid storing unnecessary results
 CELERY_TASK_IGNORE_RESULT = True  # Set to True if results are not needed
 # ==========================
