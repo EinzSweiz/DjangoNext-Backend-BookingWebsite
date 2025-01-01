@@ -2,28 +2,31 @@ from rest_framework import serializers
 from .models import Property, Reservation, PropertyImage
 from useraccounts.serializers import UserModelDynamicSerializer
 
-class PropertyListSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Property
-        fields = (
-            'id',
-            'title',
-            'price_per_night',
-            'image_url',
-            'country',
-        )
-
 class PropertyImagesSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
         fields = ['image', 'alt_text', 'image_url']
 
-class PropertyDetailSerializer(serializers.ModelSerializer):
+class PropertyModelDynamicSerializer(serializers.ModelSerializer):
     extra_images = PropertyImagesSerializer(many=True, read_only=True)
     landlord = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], many=False, read_only=True)
+    image_url = serializers.SerializerMethodField()
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+        super().__init__(*args, **kwargs)
+
+        if fields:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+    
     class Meta:
         model = Property
-        fields = (
+        fields = '__all__'
+    
+class ReservationListSerializer(serializers.ModelSerializer):
+    property = PropertyModelDynamicSerializer(read_only=True, fields=[
             'id',
             'title',
             'description',
@@ -33,11 +36,7 @@ class PropertyDetailSerializer(serializers.ModelSerializer):
             'bathrooms',
             'guests',
             'landlord',
-            'extra_images',
-        )
-
-class ResirvationListSerializer(serializers.ModelSerializer):
-    property = PropertyDetailSerializer(read_only=True, many=False)
+            'extra_images',], many=False)
     class Meta:
         model = Reservation
         fields = (

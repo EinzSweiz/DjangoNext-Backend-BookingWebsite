@@ -59,3 +59,19 @@ favorite_toggle_response_schema = openapi.Schema(
         "is_favorited": openapi.Schema(type=openapi.TYPE_BOOLEAN, description="Favorite status of the property"),
     },
 )
+
+create_property_request_schema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    properties={
+        "title": openapi.Schema(type=openapi.TYPE_STRING, description="Property title"),
+        "description": openapi.Schema(type=openapi.TYPE_STRING, description="Property description"),
+        "price_per_night": openapi.Schema(type=openapi.TYPE_INTEGER, description="Price per night"),
+        "bedrooms": openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of bedrooms"),
+        "bathrooms": openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of bathrooms"),
+        "guests": openapi.Schema(type=openapi.TYPE_INTEGER, description="Number of guests"),
+        "country": openapi.Schema(type=openapi.TYPE_STRING, description="Country"),
+        "category": openapi.Schema(type=openapi.TYPE_STRING, description="Category"),
+        "image": openapi.Schema(type=openapi.TYPE_STRING, format="binary", description="Main property image"),
+    },
+    required=["title", "description", "price_per_night", "bedrooms", "bathrooms", "guests", "country"],
+)

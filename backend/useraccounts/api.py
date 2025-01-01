@@ -2,7 +2,7 @@ from .serializers import PasswordResetSerializer, SetPasswordSerializer, UserMod
 from django.http import JsonResponse
 from .models import User
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
-from property.serializers import ResirvationListSerializer
+from property.serializers import ReservationListSerializer
 import logging
 from django.shortcuts import redirect
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -50,7 +50,7 @@ class ReservationsListView(APIView):
     )
     def get(self, request):
         qs = request.user.reservations.all()
-        serializer = ResirvationListSerializer(qs, many=True)
+        serializer = ReservationListSerializer(qs, many=True)
         return JsonResponse(serializer.data, safe=False)
     
 

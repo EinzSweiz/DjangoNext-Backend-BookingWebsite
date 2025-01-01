@@ -1,11 +1,21 @@
 from rest_framework import serializers
 from .models import Review, ReviewReport
 from useraccounts.serializers import UserModelDynamicSerializer
-from property.serializers import PropertyDetailSerializer
+from property.serializers import PropertyModelDynamicSerializer
 
 class ReviewModelDynamicSerializer(serializers.ModelSerializer):
     user = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
-    property = PropertyDetailSerializer(read_only=True)
+    property = PropertyModelDynamicSerializer(fields=[
+            'id',
+            'title',
+            'description',
+            'price_per_night',
+            'image_url',
+            'bedrooms',
+            'bathrooms',
+            'guests',
+            'landlord',
+            'extra_images',], read_only=True)
 
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
