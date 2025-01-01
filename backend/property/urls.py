@@ -2,10 +2,10 @@ from django.urls import path
 from . import api
 
 urlpatterns = [
-    path('properties/', api.properties_list, name='api_properties_list'),
-    path('properties/create/', api.create_property, name='api_create'),
-    path('properties/<uuid:pk>/', api.properties_detail, name='api_properties_detail'),
-    path('properties/<uuid:pk>/book/', api.book_property, name='api_properties_book'),
-    path('properties/<uuid:pk>/toggle_favorite/', api.toggle_favorite, name='api_toggle_favorite'),
-    path('properties/<uuid:pk>/reservations/', api.properties_reservations, name='api_properties_reservations')
+    path('properties/', api.PropertiesListAPIView.as_view(), name='api_properties_list'),
+    path('properties/create/', api.CreatePropertyAPIView.as_view(), name='api_create'),
+    path('properties/<uuid:pk>/', api.PropertyDetailAPIView.as_view(), name='api_properties_detail'),
+    path('properties/<uuid:pk>/book/', api.BookPropertyAPIView.as_view(), name='api_properties_book'),
+    path('properties/<uuid:pk>/toggle_favorite/', api.ToggleFavoriteAPIView.as_view(), name='api_toggle_favorite'),
+    path('properties/<uuid:pk>/reservations/', api.PropertiesReservationsAPIView.as_view(), name='api_properties_reservations')
 ]
