@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .models import Property, Reservation, PropertyImage
-from .serializers import PropertyListSerializer, PropertyDetailSerializer, ResirvationListSerializer, BookingSerializer
+from .serializers import PropertyListSerializer, PropertyDetailSerializer, ResirvationListSerializer
 from .forms import PropertyForm
 from django.shortcuts import get_object_or_404
 from useraccounts.models import User
