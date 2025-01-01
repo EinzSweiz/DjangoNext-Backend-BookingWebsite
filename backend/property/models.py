@@ -21,6 +21,7 @@ class Property(models.Model):
     landlord = models.ForeignKey(User, related_name='properties', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    @property
     def image_url(self):
         return f'{settings.WEBSITE_URL}{self.image.url}'
 
@@ -31,7 +32,7 @@ class PropertyImage(models.Model):
     alt_text = models.CharField(max_length=255, blank=True, null=True)
 
     def image_url(self):
-        return f"{settings.WEBSITE_URL}{self.image.url}"
+        return f"{settings.WEBSITE_URL}{self.image.url}" if self.image else None
     
 
 class Reservation(models.Model):
