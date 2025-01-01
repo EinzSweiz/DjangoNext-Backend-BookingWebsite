@@ -17,7 +17,7 @@ from rest_framework.views import APIView
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 from drf_yasg.utils import swagger_auto_schema
 from .swagger_usecases import (email_schema, password_reset_error_schema, password_reset_response_schema, 
-                            set_password_request_schema, set_password_response_schema, user_profile_update_schema)
+                            set_password_request_schema, set_password_response_schema, user_profile_update_schema, reservations_response_schema)
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ class ReservationsListView(APIView):
     @swagger_auto_schema(
         operation_summary="Get User Reservations",
         operation_description="Fetch the list of reservations for the authenticated user.",
-        responses={200: "Reservations retrieved successfully."}
+        responses={200: reservations_response_schema}
     )
     def get(self, request):
         qs = request.user.reservations.all()

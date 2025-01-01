@@ -12,7 +12,7 @@ from .swagger_usecases import (
     report_create_response_schema,
     report_create_schema,
     review_create_response_schema,
-    review_create_schema
+    review_create_schema,
 )
 
 

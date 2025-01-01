@@ -1,5 +1,10 @@
 from drf_yasg import openapi
+from property.serializers import ResirvationListSerializer
 
+reservations_response_schema = openapi.Response(
+    description="Reservations retrieved successfully.",
+    schema=ResirvationListSerializer(many=True)  # Define the schema for a list of reservations
+)
 # Reusable schema for responses and requests
 user_id_schema = openapi.Schema(
     type=openapi.TYPE_STRING,
