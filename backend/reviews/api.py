@@ -24,7 +24,6 @@ class GetReviewsAPIView(APIView):
     authentication_classes = []
 
     @swagger_auto_schema(
-        method='get',
         operation_summary="Retrieve Paginated Reviews",
         operation_description="Fetch paginated reviews for a specific property, excluding dismissed reports.",
         responses={200: paginated_reviews_schema, 500: "Internal Server Error"}
@@ -63,7 +62,6 @@ class CreateReviewAPIView(APIView):
     Create a review for a specific property.
     """
     @swagger_auto_schema(
-        method='post',
         operation_summary="Create a Review",
         operation_description="Submit a review for a specific property.",
         request_body=review_create_schema,
@@ -95,7 +93,6 @@ class CreateReviewReportAPIView(APIView):
     Submit a report for a specific review.
     """
     @swagger_auto_schema(
-        method='post',
         operation_summary="Create a Review Report",
         operation_description="Submit a report for a specific review.",
         request_body=report_create_schema,
