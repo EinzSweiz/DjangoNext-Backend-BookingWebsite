@@ -24,9 +24,7 @@ class PropertyModelDynamicSerializer(serializers.ModelSerializer):
         """
         Serializer method to get the image URL.
         """
-        if obj.image:
-            return obj.image.url
-        return None
+        return obj.image_url if obj.image else None
 
     class Meta:
         model = Property
