@@ -20,11 +20,9 @@ class PropertyModelDynamicSerializer(serializers.ModelSerializer):
             existing = set(self.fields)
             for field_name in existing - allowed:
                 self.fields.pop(field_name)
+
     def get_image_url(self, obj):
-        """
-        Serializer method to get the image URL.
-        """
-        return obj.image_url
+        return obj.image_url()
 
     class Meta:
         model = Property
