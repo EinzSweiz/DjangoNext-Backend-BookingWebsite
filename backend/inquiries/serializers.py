@@ -30,12 +30,6 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['sender', 'message', 'timestamp']
-
-class CustomerServiceAgentSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'name', 'email']
-
         
 class GetInquirySerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.name', read_only=True)  # If you want to include the user's name

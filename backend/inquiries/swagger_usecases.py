@@ -99,3 +99,48 @@ update_status_response_schema = openapi.Response(
         }
     },
 )
+
+# Get Inquiry Details Response Schema
+get_inquiry_response_schema = openapi.Response(
+    description="Retrieve detailed information about a specific inquiry.",
+    examples={
+        "application/json": {
+            "id": 1,
+            "subject": "Booking issue",
+            "message": "I have a problem with my booking.",
+            "response": "Your booking issue has been resolved.",
+            "status": "resolved",
+            "created_at": "2024-01-01T12:00:00Z",
+            "updated_at": "2024-01-02T15:00:00Z",
+            "user_name": "John Doe",
+            "user_email": "john.doe@example.com",
+            "messages": [
+                {
+                    "sender": "user",
+                    "message": "I have a problem with my booking.",
+                    "timestamp": "2024-01-01T12:05:00Z",
+                },
+                {
+                    "sender": "customer_service",
+                    "message": "We are looking into your issue.",
+                    "timestamp": "2024-01-01T12:15:00Z",
+                },
+            ],
+            "severity": "urgent",
+            "customer_service": 3,
+            "customer_service_name": "Agent Smith",
+            "user_role": "user",
+        }
+    },
+)
+
+# Get Customer Service Agents Response Schema
+get_customer_service_agents_response_schema = openapi.Response(
+    description="Retrieve a list of all customer service agents.",
+    examples={
+        "application/json": [
+            {"id": 1, "name": "Agent Smith", "email": "agent.smith@example.com"},
+            {"id": 2, "name": "Agent Johnson", "email": "agent.johnson@example.com"},
+        ]
+    },
+)

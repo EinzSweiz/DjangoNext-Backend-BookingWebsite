@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from drf_yasg.utils import swagger_auto_schema
-from drf_yasg import openapi
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .swagger_usecases import (
     chatbot_request_schema,
