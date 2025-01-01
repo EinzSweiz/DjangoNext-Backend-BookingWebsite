@@ -2,7 +2,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .serializers import ReviewViewSerializer, ReviewCreateSerializer, ReviewReportCreateSerializer
+from .serializers import ReviewReportCreateSerializer, ReviewModelDynamicSerializer
 from .models import Review, Property, ReviewReport
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from django.core.paginator import Paginator
@@ -38,7 +38,7 @@ def get_reviews_api(request, pk):
         page = paginator.get_page(page_number)
 
         # Serialize the paginated data
-        serializer = ReviewViewSerializer(page.object_list, many=True)
+        serializer = ReviewModelDynamicSerializer(page.object_list, fields=['id', 'user', 'text', 'created_at'], many=True)
 
         # Return paginated response
         return Response({
@@ -70,7 +70,7 @@ def create_reviews_api(request, pk):
         # Debug: Log incoming data
         print(f"Received data: {data}")
 
-        serializer = ReviewCreateSerializer(data=data, context={'request': request})
+        serializer = ReviewModelDynamicSerializer(data=data, fields=['id', 'property', 'text', 'user'], context={'request': request})
         
         # Debug: Log serializer validation
         if not serializer.is_valid():

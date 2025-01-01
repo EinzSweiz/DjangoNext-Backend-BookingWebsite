@@ -3,29 +3,26 @@ from .models import Review, ReviewReport
 from useraccounts.serializers import UserModelDynamicSerializer
 from property.serializers import PropertyDetailSerializer
 
-
-class ReviewViewSerializer(serializers.ModelSerializer):
-    user = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
-
-    class Meta:
-        model=Review
-        fields = ['id', 'user', 'text', 'created_at']
-class ReviewDetailSerializer(serializers.ModelSerializer):
-    class Meta:
-        model=Review
-        fields = ['id', 'text', 'created_at']
-
-class ReviewCreateSerializer(serializers.ModelSerializer):
+class ReviewModelDynamicSerializer(serializers.ModelSerializer):
     user = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
     property = PropertyDetailSerializer(read_only=True)
 
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+        super().__init__(*args, **kwargs)
+
+        if fields:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+    
     class Meta:
         model = Review
-        fields = ['id', 'property', 'text', 'user']  # Include 'user' explicitly
-
+        fields = '__all__'
 
 class ReviewReportCreateSerializer(serializers.ModelSerializer):
-    review = ReviewDetailSerializer(read_only=True)
+    review = ReviewModelDynamicSerializer(fields=['id', 'text', 'created_at'], read_only=True)
     reported_by = UserModelDynamicSerializer(fields=['id', 'name', 'avatar_url'], read_only=True)
 
     class Meta:
