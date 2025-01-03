@@ -151,17 +151,41 @@ ROOT_URLCONF = 'django_backend.urls'
 # ==========================
 # DATABASE
 # ==========================
-DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10 MB
-DATABASES = {
-    'default': {
-        'ENGINE': config("SQL_ENGINE"),
-        'NAME': config('SQL_DATABASE'),
-        'USER': config('SQL_USER'),
-        'PASSWORD': config('SQL_PASSWORD'),
-        'HOST': config('SQL_HOST'),
-        'PORT': config('SQL_PORT'),
+import sys
+import os
+sys.path.append(config("PYTHONPATH"))
+# Default database settings
+DATABASES = {}
+
+# Use SQLite for tests
+if 'pytest' in sys.argv[0]:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
     }
-}
+# Use SQLite for local development (DEBUG = True)
+elif config('DEBUG', default=False, cast=bool):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+# Use PostgreSQL for production (DEBUG = False)
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': config('SQL_ENGINE', default='django.db.backends.postgresql'),
+            'NAME': config('SQL_DATABASE', default=''),
+            'USER': config('SQL_USER', default=''),
+            'PASSWORD': config('SQL_PASSWORD', default=''),
+            'HOST': config('SQL_HOST', default=''),
+            'PORT': config('SQL_PORT', default=''),
+        }
+    }
+
 
 # ==========================
 # INSTALLED APPS

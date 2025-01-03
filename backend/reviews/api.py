@@ -68,6 +68,7 @@ class CreateReviewAPIView(APIView):
         responses={201: review_create_response_schema, 400: "Validation Error", 500: "Internal Server Error"}
     )
     def post(self, request, pk):
+        print(f"CreateReviewAPIView hit with pk: {pk}")
         try:
             property_instance = get_object_or_404(Property, pk=pk)
             data = request.data.copy()

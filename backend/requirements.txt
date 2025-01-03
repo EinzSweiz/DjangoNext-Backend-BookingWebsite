@@ -24,3 +24,5 @@ watchtower
 channels-redis
 drf-yasg
 sentry-sdk[django]
+pytest
+pytest-mock

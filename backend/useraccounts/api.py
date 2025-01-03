@@ -196,8 +196,8 @@ class CustomPasswordResetConfirmView(APIView):
     """
     Custom password reset confirm view to handle password reset functionality.
     """
-    authentication_classes = []  # No authentication required
-    permission_classes = [AllowAny]  # Allows any user to access this endpoint
+    authentication_classes = []
+    permission_classes = []
 
     @swagger_auto_schema(
         operation_summary="Confirm Password Reset",
