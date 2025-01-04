@@ -21,10 +21,6 @@ def apply_migrations(django_db_setup, django_db_blocker):
     with django_db_blocker.unblock():
         call_command("migrate", verbosity=0, interactive=False)
 
-@pytest.fixture
-def api_client():
-    return APIClient()
-
 @pytest.fixture(scope="function")
 def create_landlord(db):
     """Fixture to create a landlord."""
@@ -36,7 +32,6 @@ def create_landlord(db):
         role=User.RoleChoises.ADMIN.value,
     )
 
-@pytest.fixture(scope="function")
 @pytest.fixture(scope="function")
 def create_reservation(db, create_landlord):
     """Fixture to create a reservation."""
@@ -70,7 +65,7 @@ def create_reservation(db, create_landlord):
             number_of_nights=4,
             guests=2,
             total_price=400.0,
-            stripe_checkout_id=None,
+            stripe_checkout_id="mock_session_id",  # Set this explicitly
             has_paid=False,
             created_by=create_landlord,
         )

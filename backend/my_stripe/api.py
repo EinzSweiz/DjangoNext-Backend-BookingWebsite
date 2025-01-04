@@ -5,6 +5,7 @@ import stripe.webhook
 from .serializers import BookingSerializer
 from django.http import JsonResponse
 from .models import UserPayment
+from django.shortcuts import get_object_or_404  
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -112,7 +113,11 @@ class PaymentCancelAPIView(APIView):
         responses={200: payment_cancel_response}
     )
     def get(self, request, pk):
-        return JsonResponse({'success': False, 'message': 'Payment was canceled'})
+        # Проверяем, существует ли резервация
+        reservation = get_object_or_404(Reservation, pk=pk)
+
+        # Если резервация существует, возвращаем сообщение об отмене
+        return JsonResponse({'success': False, 'message': f'Payment for reservation {reservation.id} was canceled.'})
 
 
 @swagger_auto_schema(

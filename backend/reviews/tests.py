@@ -3,34 +3,41 @@ from rest_framework import status
 from property.models import Property
 
 @pytest.mark.django_db
-def test_create_review(api_client, create_user, create_property):
-    user = create_user
-    property_instance = create_property
+def test_create_review(create_review):
+    review = create_review
 
+    assert review.text == "This is a test review."
+
+    assert review.property is not None
+
+    assert review.user is not None
+
+
+
+@pytest.mark.django_db
+def test_get_reviews(api_client, create_review):
+
+    review = create_review
+
+    url = f'/api/reviews/all/{str(review.property.id)}'
+
+    response = api_client.get(url)
     # Debugging
-    print(f"Testing with Property ID: {property_instance.id}")
-    print(f"Property exists in DB: {Property.objects.filter(id=property_instance.id).exists()}")
-
-    # Test URL
-    url = f'/api/reviews/create/{str(property_instance.id)}'
-    print(f"Test URL: {url}")
-
-    # Authenticate the user
-    api_client.force_authenticate(user=user)
-
-    # Request payload
-    review_data = {
-        "text": "This is a test review.",
-    }
-
-    # Send POST request
-    response = api_client.post(url, data=review_data)
-
-    # Debugging
-    print(f"Request Data: {review_data}")
     print(f"Response Status Code: {response.status_code}")
-    print(f"Response Content: {response.content.decode()}")
+    print(f"Response Content: {response.json()}")
 
-    # Assertions
-    assert response.status_code == status.HTTP_201_CREATED
-    assert response.json().get('success') == 'Review was created successfully'
+    assert response.status_code == status.HTTP_200_OK
+
+    assert response.json()['total_reviews'] > 0
+    assert len(response.json()['reviews']) > 0
+    assert response.json()['reviews'][0]['text'] == "This is a test review."
+
+
+@pytest.mark.django_db
+def test_create_review_report(api_client, create_report_review):
+    """
+    Test the creation of a review report using the helper fixture.
+    """
+    report_response = create_report_review
+
+    assert report_response.get('success') == 'Report was created successfully'
